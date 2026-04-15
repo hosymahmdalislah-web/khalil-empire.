@@ -3,102 +3,157 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تعديل البروفايل - ملك الشات</title>
+    <title>إدارة ملك الشات - التحكم الكامل</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #1a1a1a;
-            color: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
+        :root { --admin-bg: #1a1a1a; --gold: #f1c40f; --blue-mic: rgba(0, 123, 255, 0.9); }
+        * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; }
+
+        /* الخلفية العامة */
+        .app-wrapper {
+            height: 100vh; display: flex; flex-direction: column;
+            background: linear-gradient(rgba(255,255,255,0.6), rgba(255,255,255,0.6)), 
+                        url('https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Old_City_of_Sana%27a.jpg/800px-Old_City_of_Sana%27a.jpg');
+            background-size: cover; background-position: center;
         }
-        .profile-card {
-            background: #2d2d2d;
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.5);
-            width: 350px;
-            text-align: center;
+
+        /* شريط الإدارة العلوي */
+        .top-nav { background: #333; color: white; display: flex; justify-content: space-around; padding: 12px 0; font-size: 11px; }
+        .nav-item { text-align: center; flex: 1; cursor: pointer; }
+        .nav-item i { display: block; font-size: 18px; margin-bottom: 3px; }
+        .nav-item:hover { color: var(--gold); }
+
+        /* شريط الميكروفونات */
+        .mic-section { background: var(--blue-mic); padding: 15px 5px; display: flex; justify-content: space-around; align-items: center; border-bottom: 2px solid #fff; }
+        .mic-slot { 
+            width: 50px; height: 50px; border-radius: 50%; border: 2px solid #fff; 
+            background: #004085; display: flex; align-items: center; justify-content: center; 
+            color: white; position: relative; cursor: pointer; overflow: hidden;
         }
-        .rank-icon {
-            font-size: 50px;
-            margin-bottom: 10px;
+        .mic-slot.active { background: #ff4757; animation: pulse 1s infinite; box-shadow: 0 0 10px #ff4757; }
+        .mic-slot span { position: absolute; bottom: -18px; font-size: 9px; font-weight: bold; color: white; }
+        .user-photo { width: 100%; height: 100%; object-fit: cover; }
+
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+
+        /* منطقة الدردشة والرسائل */
+        .chat-container { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 15px; }
+        .msg-line { display: flex; align-items: center; gap: 8px; }
+        .avatar-main { width: 40px; height: 40px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        
+        /* الرتبة المنعزلة (الكأس) */
+        .rank-cup { color: var(--gold); font-size: 20px; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
+
+        /* خلفية الاسم المنعزلة */
+        .name-background { 
+            background: var(--admin-bg); color: #fff; padding: 5px 12px; 
+            border-radius: 8px; font-weight: bold; font-size: 14px;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
         }
-        input {
-            width: 90%;
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 5px;
-            border: none;
-            background: #444;
-            color: white;
-        }
-        .btn-save {
-            background-color: #f39c12;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-            width: 100%;
-        }
-        .btn-save:hover {
-            background-color: #e67e22;
-        }
-        .preview-bg {
-            width: 100%;
-            height: 100px;
-            background-size: cover;
-            background-position: center;
-            border-radius: 10px;
-            margin-bottom: 15px;
-            background-image: url('https://via.placeholder.com/350x100');
-        }
+        .msg-text { color: #003366; font-weight: bold; font-size: 15px; }
+
+        /* شريط الإدخال والتحكم */
+        .bottom-controls { background: rgba(0,0,0,0.5); padding: 10px; display: flex; align-items: center; gap: 10px; }
+        .input-pill { flex: 1; background: #fff; border-radius: 25px; padding: 5px 15px; display: flex; align-items: center; }
+        .input-pill input { border: none; background: transparent; flex: 1; padding: 8px; outline: none; text-align: right; }
+        .action-icon { color: white; font-size: 22px; cursor: pointer; }
+        .send-btn { background: #444; color: white; width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+
+        /* القائمة السفلية */
+        .footer-nav { background: #222; color: white; display: flex; justify-content: space-around; padding: 10px 0; }
+        .footer-item { text-align: center; font-size: 11px; flex: 1; cursor: pointer; }
+        .footer-item i { display: block; font-size: 18px; margin-bottom: 2px; }
     </style>
 </head>
 <body>
 
-<div class="profile-card">
-    <div class="rank-icon">🏆</div>
-    <h2>تعديل بروفايل الملك</h2>
-    
-    <div id="bgPreview" class="preview-bg"></div>
+<div class="app-wrapper">
+    <div class="top-nav">
+        <div class="nav-item" onclick="adminAction('إعدادات الموقع')"><i class="fas fa-tools"></i>إعدادات</div>
+        <div class="nav-item" onclick="adminAction('مركز البلاغات')"><i class="fas fa-shield-alt"></i>إبلاغ</div>
+        <div class="nav-item" onclick="adminAction('الإشعارات العامة')"><i class="fas fa-bullhorn"></i>إشعار</div>
+        <div class="nav-item" onclick="adminAction('البريد الخاص')"><i class="fas fa-envelope-open-text"></i>رسالة</div>
+        <div class="nav-item" style="color: var(--gold);" onclick="adminAction('لوحة الأثرياء')"><i class="fas fa-gem"></i>الأثرياء</div>
+    </div>
 
-    <input type="text" id="userName" placeholder="الاسم الجديد...">
-    <input type="text" id="bgUrl" placeholder="رابط صورة الخلفية...">
-    <input type="text" id="musicUrl" placeholder="رابط ملف الموسيقى (mp3)...">
-    
-    <button class="btn-save" onclick="saveProfile()">حفظ التعديلات ✨</button>
-    
-    <div id="status" style="margin-top: 15px; font-size: 14px; color: #f39c12;"></div>
+    <div class="mic-section">
+        <div class="mic-slot" onclick="activateMic(this)"><i class="fas fa-bars"></i></div>
+        <div class="mic-slot" onclick="activateMic(this)"><i class="fas fa-microphone"></i><span>مايك 1</span></div>
+        <div class="mic-slot" onclick="activateMic(this)"><i class="fas fa-microphone"></i><span>مايك 2</span></div>
+        <div class="mic-slot" onclick="activateMic(this)">
+            <img src="https://via.placeholder.com/100" class="user-photo">
+            <span>أنا الملك</span>
+        </div>
+        <div class="mic-slot" onclick="activateMic(this)"><i class="fas fa-microphone"></i><span>مايك 3</span></div>
+    </div>
+
+    <div class="chat-container" id="chatBox">
+        <div class="msg-line">
+            <img src="https://via.placeholder.com/100" class="avatar-main">
+            <i class="fas fa-trophy rank-cup"></i> <div class="name-background">خليل إبراهيم</div> <span class="msg-text">أهلاً بك يا ملك.. الإدارة كاملة بيدك الآن! 🏆</span>
+        </div>
+    </div>
+
+    <div class="bottom-controls">
+        <div class="send-btn" onclick="postMsg()"><i class="fas fa-paper-plane" style="transform: rotate(-45deg);"></i></div>
+        <div class="input-pill">
+            <i class="far fa-laugh" style="font-size: 20px; color: #888;"></i>
+            <input type="text" id="mainMsgInput" placeholder="اكتب رسالتك الإدارية...">
+        </div>
+        <i class="fas fa-microphone action-icon" id="bottomMic" onclick="activateMic(this)"></i>
+        <i class="fas fa-plus-circle action-icon" onclick="adminAction('إضافة مرفق')"></i>
+    </div>
+
+    <div class="footer-nav">
+        <div class="footer-item" onclick="adminAction('الخيارات المتقدمة')"><i class="fas fa-cogs"></i>خيارات</div>
+        <div class="footer-item" onclick="adminAction('قائمة الأصدقاء')"><i class="fas fa-user-friends"></i>الأصدقاء</div>
+        <div class="footer-item" onclick="adminAction('المتصلين')"><i class="fas fa-users"></i>المتصلين</div>
+        <div class="footer-item" onclick="adminAction('الغرف')"><i class="fas fa-university"></i>الغرف</div>
+        <div class="footer-item" onclick="adminAction('الراديو')"><i class="fas fa-broadcast-tower"></i>Radio</div>
+    </div>
 </div>
 
 <script>
-    function saveProfile() {
-        const name = document.getElementById('userName').value;
-        const bg = document.getElementById('bgUrl').value;
-        const music = document.getElementById('musicUrl').value;
-        
-        // تحديث المعاينة
-        if(bg) {
-            document.getElementById('bgPreview').style.backgroundImage = `url('${bg}')`;
+    // تشغيل الميكروفونات
+    function activateMic(el) {
+        el.classList.toggle('active');
+        if(el.classList.contains('active')) {
+            console.log("الميكروفون قيد التشغيل...");
         }
-        
-        // محاكاة حفظ البيانات
-        document.getElementById('status').innerText = "تم حفظ التعديلات بنجاح يا ملك! 🏆";
-        
-        console.log("بيانات البروفايل المحدثة:", {
-            الاسم: name,
-            الخلفية: bg,
-            الموسيقى: music,
-            الرتبة: "كأس 🏆"
-        });
     }
+
+    // إرسال الرسالة بالتصميم الجديد (كأس منعزل + خلفية اسم)
+    function postMsg() {
+        const input = document.getElementById('mainMsgInput');
+        const box = document.getElementById('chatBox');
+        
+        if (input.value.trim() !== "") {
+            const div = document.createElement('div');
+            div.className = 'msg-line';
+            div.innerHTML = `
+                <img src="https://via.placeholder.com/100" class="avatar-main">
+                <i class="fas fa-trophy rank-cup"></i>
+                <div class="name-background">خليل إبراهيم</div>
+                <span class="msg-text">${input.value}</span>
+            `;
+            box.appendChild(div);
+            input.value = "";
+            box.scrollTop = box.scrollHeight;
+        }
+    }
+
+    // تنبيهات الإدارة لجميع الأزرار
+    function adminAction(title) {
+        alert("لوحة الإدارة: فتح قسم [" + title + "] بنجاح.");
+    }
+
+    // دعم زر Enter
+    document.getElementById('mainMsgInput').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') postMsg();
+    });
 </script>
 
 </body>
-</html>
+            </html>
+        
