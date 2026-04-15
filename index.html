@@ -2,73 +2,71 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مملكة الكأس 👑</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>إمبراطورية الكأس 🏆</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap');
-        body { font-family: 'Tajawal', sans-serif; background: #2d0a4e; color: white; margin: 0; overflow: hidden; }
-        .gold-border { border: 2px solid #ffd700; box-shadow: 0 0 15px #ffd700; }
-        .royal-gradient { background: linear-gradient(135deg, #6b21a8, #2d0a4e); }
-        .tab-content { display: none; height: calc(100vh - 160px); overflow-y: auto; }
-        .tab-content.active { display: block; }
-        .royal-btn { background: #ffd700; color: #2d0a4e; font-weight: bold; border-radius: 50%; width: 45px; height: 45px; }
+        body { font-family: 'Tajawal', sans-serif; background: #1a0633; color: white; margin: 0; padding: 0; display: flex; flex-direction: column; height: 100vh; }
+        .royal-header { background: linear-gradient(to bottom, #4b1d82, #1a0633); border-bottom: 2px solid #ffd700; padding: 10px; }
+        .gold-text { color: #ffd700; text-shadow: 0 0 5px rgba(255, 215, 0, 0.5); }
+        .nav-btn { flex: 1; text-align: center; padding: 10px; font-size: 1.2rem; transition: 0.3s; border-bottom: 3px solid transparent; }
+        .nav-btn.active { border-bottom: 3px solid #ffd700; color: #ffd700; }
+        .chat-area { flex: 1; overflow-y: auto; padding: 15px; }
+        .message { background: rgba(255, 255, 255, 0.1); border-right: 4px solid #ffd700; padding: 10px; border-radius: 8px; margin-bottom: 10px; }
+        .footer-input { background: #2d0a4e; border-top: 2px solid #ffd700; padding: 10px; display: flex; align-items: center; gap: 10px; }
+        .input-box { flex: 1; background: #1a0633; border: 1px solid #ffd700; border-radius: 20px; padding: 8px 15px; color: white; outline: none; }
+        .action-btn { background: #ffd700; color: #1a0633; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; cursor: pointer; }
     </style>
 </head>
-<body class="flex flex-col h-screen">
+<body>
 
-    <header class="royal-gradient p-4 text-center border-b-2 border-yellow-500">
-        <h1 class="text-2xl font-bold text-yellow-400 italic">👑 مملكة الكأس 👑</h1>
-        <div class="flex justify-around mt-2 text-xs">
-            <span class="bg-yellow-600 px-2 py-1 rounded">الرتبة: الملك خليل 👑</span>
-            <span class="bg-yellow-600 px-2 py-1 rounded">الذهب: 1,000,000 💰</span>
+    <header class="royal-header text-center">
+        <h1 class="text-xl font-bold gold-text">🏆 إمبراطورية الكأس 🏆</h1>
+        <div class="flex justify-between px-4 mt-2">
+            <span class="bg-purple-900/80 px-3 py-1 rounded-full text-xs border border-yellow-500">الرتبة: كأس 🏆</span>
+            <span class="bg-purple-900/80 px-3 py-1 rounded-full text-xs border border-yellow-500">الذهب: 1,000,000 💰</span>
         </div>
     </header>
 
-    <nav class="flex justify-around bg-purple-900 p-3 border-b border-yellow-700">
-        <button onclick="showTab('chat')" class="nav-link text-yellow-400"><i class="fas fa-comments text-xl"></i></button>
-        <button onclick="showTab('private')" class="nav-link"><i class="fas fa-comment-medical text-xl"></i></button>
-        <button onclick="showTab('rich')" class="nav-link"><i class="fas fa-gem text-xl"></i></button>
-        <button onclick="showTab('settings')" class="nav-link"><i class="fas fa-crown text-xl"></i></button>
+    <nav class="flex bg-purple-950">
+        <div onclick="switchTab('chat')" id="btn-chat" class="nav-btn active"><i class="fas fa-comments"></i></div>
+        <div onclick="switchTab('private')" id="btn-private" class="nav-btn"><i class="fas fa-lock"></i></div>
+        <div onclick="switchTab('rich')" id="btn-rich" class="nav-btn"><i class="fas fa-crown"></i></div>
+        <div onclick="switchTab('mic')" id="btn-mic" class="nav-btn"><i class="fas fa-microphone"></i></div>
     </nav>
 
-    <main class="flex-1 p-4">
-        <div id="chat" class="tab-content active space-y-3">
-            <div class="bg-purple-800/50 p-3 rounded-lg border-r-4 border-yellow-500">
-                <span class="text-yellow-400 font-bold ml-2">[الملك خليل]:</span>
-                <span>مرحباً بكم في إمبراطوريتي.. الدردشة مفتوحة الآن! 👑</span>
-            </div>
-        </div>
-
-        <div id="private" class="tab-content text-center pt-20">
-            <i class="fas fa-user-shield text-6xl text-yellow-600 mb-4"></i>
-            <h2 class="text-xl font-bold text-yellow-400">الدردشة الخاصة (مشفرة)</h2>
-            <p class="text-gray-400 mt-2">غرفتك الخاصة يا ملك خليل جاهزة لاستقبال الرسائل.</p>
-        </div>
-
-        <div id="rich" class="tab-content">
-            <h2 class="text-center text-yellow-400 mb-4 font-bold border-b border-yellow-600 pb-2">💎 قائمة أثرياء المملكة 💎</h2>
-            <div class="flex justify-between items-center bg-yellow-600/20 p-3 rounded-lg border border-yellow-500">
-                <span class="font-bold text-lg">1. الملك خليل إبراهيم 👑</span>
-                <span class="text-yellow-300">مليونير المملكة</span>
+    <main class="chat-area" id="main-content">
+        <div id="chat-tab">
+            <div class="message">
+                <span class="gold-text font-bold">🏆 [كأس خليل]:</span>
+                <span>أهلاً بكم في إمبراطوريتي.. تم تفعيل جميع المميزات بنسبة 100%!</span>
             </div>
         </div>
     </main>
 
-    <footer class="p-4 bg-purple-900 border-t border-yellow-700">
-        <div class="flex gap-2">
-            <input type="text" placeholder="اكتب أمرك يا ملك..." class="flex-1 p-3 rounded-full bg-purple-800 border border-yellow-600 text-white focus:outline-none focus:border-yellow-400">
-            <button class="royal-btn"><i class="fas fa-paper-plane"></i></button>
-        </div>
+    <footer class="footer-input">
+        <div class="action-btn" onclick="alert('الميكروفون مفعل وجاهز للتسجيل!')"><i class="fas fa-microphone"></i></div>
+        <input type="text" class="input-box" placeholder="اكتب أمرك يا ملك...">
+        <div class="action-btn"><i class="fas fa-paper-plane"></i></div>
     </footer>
 
     <script>
-        function showTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
-            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('text-yellow-400'));
-            event.currentTarget.classList.add('text-yellow-400');
+        function switchTab(tab) {
+            const content = document.getElementById('main-content');
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('btn-' + tab).classList.add('active');
+
+            if(tab === 'chat') {
+                content.innerHTML = '<div class="message"><span class="gold-text font-bold">🏆 [كأس خليل]:</span><span>الدردشة العامة نشطة..</span></div>';
+            } else if(tab === 'private') {
+                content.innerHTML = '<div class="text-center mt-10"><i class="fas fa-user-secret text-5xl text-yellow-500"></i><h2 class="mt-4">غرفة الخاص المشفرة</h2><p class="text-sm text-gray-400">لا يمكن لأحد رؤية رسائلك هنا.</p></div>';
+            } else if(tab === 'rich') {
+                content.innerHTML = '<h2 class="text-center gold-text font-bold mb-4">💎 قائمة الأثرياء 💎</h2><div class="bg-yellow-500/10 p-3 rounded border border-yellow-500 flex justify-between"><span>1. خليل إبراهيم 🏆</span><span>1,000,000 💰</span></div>';
+            } else if(tab === 'mic') {
+                content.innerHTML = '<div class="text-center mt-10"><i class="fas fa-broadcast-tower text-5xl text-red-500 animate-pulse"></i><h2 class="mt-4">نظام البث المباشر</h2><p class="text-sm text-gray-400">الميكروفون متصل الآن.</p></div>';
+            }
         }
     </script>
 </body>
