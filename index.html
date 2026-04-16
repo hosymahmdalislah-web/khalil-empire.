@@ -3,277 +3,246 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>إمبراطورية الشات - النسخة الشاملة</title>
+    <title>إمبراطورية الشات - لوحة التحكم الملكية</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --gold: #f1c40f; --king-grad: linear-gradient(180deg, #ffd700, #b8860b); --dark: #000; }
         * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; -webkit-tap-highlight-color: transparent; }
-        body, html { margin: 0; padding: 0; height: 100vh; background: var(--dark); color: #fff; overflow: hidden; position: relative; }
+        body, html { margin: 0; padding: 0; height: 100vh; background: #000; color: #fff; overflow: hidden; }
 
         /* شاشة الدخول */
         #loginOverlay { position: fixed; inset: 0; background: radial-gradient(circle, #222, #000); z-index: 100000; display: flex; align-items: center; justify-content: center; padding: 15px; }
-        .login-card { background: rgba(255, 255, 255, 0.03); width: 100%; max-width: 400px; padding: 30px; border-radius: 25px; border: 2px solid var(--gold); backdrop-filter: blur(15px); text-align: center; box-shadow: 0 0 40px gold; }
+        .login-card { background: rgba(255, 255, 255, 0.05); width: 100%; max-width: 400px; padding: 30px; border-radius: 25px; border: 2px solid var(--gold); backdrop-filter: blur(15px); text-align: center; box-shadow: 0 0 50px var(--gold); }
         .tabs { display: flex; gap: 8px; margin-bottom: 20px; }
-        .tabs button { flex: 1; padding: 12px; border: none; background: #222; color: #fff; cursor: pointer; border-radius: 10px; font-weight: bold; }
-        .tabs button.active { background: var(--king-grad); color: #000; }
-        .login-form { display: none; } .login-form.active { display: block; }
-        input { width: 100%; padding: 14px; margin: 10px 0; border-radius: 12px; border: 1px solid var(--gold); background: #111; color: #fff; text-align: center; }
-        .btn-king { width: 100%; padding: 15px; background: var(--king-grad); border: none; border-radius: 12px; font-weight: bold; cursor: pointer; }
+        .tabs button { flex: 1; padding: 12px; border: none; background: #222; color: #fff; border-radius: 10px; cursor: pointer; }
+        .tabs button.active { background: var(--king-grad); color: #000; font-weight: bold; }
+        input { width: 100%; padding: 14px; margin: 8px 0; border-radius: 12px; border: 1px solid var(--gold); background: #111; color: #fff; text-align: center; }
+        .btn-king { width: 100%; padding: 15px; background: var(--king-grad); border: none; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 16px; transition: 0.3s; }
+        .btn-king:hover { filter: brightness(1.2); box-shadow: 0 0 15px var(--gold); }
 
-        /* الهيكل الأساسي */
-        #chatApp { display: none; height: 100vh; flex-direction: column; background: #000; position: relative; }
+        /* الهيكل الرئيسي */
+        #chatApp { display: none; height: 100vh; flex-direction: column; position: relative; }
         
-        /* الشريط العلوي المثبت */
+        /* الأشرطة الثابتة */
         .top-nav { position: fixed; top: 0; width: 100%; height: 75px; background: #000; display: flex; border-bottom: 2px solid var(--gold); align-items: center; z-index: 1000; }
         .nav-item { flex: 1; text-align: center; color: var(--gold); font-size: 11px; cursor: pointer; }
-        .nav-item i { display: block; font-size: 22px; margin-bottom: 2px; }
+        .nav-item i { display: block; font-size: 24px; margin-bottom: 3px; }
 
-        /* منطقة المحادثة */
-        .chat-view { flex: 1; overflow-y: auto; padding: 85px 15px 135px 15px; display: flex; flex-direction: column; gap: 15px; }
-        .msg-container { align-self: flex-start; max-width: 90%; position: relative; animation: slideIn 0.3s ease; }
-        @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
-        
-        .msg-header { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
-        .admin-icon-btn { width: 38px; height: 38px; border-radius: 50%; border: 2px solid var(--gold); cursor: pointer; background: #fff; object-fit: cover; box-shadow: 0 0 5px gold; }
-        .user-name-tag { background: #111; border: 1px solid var(--gold); padding: 2px 10px; border-radius: 15px; font-size: 11px; color: var(--gold); font-weight: bold; }
-        .msg-text-box { background: #fff; color: #000; padding: 12px 15px; border-radius: 0 18px 18px 18px; font-size: 14px; cursor: pointer; box-shadow: 3px 3px 10px rgba(0,0,0,0.3); }
-        .quote-style { background: #f0f0f0; border-right: 4px solid var(--gold); padding: 6px; font-size: 12px; margin-bottom: 8px; color: #444; border-radius: 5px; font-style: italic; }
+        .chat-view { flex: 1; overflow-y: auto; padding: 85px 15px 145px 15px; display: flex; flex-direction: column; gap: 15px; }
 
-        /* لوحة الكتابة المثبتة */
-        .footer-area { position: fixed; bottom: 0; width: 100%; background: #000; z-index: 1000; }
-        .quote-preview { display: none; background: #1a1a1a; padding: 8px 15px; font-size: 12px; border-top: 2px solid var(--gold); color: var(--gold); }
-        .input-bar { display: flex; align-items: center; padding: 10px; gap: 10px; border-top: 1px solid #333; }
-        .msg-inp { flex: 1; background: #111; border: 1.5px solid var(--gold); color: #fff; height: 45px; border-radius: 25px; padding: 0 15px; outline: none; }
-        
-        .bottom-nav { height: 60px; display: flex; align-items: center; border-top: 1px solid var(--gold); background: #000; }
-        .b-nav-item { flex: 1; text-align: center; color: #fff; font-size: 10px; cursor: pointer; transition: 0.2s; }
-        .b-nav-item:active { transform: scale(0.9); }
-        .b-nav-item i { display: block; font-size: 20px; color: var(--gold); margin-bottom: 2px; }
+        /* تصميم الرسالة */
+        .msg-container { align-self: flex-start; max-width: 90%; animation: fadeIn 0.3s ease; }
+        .msg-header { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+        .avatar-box { position: relative; width: 45px; height: 45px; }
+        .user-img { width: 100%; height: 100%; border-radius: 50%; border: 2px solid var(--gold); object-fit: cover; cursor: pointer; }
+        .crown-icon { position: absolute; top: -12px; right: -5px; color: var(--gold); font-size: 18px; filter: drop-shadow(0 0 3px #000); }
+        .user-tag { padding: 3px 12px; border-radius: 15px; font-size: 12px; font-weight: bold; border: 1px solid var(--gold); }
 
-        /* المودال */
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 100000; align-items: center; justify-content: center; padding: 20px; }
-        .modal-content { background: #111; width: 100%; max-width: 380px; border: 2px solid var(--gold); border-radius: 20px; padding: 25px; text-align: center; position: relative; }
-        .close-btn { position: absolute; top: 10px; right: 15px; font-size: 28px; color: #ff4d4d; cursor: pointer; }
+        .msg-text { background: #fff; color: #000; padding: 12px 18px; border-radius: 0 20px 20px 20px; font-size: 14px; position: relative; box-shadow: 5px 5px 15px rgba(0,0,0,0.5); }
+
+        /* الفوتر المثبت */
+        .footer { position: fixed; bottom: 0; width: 100%; background: #000; border-top: 1px solid var(--gold); z-index: 1000; }
+        .input-bar { display: flex; padding: 10px; gap: 10px; align-items: center; }
+        .msg-inp { flex: 1; background: #111; border: 1.5px solid var(--gold); color: #fff; height: 45px; border-radius: 25px; padding: 0 20px; }
+        .bottom-nav { height: 60px; display: flex; align-items: center; background: #000; border-top: 1px solid #222; }
+        .b-nav-item { flex: 1; text-align: center; color: var(--gold); font-size: 10px; cursor: pointer; }
+        .b-nav-item i { display: block; font-size: 20px; margin-bottom: 2px; }
+
+        /* المودال والبروفايل */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 100000; align-items: center; justify-content: center; }
+        .modal-content { background: #111; width: 95%; max-width: 400px; border: 2px solid var(--gold); border-radius: 25px; padding: 25px; position: relative; max-height: 90vh; overflow-y: auto; }
         
-        .profile-img-big { width: 110px; height: 110px; border-radius: 50%; border: 4px solid var(--gold); object-fit: cover; margin-bottom: 10px; }
+        .p-header { text-align: center; }
+        .p-img-big { width: 100px; height: 100px; border-radius: 50%; border: 4px solid var(--gold); }
+        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0; }
+        .stat-item { background: #222; padding: 10px; border-radius: 12px; border: 1px solid #333; font-size: 12px; }
+        .stat-item b { color: var(--gold); display: block; font-size: 16px; }
+
+        .admin-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 15px; border-top: 1px solid #333; padding-top: 15px; }
+        .btn-adm { padding: 8px; border-radius: 8px; border: none; cursor: pointer; font-weight: bold; font-size: 12px; }
+        
+        .bg-red { background: #e74c3c; color: #fff; }
+        .bg-blue { background: #3498db; color: #fff; }
+        .bg-green { background: #2ecc71; color: #fff; }
     </style>
 </head>
 <body>
 
 <div id="loginOverlay">
     <div class="login-card">
-        <i class="fas fa-crown" style="font-size: 45px; color: var(--gold); margin-bottom: 15px;"></i>
+        <i class="fas fa-chess-king" style="font-size: 50px; color: var(--gold);"></i>
+        <h2 style="color: var(--gold); margin: 10px 0;">مملكة الإمبراطور</h2>
         <div class="tabs">
-            <button class="t-btn active" onclick="showForm('tab-vis', this)">زائر</button>
-            <button class="t-btn" onclick="showForm('tab-mem', this)">عضوية</button>
-            <button class="t-btn" onclick="showForm('tab-new', this)">جديد</button>
+            <button id="t1" class="active" onclick="switchTab('v')">زائر</button>
+            <button id="t2" onclick="switchTab('m')">عضوية</button>
         </div>
-        <div id="tab-vis" class="login-form active">
-            <input type="text" id="v_name" placeholder="أدخل اسم الزائر">
-            <button class="btn-king" onclick="login('visitor')">دخول سريع 🚀</button>
+        <div id="form-v">
+            <input type="text" id="nameV" placeholder="ادخل اسمك المستعار">
+            <button class="btn-king" onclick="doLogin('visitor')">دخول سريع</button>
         </div>
-        <div id="tab-mem" class="login-form">
-            <input type="email" id="m_email" placeholder="البريد الإلكتروني">
-            <input type="password" placeholder="كلمة المرور">
-            <button class="btn-king" onclick="login('member')">دخول العضوية 🔐</button>
-        </div>
-        <div id="tab-new" class="login-form">
-            <input type="text" id="n_name" placeholder="الاسم الملكي">
-            <input type="email" placeholder="البريد الإلكتروني">
-            <input type="password" placeholder="كلمة المرور">
-            <button class="btn-king" onclick="login('new')">إنشاء حساب جديد 👑</button>
+        <div id="form-m" style="display:none">
+            <input type="text" id="nameM" placeholder="الاسم أو البريد">
+            <input type="password" id="passM" placeholder="كلمة المرور">
+            <button class="btn-king" onclick="doLogin('member')">تسجيل دخول</button>
         </div>
     </div>
 </div>
 
 <div id="chatApp">
     <div class="top-nav">
-        <div class="nav-item" onclick="viewProfile(user, true)"><i class="fas fa-user-circle"></i>إعداداتي</div>
-        <div class="nav-item" onclick="alert('قائمة الكبار قريباً')"><i class="fas fa-crown"></i>الكبار</div>
-        <div class="nav-item" onclick="alert('قائمة الأثرياء قريباً')"><i class="fas fa-gem"></i>الأثرياء</div>
-        <div class="nav-item" onclick="showAdminTools()"><i class="fas fa-tools"></i>الأدوات</div>
-        <div class="nav-item" onclick="alert('الخاص فارغ')"><i class="fas fa-envelope"></i>الخاص</div>
+        <div class="nav-item" onclick="showProfile(me)"><i class="fas fa-id-card-alt"></i>بروفايلي</div>
+        <div class="nav-item"><i class="fas fa-users-cog"></i>الإدارة</div>
+        <div class="nav-item"><i class="fas fa-gem"></i>المتجر</div>
+        <div class="nav-item" style="color:red" onclick="logout()"><i class="fas fa-power-off"></i>خروج</div>
     </div>
 
     <div class="chat-view" id="chatBox"></div>
 
-    <div class="footer-area">
-        <div id="quoteArea" class="quote-preview">
-            <i class="fas fa-reply"></i> الرد على: <span id="quoteText"></span>
-            <i class="fas fa-times" onclick="cancelQuote()" style="float:left; cursor:pointer; color:red;"></i>
-        </div>
+    <div class="footer">
         <div class="input-bar">
-            <i class="fas fa-camera" style="color:var(--gold); font-size: 24px;" onclick="document.getElementById('imgInp').click()"></i>
-            <input type="text" id="mainMsg" class="msg-inp" placeholder="اكتب رسالتك.. (نادي حسين)">
-            <div onclick="sendMsg()" style="background:var(--king-grad); padding:10px 18px; border-radius:25px; color:#000; font-weight:bold; cursor:pointer;">نشر</div>
+            <i class="fas fa-plus-circle" style="color:var(--gold); font-size: 25px;" onclick="document.getElementById('fileInp').click()"></i>
+            <input type="text" id="msgInput" class="msg-inp" placeholder="تحدث مع الإمبراطور والبوت حسين...">
+            <div class="btn-king" style="width: auto; padding: 10px 20px;" onclick="handleSend()">نشر</div>
         </div>
         <div class="bottom-nav">
-            <div class="b-nav-item" onclick="showUsers()"><i class="fas fa-users"></i>المتواجدين</div>
-            <div class="b-nav-item" onclick="openYT()"><i class="fab fa-youtube"></i>اليوتيوب</div>
-            <div class="b-nav-item" onclick="sendVoice()"><i class="fas fa-microphone"></i>تسجيل</div>
+            <div class="b-nav-item"><i class="fas fa-user-friends"></i>المتواجدون</div>
+            <div class="b-nav-item" onclick="askYt()"><i class="fab fa-youtube" style="color:red"></i>يوتيوب</div>
+            <div class="b-nav-item"><i class="fas fa-microphone"></i>تسجيل</div>
             <div class="b-nav-item" onclick="location.reload()"><i class="fas fa-sync-alt"></i>تحديث</div>
-            <div class="b-nav-item" style="color:red" onclick="logout()"><i class="fas fa-power-off"></i>خروج</div>
         </div>
     </div>
-
-    <input type="file" id="imgInp" hidden onchange="uploadImg(this)">
-    <input type="file" id="iconInp" hidden onchange="updateIcon(this)">
+    <input type="file" id="fileInp" hidden onchange="uploadFile(this)">
 </div>
 
 <div id="modal" class="modal">
     <div class="modal-content">
-        <span class="close-btn" onclick="closeModal()">&times;</span>
+        <span onclick="closeModal()" style="position:absolute; top:10px; right:15px; color:red; font-size:30px; cursor:pointer;">&times;</span>
         <div id="modalBody"></div>
     </div>
 </div>
 
 <script>
-    let user = JSON.parse(localStorage.getItem('impUser')) || { name: "ملك", icon: "https://i.pravatar.cc/150?u=1", status: "متوفر 🟢", likes: 0, joined: "2026/04/16" };
-    let currentQuote = "";
+    // بيانات المستخدم (أنت الملك)
+    let me = JSON.parse(localStorage.getItem('impUser')) || null;
+    let botImg = "https://cdn-icons-png.flaticon.com/512/4712/4712035.png";
 
-    window.onload = () => { if(localStorage.getItem('impUser')) startApp(); };
-
-    function showForm(id, b) {
-        document.querySelectorAll('.login-form').forEach(f=>f.classList.remove('active'));
-        document.querySelectorAll('.t-btn').forEach(t=>t.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-        b.classList.add('active');
+    function switchTab(t) {
+        document.getElementById('form-v').style.display = t=='v'?'block':'none';
+        document.getElementById('form-m').style.display = t=='m'?'block':'none';
+        document.getElementById('t1').className = t=='v'?'active':'';
+        document.getElementById('t2').className = t=='m'?'active':'';
     }
 
-    function login(type) {
-        user.name = document.getElementById('v_name').value || document.getElementById('n_name').value || "إمبراطور";
-        localStorage.setItem('impUser', JSON.stringify(user));
+    function doLogin(type) {
+        let name = type=='visitor' ? document.getElementById('nameV').value : document.getElementById('nameM').value;
+        if(!name) return alert("يرجى إدخال الاسم");
+        
+        me = {
+            name: name,
+            role: name === "المدير" || name === "سيدي" ? "إمبراطور الموقع" : "عضو جديد",
+            roleColor: name === "المدير" || name === "سيدي" ? "gold" : "#fff",
+            nameBg: name === "المدير" || name === "سيدي" ? "linear-gradient(90deg, #b8860b, #000)" : "transparent",
+            icon: "https://i.pravatar.cc/150?u=" + name,
+            gold: 1000000, gems: 50000, roses: 999,
+            lvl: 100, xp: "MAX", joined: "2026/04/16", room: "الغرفة الملكية"
+        };
+        localStorage.setItem('impUser', JSON.stringify(me));
         startApp();
     }
 
     function startApp() {
-        document.getElementById('loginOverlay').style.display='none';
-        document.getElementById('chatApp').style.display='flex';
-        welcomeBot();
+        document.getElementById('loginOverlay').style.display = 'none';
+        document.getElementById('chatApp').style.display = 'flex';
+        sendMsg("نظام حسين", "أهلاً بك يا سيدي ومولاي " + me.name + "! أنا حسين، ذكاء الدردشة في خدمتك. اسألني عن أي شيء أو اطلب قصة.", botImg, "بوت ذكي");
+    }
+
+    function handleSend() {
+        let txt = document.getElementById('msgInput').value;
+        if(!txt) return;
+        sendMsg(me.name, txt, me.icon, me.role, me.roleColor, me.nameBg);
+        document.getElementById('msgInput').value = "";
+        processBot(txt);
+    }
+
+    function sendMsg(user, text, img, role, rCol = "gold", rBg = "transparent") {
+        let div = document.createElement('div');
+        div.className = 'msg-container';
+        div.innerHTML = `
+            <div class="msg-header">
+                <div class="avatar-box">
+                    <img src="${img}" class="user-img" onclick="showProfile({name:'${user}', role:'${role}', icon:'${img}', gold:500, gems:100, roses:5, lvl:1, joined:'2026', room:'العامة'})">
+                    <i class="fas fa-crown crown-icon"></i>
+                </div>
+                <div class="user-tag" style="background:${rBg}; color:${rCol}">${user} - ${role}</div>
+            </div>
+            <div class="msg-text">${text}</div>
+            <small style="font-size:9px; color:#555; margin:3px 10px;">${new Date().toLocaleTimeString()}</small>
+        `;
+        document.getElementById('chatBox').appendChild(div);
+        document.getElementById('chatBox').scrollTop = document.getElementById('chatBox').scrollHeight;
+    }
+
+    function processBot(txt) {
+        if(txt.includes("مين انا")) {
+            setTimeout(() => sendMsg("حسين", "أنت سيدي وتاج رأسي صاحب الموقع يا إمبراطور " + me.name + "!", botImg, "بوت ذكي", "cyan"), 1000);
+        } else if(txt.includes("قصة")) {
+            setTimeout(() => sendMsg("حسين", "كان يا مكان في قديم الزمان، كان هناك ملك عظيم مثلك يحكم إمبراطورية شات لا تنام، وكان الجميع يحبه لقوته وعدله...", botImg, "بوت ذكي", "cyan"), 1000);
+        } else if(txt.includes("دولة")) {
+            setTimeout(() => sendMsg("حسين", "كل الدول تحت أمرك يا سيدي، هل تريد أن أخبرك عن تاريخ اليمن العظيم أو أي بلد آخر؟", botImg, "بوت ذكي", "cyan"), 1000);
+        }
+    }
+
+    function showProfile(u) {
+        let isMe = u.name === me.name;
+        let data = isMe ? me : u;
+        let html = `
+            <div class="p-header">
+                <img src="${data.icon}" class="p-img-big">
+                <h2 style="color:var(--gold)">${data.name}</h2>
+                <span class="user-tag" style="background:${data.nameBg}">${data.role}</span>
+            </div>
+            <div class="stat-grid">
+                <div class="stat-item"><b>🏆 المستوى</b> ${data.lvl}</div>
+                <div class="stat-item"><b>💰 ذهب</b> ${data.gold}</div>
+                <div class="stat-item"><b>💎 مجوهرات</b> ${data.gems}</div>
+                <div class="stat-item"><b>🌹 ورود</b> ${data.roses}</div>
+            </div>
+            <div class="stat-item" style="margin-bottom:10px">📅 تاريخ الانضمام: ${data.joined} | 📍 الغرفة: ${data.room}</div>
+            
+            <div class="admin-controls">
+                ${isMe ? `
+                    <button class="btn-adm bg-blue" onclick="alert('تعديل الاسم قيد التطوير')">تعديل اسمي</button>
+                    <button class="btn-adm bg-green" onclick="alert('تغيير الخلفية')">خلفية الاسم</button>
+                ` : `
+                    <button class="btn-adm bg-red" onclick="alert('تم الطرد!')">طرد</button>
+                    <button class="btn-adm bg-red" onclick="alert('تم الكتم!')">كتم</button>
+                    <button class="btn-adm bg-blue" onclick="alert('تم منح الرتبة')">منح رتبة</button>
+                    <button class="btn-adm bg-green" onclick="alert('تم منح 1000 نقطة')">منح نقاط</button>
+                `}
+                <button class="btn-adm bg-blue" style="grid-column: span 2">إضافة صديق 🌹</button>
+            </div>
+        `;
+        document.getElementById('modalBody').innerHTML = html;
+        document.getElementById('modal').style.display = 'flex';
+    }
+
+    function askYt() {
+        let q = prompt("ماذا تريد أن تشاهد على يوتيوب؟");
+        if(q) sendMsg(me.name, `<b style='color:red'><i class='fab fa-youtube'></i> فيديو يوتيوب: ${q}</b><br><iframe width="100%" height="200" src="https://www.youtube.com/embed/dQw4w9WgXcQ" frameborder="0"></iframe>`, me.icon, me.role);
+    }
+
+    function uploadFile(input) {
+        if (input.files && input.files[0]) {
+            let r = new FileReader();
+            r.onload = e => sendMsg(me.name, `<img src="${e.target.result}" style="max-width:100%; border-radius:10px;">`, me.icon, me.role);
+            r.readAsDataURL(input.files[0]);
+        }
     }
 
     function logout() { localStorage.removeItem('impUser'); location.reload(); }
-
-    function sendMsg(text = null, author = null, icon = null) {
-        const val = text || document.getElementById('mainMsg').value;
-        if(!val) return;
-        
-        const msgDiv = document.createElement('div');
-        msgDiv.className = 'msg-container';
-        let quoteHtml = currentQuote ? `<div class="quote-style"><i class="fas fa-quote-right"></i> ${currentQuote}</div>` : "";
-        
-        msgDiv.innerHTML = `
-            <div class="msg-header">
-                <img src="${icon || user.icon}" class="admin-icon-btn" onclick="openMemberOptions('${author || user.name}')">
-                <div class="user-name-tag">${author || user.name}</div>
-                <i class="fas fa-trophy" style="color:gold"></i>
-            </div>
-            <div class="msg-text-box" ondblclick="quoteMsg('${val}')">
-                ${quoteHtml} ${val}
-            </div>
-            <small style="font-size:9px; color:#666; margin-top:3px;">${new Date().toLocaleTimeString()}</small>
-        `;
-        document.getElementById('chatBox').appendChild(msgDiv);
-        document.getElementById('mainMsg').value = "";
-        cancelQuote();
-        document.getElementById('chatBox').scrollTop = document.getElementById('chatBox').scrollHeight;
-
-        if(!author && val.toLowerCase().includes("حسين")) handleBot(val);
-    }
-
-    function quoteMsg(txt) {
-        currentQuote = txt;
-        document.getElementById('quoteArea').style.display = 'block';
-        document.getElementById('quoteText').innerText = txt;
-        document.getElementById('mainMsg').focus();
-    }
-    function cancelQuote() { currentQuote = ""; document.getElementById('quoteArea').style.display = 'none'; }
-
-    // نظام بوت حسين
-    function handleBot(q) {
-        let reply = "لبيك يا إمبراطور! كيف أخدمك؟ (اسألني عن الوقت أو قل نكتة)";
-        if(q.includes("وقت")) reply = "الوقت الآن هو " + new Date().toLocaleTimeString();
-        if(q.includes("نكتة")) reply = "مرة واحد سجل في الشات، نسي الباسورد صار مشرف!";
-        setTimeout(() => sendMsg(reply, "البوت حسين", "https://i.pravatar.cc/150?u=bot"), 1000);
-    }
-
-    function welcomeBot() {
-        setTimeout(() => sendMsg("أهلاً بك يا " + user.name + " في مملكتك! أنا حسين، خادمك هنا. 🛡️", "البوت حسين", "https://i.pravatar.cc/150?u=bot"), 1000);
-    }
-
-    // خيارات العضو
-    function openMemberOptions(name) {
-        showModal('خيارات العضو: ' + name, `
-            <button class="btn-king" onclick="viewMemberProfile('${name}')">عرض البروفايل</button>
-            ${name === user.name ? `<button class="btn-king" style="margin-top:10px" onclick="document.getElementById('iconInp').click(); closeModal()">تغيير الصورة</button>` : ''}
-            <button class="btn-king" style="margin-top:10px; background:#2196f3; color:#fff" onclick="alert('تم إرسال طلب الصداقة')">إضافة صديق ➕</button>
-        `);
-    }
-
-    function viewMemberProfile(name) {
-        const isMe = name === user.name;
-        showModal('بطاقة العضو الملكي', `
-            <img src="${isMe ? user.icon : 'https://i.pravatar.cc/150?u='+name}" class="profile-img-big"><br>
-            <h2 style="color:var(--gold)">${name}</h2>
-            <p style="color:#2ecc71">● متصل الآن</p>
-            <div style="display:flex; justify-content:space-around; margin:15px 0;">
-                <div onclick="user.likes++; alert('شكراً على اللايك!')">❤️ <b>${isMe ? user.likes : 45}</b> لايك</div>
-                <div>🎁 <b>12</b> هدايا</div>
-            </div>
-            <p>تاريخ الانضمام: ${user.joined}</p>
-        `);
-    }
-
-    // الميديا
-    function openYT() {
-        showModal('البحث في اليوتيوب', `
-            <input type="text" id="ytQ" placeholder="أدخل اسم الفيديو..">
-            <button class="btn-king" onclick="deployYT()">نشر الفيديو بالعام 🎬</button>
-        `);
-    }
-    function deployYT() {
-        let v = document.getElementById('ytQ').value;
-        sendMsg(`<div style="border:2px solid red; background:#000; padding:10px; border-radius:10px;">
-            <b style="color:red">🎬 يوتيوب: ${v}</b><br>
-            <iframe width="100%" height="180" src="https://www.youtube.com/embed/dQw4w9WgXcQ" frameborder="0" allowfullscreen></iframe>
-        </div>`);
-        closeModal();
-    }
-
-    function uploadImg(input) {
-        if (input.files[0]) {
-            let reader = new FileReader();
-            reader.onload = (e) => sendMsg(`<img src="${e.target.result}" style="width:100%; border-radius:10px; border:2px solid var(--gold);">`);
-            reader.readAsDataURL(input.files[0]);
-        }
-    }
-
-    function updateIcon(input) {
-        if (input.files[0]) {
-            let reader = new FileReader();
-            reader.onload = (e) => { user.icon = e.target.result; localStorage.setItem('impUser', JSON.stringify(user)); alert("تم تحديث صورتك!"); };
-            reader.readAsDataURL(input.files[0]);
-        }
-    }
-
-    function sendVoice() {
-        sendMsg(`<div style="background:#333; color:gold; padding:10px; border-radius:20px;">🎤 مقطع صوتي: 0:08 <i class="fas fa-play-circle"></i> ━━━━●────</div>`);
-    }
-
-    function showAdminTools() {
-        showModal('أدوات الإدارة', `<button class="btn-king" style="background:red; color:#fff" onclick="localStorage.clear(); location.reload();">تصفير الشات والنظام 🧨</button>`);
-    }
-
-    function showUsers() {
-        showModal('المتواجدون الآن', `🟢 ${user.name} (أنت)<br>🤖 البوت حسين`);
-    }
-
-    function showModal(t, c) {
-        document.getElementById('modalBody').innerHTML = `<h3>${t}</h3><hr style="border:0.5px solid #333">${c}`;
-        document.getElementById('modal').style.display='flex';
-    }
-    function closeModal() { document.getElementById('modal').style.display='none'; }
+    function closeModal() { document.getElementById('modal').style.display = 'none'; }
 </script>
+
 </body>
-    </html>
-    
+        </html>
+                
