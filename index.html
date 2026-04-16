@@ -3,222 +3,231 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>إمبراطورية خليل - النسخة الملكية</title>
+    <title>إمبراطورية الشات - النسخة السيادية النهائية</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --gold: #f1c40f; --dark: #000000; --vip: #e74c3c; }
-        * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body, html { margin: 0; padding: 0; height: 100vh; background: var(--dark); color: #fff; overflow: hidden; }
+        :root { --gold: #f1c40f; --king-grad: linear-gradient(180deg, #ffd700, #b8860b); --dark: #000; }
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; -webkit-tap-highlight-color: transparent; }
+        body, html { margin: 0; padding: 0; height: 100vh; background: #000; color: #fff; overflow: hidden; }
 
-        /* الهيدر */
-        .header-bar { position: fixed; top: 0; width: 100%; height: 70px; background: #000; display: flex; border-bottom: 2px solid var(--gold); align-items: center; z-index: 1000; }
-        .h-btn { flex: 1; text-align: center; color: var(--gold); font-size: 11px; cursor: pointer; }
-        .h-btn i { display: block; font-size: 22px; margin-bottom: 2px; }
+        /* شاشة الدخول الإجبارية للأعضاء الجدد */
+        #loginOverlay { position: fixed; inset: 0; background: radial-gradient(circle, #222, #000); z-index: 100000; display: flex; align-items: center; justify-content: center; padding: 15px; }
+        .login-card { background: rgba(255, 255, 255, 0.05); width: 100%; max-width: 400px; padding: 25px; border-radius: 20px; border: 2px solid var(--gold); backdrop-filter: blur(15px); text-align: center; box-shadow: 0 0 50px var(--gold); }
+        .tabs { display: flex; gap: 5px; margin-bottom: 15px; background: #111; padding: 5px; border-radius: 10px; }
+        .tabs button { flex: 1; padding: 10px; border: none; background: none; color: #fff; cursor: pointer; font-size: 11px; }
+        .tabs button.active { background: var(--king-grad); color: #000; border-radius: 8px; font-weight: bold; }
+        .login-form { display: none; } .login-form.active { display: block; }
+        input { width: 100%; padding: 12px; margin: 8px 0; border-radius: 10px; border: 1px solid var(--gold); background: #000; color: #fff; text-align: center; }
+        .btn-king { width: 100%; padding: 14px; background: var(--king-grad); border: none; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 10px; }
 
-        /* الميكات */
-        .mics-row { display: flex; justify-content: space-around; padding: 10px; background: #000; margin-top: 72px; border-bottom: 1px solid #222; }
-        .mic-unit { width: 45px; height: 45px; border-radius: 50%; border: 2px dashed var(--gold); display: flex; align-items: center; justify-content: center; color: var(--gold); font-weight: bold; }
-        .mic-unit.on { border-style: solid; background: var(--gold); color: #000; box-shadow: 0 0 10px var(--gold); }
-
-        /* الشات */
-        .chat-scroll { height: calc(100vh - 270px); overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 15px; }
-        .msg-wrap { align-self: flex-start; max-width: 90%; animation: fadeIn 0.3s; }
-        @keyframes fadeIn { from {opacity:0; transform: translateY(10px);} to {opacity:1; transform: translateY(0);} }
+        /* الهيكل الأساسي */
+        #chatApp { display: none; height: 100vh; flex-direction: column; position: relative; }
         
-        .msg-top { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
-        .pfp { width: 45px; height: 45px; border-radius: 50%; border: 2px solid var(--gold); position: relative; overflow: visible; }
-        .pfp img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
-        .dot { width: 12px; height: 12px; border-radius: 50%; position: absolute; bottom: 0; right: 0; border: 2px solid #000; background: #2ecc71; }
-        
-        .name-box { background: #111; border: 1px solid var(--gold); color: #fff; padding: 2px 10px; border-radius: 10px; font-size: 11px; }
-        .bubble { background: #fff; color: #000; padding: 10px 15px; border-radius: 0 15px 15px 15px; font-size: 14px; line-height: 1.4; position: relative; }
+        /* الشريط العلوي - كامل ومفعل */
+        .top-nav { position: fixed; top: 0; width: 100%; height: 75px; background: #000; display: flex; border-bottom: 2px solid var(--gold); align-items: center; z-index: 1000; padding: 0 5px; }
+        .nav-item { flex: 1; text-align: center; color: var(--gold); font-size: 9px; cursor: pointer; transition: 0.3s; }
+        .nav-item:hover { transform: scale(1.1); text-shadow: 0 0 5px gold; }
+        .nav-item i { display: block; font-size: 20px; margin-bottom: 2px; }
 
-        /* الفوتر */
-        .footer-fixed { position: fixed; bottom: 0; width: 100%; background: #000; border-top: 2px solid var(--gold); z-index: 1000; }
-        .input-row { display: flex; padding: 10px; gap: 10px; align-items: center; }
-        .chat-input { flex: 1; background: #111; border: 1px solid var(--gold); color: #fff; height: 40px; border-radius: 20px; padding: 0 15px; }
-        .send-btn { background: var(--gold); border: none; padding: 8px 18px; border-radius: 15px; font-weight: bold; cursor: pointer; }
-        
-        .bottom-nav { height: 55px; display: flex; align-items: center; justify-content: space-around; color: var(--gold); font-size: 10px; }
+        .chat-view { flex: 1; overflow-y: auto; padding: 85px 10px 145px 10px; display: flex; flex-direction: column; gap: 15px; }
 
-        /* المودال */
-        .king-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 5000; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
-        .king-card { background: #000; width: 85%; max-width: 320px; border: 2px solid var(--gold); border-radius: 20px; padding: 20px; text-align: center; position: relative; }
-        .k-btn { width: 100%; padding: 10px; margin: 5px 0; background: #111; border: 1px solid #333; color: #fff; border-radius: 10px; cursor: pointer; }
-        .k-btn:hover { background: var(--gold); color: #000; }
+        /* الرسائل وتصميم الكأس المنفصل */
+        .msg-container { align-self: flex-start; max-width: 95%; animation: fadeIn 0.3s ease; }
+        .msg-header { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+        .avatar-box { position: relative; width: 45px; height: 45px; }
+        .user-img { width: 100%; height: 100%; border-radius: 50%; border: 2px solid var(--gold); object-fit: cover; cursor: pointer; }
+        .trophy-sep { color: var(--gold); font-size: 18px; filter: drop-shadow(0 0 3px gold); animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
         
-        /* قائمة الترتيب */
-        .rank-item { display: flex; align-items: center; gap: 10px; padding: 8px; border-bottom: 1px solid #222; text-align: right; }
-        .rank-num { color: var(--gold); font-weight: bold; width: 25px; }
+        .user-name-wrap { padding: 3px 12px; border-radius: 15px; font-size: 12px; font-weight: bold; border: 1px solid var(--gold); display: flex; align-items: center; }
+        .msg-text { background: #fff; color: #000; padding: 12px 18px; border-radius: 0 18px 18px 18px; font-size: 14px; box-shadow: 5px 5px 15px rgba(0,0,0,0.5); margin-right: 40px; }
+
+        /* الفوتر المتكامل */
+        .footer { position: fixed; bottom: 0; width: 100%; background: #000; border-top: 2px solid var(--gold); z-index: 1000; }
+        .input-area { display: flex; padding: 10px; gap: 8px; align-items: center; }
+        .msg-inp { flex: 1; background: #111; border: 1px solid var(--gold); color: #fff; height: 45px; border-radius: 25px; padding: 0 20px; font-size: 14px; }
+        .emoji-btn { font-size: 22px; color: var(--gold); cursor: pointer; }
+        .btn-send { background: var(--king-grad); border: none; padding: 10px 20px; border-radius: 20px; font-weight: bold; cursor: pointer; color: #000; }
+
+        .bottom-nav { height: 60px; display: flex; align-items: center; background: #000; border-top: 1px solid #222; }
+        .b-nav-item { flex: 1; text-align: center; color: var(--gold); font-size: 10px; cursor: pointer; }
+        .b-nav-item i { display: block; font-size: 18px; margin-bottom: 2px; }
+
+        /* المودال الملكي */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 100000; align-items: center; justify-content: center; }
+        .modal-content { background: #111; width: 95%; max-width: 400px; border: 2px solid var(--gold); border-radius: 25px; padding: 25px; position: relative; text-align: center; }
+        .p-stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0; }
+        .stat-card { background: #222; padding: 10px; border-radius: 12px; border: 1px solid #333; }
+        .stat-card b { color: var(--gold); display: block; font-size: 16px; }
+        .rank-btn { width: 100%; padding: 10px; margin: 5px 0; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; color: #fff; }
     </style>
 </head>
 <body>
 
-<div class="header-bar">
-    <div class="h-btn" onclick="openProfile(me)"><i class="fas fa-id-card"></i>إعداداتي</div>
-    <div class="h-btn" onclick="openAdmin()"><i class="fas fa-crown"></i>الإدارة</div>
-    <div class="h-btn" onclick="showRichList()"><i class="fas fa-gem"></i>الأثرياء</div>
-    <div class="h-btn" style="color:red" onclick="location.reload()"><i class="fas fa-power-off"></i>خروج</div>
-</div>
-
-<div class="mics-row">
-    <div class="mic-unit" id="mic1" onclick="micClick(1)">1</div>
-    <div class="mic-unit" id="mic2" onclick="micClick(2)">2</div>
-    <div class="mic-unit" id="mic3" onclick="micClick(3)">3</div>
-    <div class="mic-unit" id="mic4" onclick="micClick(4)">4</div>
-</div>
-
-<div class="chat-scroll" id="box"></div>
-
-<div class="footer-fixed">
-    <div class="input-row">
-        <i class="fas fa-laugh-beam" style="color:var(--gold); font-size:22px;"></i>
-        <input type="text" id="inp" class="chat-input" placeholder="تحدث يا إمبراطور...">
-        <button class="send-btn" onclick="send()">نشر</button>
-    </div>
-    <div class="bottom-nav">
-        <div class="b-btn" onclick="showTopUsers()"><i class="fas fa-star"></i>قائمة الكبار</div>
-        <div class="b-btn" onclick="alert('قريباً')"><i class="fab fa-youtube" style="color:red"></i>يوتيوب</div>
-        <div class="b-btn"><i class="fas fa-microphone"></i>تسجيل</div>
-        <div class="b-btn" onclick="location.reload()"><i class="fas fa-sync-alt"></i>تحديث</div>
+<div id="loginOverlay">
+    <div class="login-card">
+        <i class="fas fa-chess-king" style="font-size: 45px; color: var(--gold); margin-bottom: 10px;"></i>
+        <div class="tabs">
+            <button id="t1" class="active" onclick="tab('v')">زائر</button>
+            <button id="t2" onclick="tab('m')">عضوية</button>
+            <button id="t3" onclick="tab('n')">تسجيل جديد</button>
+        </div>
+        <div id="f-v" class="login-form active"><input type="text" id="vN" placeholder="اسمك المستعار"><button class="btn-king" onclick="login('v')">دخول الزوار</button></div>
+        <div id="f-m" class="login-form"><input type="text" id="mN" placeholder="الاسم أو البريد"><input type="password" id="mP" placeholder="كلمة المرور"><button class="btn-king" onclick="login('m')">دخول الأعضاء</button></div>
+        <div id="f-n" class="login-form"><input type="text" id="nN" placeholder="الاسم الكامل"><input type="email" placeholder="البريد الإلكتروني"><input type="password" placeholder="كلمة المرور"><button class="btn-king" onclick="login('n')">إنشاء حساب ملكي</button></div>
     </div>
 </div>
 
-<div id="modal" class="king-modal"><div class="king-card" id="mContent"></div></div>
+<div id="chatApp">
+    <div class="top-nav">
+        <div class="nav-item" onclick="openMe()"><i class="fas fa-user-shield"></i>إعداداتي</div>
+        <div class="nav-item" onclick="alert('قائمة الكبار قيد التحديث')"><i class="fas fa-chess-king"></i>الكبار</div>
+        <div class="nav-item" onclick="alert('قائمة الأثرياء قيد التحديث')"><i class="fas fa-gem"></i>الأثرياء</div>
+        <div class="nav-item" onclick="alert('الأدوات الإدارية مفعلة')"><i class="fas fa-tools"></i>الأدوات</div>
+        <div class="nav-item" onclick="alert('صندوق الرسائل الخاصة')"><i class="fas fa-envelope-open-text"></i>الخاص</div>
+        <div class="nav-item" style="color:red" onclick="logout()"><i class="fas fa-power-off"></i>خروج</div>
+    </div>
+
+    <div class="chat-view" id="chatBox"></div>
+
+    <div class="footer">
+        <div class="input-area">
+            <i class="fas fa-image emoji-btn" onclick="document.getElementById('imgUp').click()"></i>
+            <i class="fas fa-laugh-beam emoji-btn" onclick="alert('لوحة الإيموجي المتحركة')"></i>
+            <input type="text" id="msgInp" class="msg-inp" placeholder="تحدث مع الإمبراطور...">
+            <button class="btn-send" onclick="onSend()">نشر</button>
+        </div>
+        <div class="bottom-nav">
+            <div class="b-nav-item"><i class="fas fa-users"></i>المتواجدون</div>
+            <div class="b-nav-item" onclick="yt()"><i class="fab fa-youtube" style="color:red"></i>يوتيوب</div>
+            <div class="b-nav-item" onclick="alert('جاري تسجيل الصوت...')"><i class="fas fa-microphone"></i>تسجيل</div>
+            <div class="b-nav-item" onclick="location.reload()"><i class="fas fa-sync-alt"></i>تحديث</div>
+        </div>
+    </div>
+    <input type="file" id="imgUp" hidden onchange="upload(this)">
+    <input type="file" id="iconUp" hidden onchange="updateIcon(this)">
+</div>
+
+<div id="modal" class="modal">
+    <div class="modal-content">
+        <span onclick="closeM()" style="position:absolute; top:10px; right:15px; color:red; font-size:30px; cursor:pointer;">×</span>
+        <div id="mBody"></div>
+    </div>
+</div>
 
 <script>
-    let me = JSON.parse(localStorage.getItem('king_data')) || {
-        name: "خليل ابراهيم",
-        gold: 5000,
-        img: "https://i.pravatar.cc/150?u=khalil",
-        level: "إمبراطور"
-    };
+    let me = JSON.parse(localStorage.getItem('impUser')) || null;
+    let botImg = "https://cdn-icons-png.flaticon.com/512/4712/4712035.png";
 
-    // بيانات وهمية للتوضيح
-    const fakeUsers = [
-        {name: "فهد العتيبي", gold: 12000, img: "https://i.pravatar.cc/150?u=1", level: "كبير الإمبراطورية"},
-        {name: "سارة الملكة", gold: 9500, img: "https://i.pravatar.cc/150?u=2", level: "VIP"},
-        {name: "حسين المدريد", gold: 7000, img: "https://i.pravatar.cc/150?u=3", level: "مشرف"}
-    ];
+    window.onload = () => { if(me) start(); };
 
-    window.onload = () => {
-        renderMsg("نظام الإمبراطورية", "أهلاً بك يا خليل، تم تفعيل نظام الخاص وقائمة الأثرياء بنجاح!", "https://cdn-icons-png.flaticon.com/512/4712/4712035.png", true);
-    };
-
-    function send() {
-        let t = document.getElementById('inp').value;
-        if(!t) return;
-        renderMsg(me.name, t, me.img, true);
-        document.getElementById('inp').value = "";
+    function tab(t) {
+        document.querySelectorAll('.login-form').forEach(f=>f.classList.remove('active'));
+        document.querySelectorAll('.tabs button').forEach(b=>b.classList.remove('active'));
+        document.getElementById('f-'+t).classList.add('active');
+        document.getElementById('t'+(t=='v'?1:t=='m'?2:3)).classList.add('active');
     }
 
-    function renderMsg(name, txt, img, isKing) {
+    function login(type) {
+        let name = document.getElementById(type+'N').value || "عضو";
+        me = {
+            name: name,
+            role: name === "المدير" ? "ملك الموقع" : "عضو جديد",
+            roleCol: name === "المدير" ? "gold" : "#fff",
+            bg: name === "المدير" ? "#222" : "transparent",
+            icon: "https://i.pravatar.cc/150?u="+name,
+            points: 500000, roses: 100, lvl: 100
+        };
+        localStorage.setItem('impUser', JSON.stringify(me));
+        start();
+    }
+
+    function start() {
+        document.getElementById('loginOverlay').style.display='none';
+        document.getElementById('chatApp').style.display='flex';
+        // بوت حسين بدون كاس ورتبة بريمو
+        sendMsg("حسين", "أهلاً بك يا سيدي " + me.name + "! أنا حسين خادمك برتبة بريمو.", botImg, "بريمو", "cyan", "#000", false);
+    }
+
+    function onSend() {
+        let txt = document.getElementById('msgInp').value;
+        if(!txt) return;
+        sendMsg(me.name, txt, me.icon, me.role, me.roleCol, me.bg, true);
+        document.getElementById('msgInp').value = "";
+        if(txt.includes("حسين")) {
+            setTimeout(() => sendMsg("حسين", "أمرك مطاع يا سيدي " + me.name + "!", botImg, "بريمو", "cyan", "#000", false), 800);
+        }
+    }
+
+    function sendMsg(user, text, img, role, rCol, rBg, hasTrophy) {
         let div = document.createElement('div');
-        div.className = 'msg-wrap';
+        div.className = 'msg-container';
         div.innerHTML = `
-            <div class="msg-top">
-                <div class="pfp" onclick="openProfile({name:'${name}', img:'${img}', gold:100, level:'عضو'})">
-                    <img src="${img}">
-                    <div class="dot"></div>
+            <div class="msg-header">
+                <div class="avatar-box">
+                    <img src="${img}" class="user-img" onclick="viewP('${user}','${role}','${img}')">
                 </div>
-                ${isKing ? '<i class="fas fa-trophy" style="color:gold"></i>' : ''}
-                <span class="name-box">${name}</span>
+                ${hasTrophy ? '<i class="fas fa-trophy trophy-sep"></i>' : ''}
+                <div class="user-name-wrap" style="background:${rBg}; color:${rCol}">${user} [${role}]</div>
             </div>
-            <div class="bubble">${txt}</div>
+            <div class="msg-text">${text}</div>
+            <small style="font-size:8px; color:#555; margin-right:50px;">${new Date().toLocaleTimeString()}</small>
         `;
-        document.getElementById('box').appendChild(div);
-        document.getElementById('box').scrollTop = document.getElementById('box').scrollHeight;
+        document.getElementById('chatBox').appendChild(div);
+        document.getElementById('chatBox').scrollTop = document.getElementById('chatBox').scrollHeight;
     }
 
-    // ميزة الخاص
-    function openPrivate(name) {
-        let h = `
-            <h3 style="color:var(--gold)">💌 محادثة خاصة: ${name}</h3>
-            <div style="height:150px; background:#111; margin-bottom:10px; padding:10px; overflow-y:auto; font-size:12px; text-align:right;" id="privChat">
-                <div style="color:gray">بدأت المحادثة الآن..</div>
+    function viewP(name, role, img) {
+        let isMe = name === me.name;
+        let html = `
+            <img src="${img}" style="width:100px; height:100px; border-radius:50%; border:3px solid gold;">
+            <h3 style="color:gold">${name}</h3>
+            <p>${role}</p>
+            <div class="p-stat-grid">
+                <div class="stat-card"><b>🏆 المستوى</b> ${isMe?100:1}</div>
+                <div class="stat-card"><b>💰 النقاط</b> ${isMe?me.points:0}</div>
+                <div class="stat-card"><b>🌹 الورود</b> ${isMe?me.roses:0}</div>
+                <div class="stat-card"><b>🕒 الوقت</b> ${new Date().toLocaleTimeString()}</div>
             </div>
-            <input type="text" id="pInp" class="chat-input" style="width:100%; margin-bottom:10px;" placeholder="اكتب رسالتك الخاصة...">
-            <button class="k-btn" onclick="alert('تم الإرسال بنجاح!')">إرسال خاص</button>
-            <button class="k-btn" style="color:red" onclick="closeM()">إغلاق</button>
+            <div class="adm-btns">
+                ${isMe ? `
+                    <button class="rank-btn" style="background:blue" onclick="document.getElementById('iconUp').click()">تغيير الصورة الشخصية</button>
+                    <button class="rank-btn" style="background:green">تغيير خلفية الاسم</button>
+                ` : `
+                    <button class="rank-btn" style="background:red" onclick="alert('تم الطرد')">طرد العضو</button>
+                    <button class="rank-btn" style="background:orange" onclick="alert('تم الكتم')">كتم العضو</button>
+                    <h4 style="color:gold">خزنة الرتب الملكية:</h4>
+                    <button class="rank-btn" style="background:#000; border:1px solid gold">إهداء كأس أسود 🏆</button>
+                    <button class="rank-btn" style="background:#b8860b">إهداء رتبة برنس 👑</button>
+                    <button class="rank-btn" style="background:cyan; color:#000">إهداء رتبة بريمو 💎</button>
+                `}
+            </div>
         `;
-        document.getElementById('mContent').innerHTML = h;
-        document.getElementById('modal').style.display = 'flex';
+        document.getElementById('mBody').innerHTML = html;
+        document.getElementById('modal').style.display='flex';
     }
 
-    // قائمة الأثرياء
-    function showRichList() {
-        let listHTML = `<h3 style="color:var(--gold)"><i class="fas fa-gem"></i> قائمة الأثرياء</h3>`;
-        let all = [...fakeUsers, me].sort((a,b) => b.gold - a.gold);
-        all.forEach((u, i) => {
-            listHTML += `
-                <div class="rank-item">
-                    <span class="rank-num">${i+1}</span>
-                    <img src="${u.img}" style="width:30px; height:30px; border-radius:50%;">
-                    <div style="flex:1">${u.name}</div>
-                    <div style="color:gold">${u.gold} 💰</div>
-                </div>
-            `;
-        });
-        listHTML += `<button class="k-btn" onclick="closeM()">إغلاق</button>`;
-        document.getElementById('mContent').innerHTML = listHTML;
-        document.getElementById('modal').style.display = 'flex';
+    function upload(i) {
+        if(i.files[0]) {
+            let r = new FileReader();
+            r.onload = e => sendMsg(me.name, `<img src="${e.target.result}" style="width:100%; border-radius:10px;">`, me.icon, me.role, me.roleCol, me.bg, true);
+            r.readAsDataURL(i.files[0]);
+        }
     }
-
-    // قائمة الكبار
-    function showTopUsers() {
-        let listHTML = `<h3 style="color:var(--gold)"><i class="fas fa-crown"></i> مجلس الكبار</h3>`;
-        fakeUsers.forEach(u => {
-            listHTML += `
-                <div class="rank-item">
-                    <img src="${u.img}" style="width:40px; height:40px; border-radius:50%; border:1px solid red;">
-                    <div style="flex:1">
-                        <b>${u.name}</b><br>
-                        <small style="color:var(--vip)">${u.level}</small>
-                    </div>
-                    <button onclick="openPrivate('${u.name}')" style="background:none; border:none; color:var(--gold); cursor:pointer;"><i class="fas fa-envelope"></i></button>
-                </div>
-            `;
-        });
-        listHTML += `<button class="k-btn" onclick="closeM()">إغلاق</button>`;
-        document.getElementById('mContent').innerHTML = listHTML;
-        document.getElementById('modal').style.display = 'flex';
+    function updateIcon(i) {
+        if(i.files[0]) {
+            let r = new FileReader();
+            r.onload = e => { me.icon = e.target.result; localStorage.setItem('impUser', JSON.stringify(me)); alert('تم تحديث صورتك!'); };
+            r.readAsDataURL(i.files[0]);
+        }
     }
-
-    function openProfile(user) {
-        let isMe = (user.name === me.name);
-        let h = `
-            <div style="position:absolute; top:10px; left:10px; color:gold"><i class="fas fa-shield-alt"></i></div>
-            <img src="${user.img}" style="width:80px; height:80px; border-radius:50%; border:3px solid var(--gold); margin-bottom:10px;">
-            <h3 style="margin:5px 0;">${user.name}</h3>
-            <div style="color:var(--gold); margin-bottom:15px;">الرتبة: ${isMe ? me.level : user.level}</div>
-            ${!isMe ? `<button class="k-btn" style="background:var(--gold); color:#000;" onclick="openPrivate('${user.name}')">💬 رسالة خاصة</button>` : ''}
-            <button class="k-btn" onclick="closeM()">إغلاق</button>
-        `;
-        document.getElementById('mContent').innerHTML = h;
-        document.getElementById('modal').style.display = 'flex';
+    function yt() {
+        let q = prompt("ابحث عن فيديو:");
+        if(q) sendMsg(me.name, `🎬 فيديو يوتيوب: ${q}<br><iframe width="100%" height="180" src="https://www.youtube.com/embed/dQw4w9WgXcQ"></iframe>`, me.icon, me.role, me.roleCol, me.bg, true);
     }
-
-    function openAdmin() {
-        let h = `
-            <h3 style="color:var(--gold)">لوحة الإدارة</h3>
-            <button class="k-btn" onclick="showTopUsers()">⭐ إدارة قائمة الكبار</button>
-            <button class="k-btn" onclick="alert('تم الحظر')">🚫 حظر مستخدم</button>
-            <button class="k-btn" onclick="alert('تم تصفير الشات')">🧹 تنظيف الشات</button>
-            <button class="k-btn" style="color:red" onclick="closeM()">إغلاق</button>
-        `;
-        document.getElementById('mContent').innerHTML = h;
-        document.getElementById('modal').style.display = 'flex';
-    }
-
-    function micClick(id) {
-        document.querySelectorAll('.mic-unit').forEach(m => m.classList.remove('on'));
-        document.getElementById('mic'+id).classList.add('on');
-        alert("أنت الآن على الميكروفون رقم " + id);
-    }
-
-    function closeM() { document.getElementById('modal').style.display = 'none'; }
+    function logout() { localStorage.removeItem('impUser'); location.reload(); }
+    function closeM() { document.getElementById('modal').style.display='none'; }
+    function openMe() { viewP(me.name, me.role, me.icon); }
 </script>
-
 </body>
-            </html>
-                                       
+    </html>
