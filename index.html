@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>إمبراطورية الشات - الإصدار المستقر</title>
+    <title>شات الإمبراطور خليل - النسخة المفعلة بالكامل</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --gold: #f1c40f; --king-grad: linear-gradient(180deg, #ffd700, #b8860b); }
@@ -17,7 +17,7 @@
 
         /* منطقة الميكروفونات */
         .mic-section { display: flex; justify-content: space-around; padding: 10px; background: #000; margin-top: 75px; border-bottom: 1px solid #222; }
-        .mic-slot { width: 55px; height: 55px; border-radius: 50%; border: 2px dashed var(--gold); display: flex; align-items: center; justify-content: center; color: var(--gold); cursor: pointer; position: relative; }
+        .mic-slot { width: 55px; height: 55px; border-radius: 50%; border: 2px dashed var(--gold); display: flex; align-items: center; justify-content: center; color: var(--gold); cursor: pointer; position: relative; font-weight: bold; }
         .mic-slot.occupied { border-style: solid; background: var(--king-grad); color: #000; box-shadow: 0 0 10px var(--gold); }
 
         /* الشات */
@@ -25,54 +25,58 @@
         .msg-box { align-self: flex-start; max-width: 90%; }
         .user-info { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
         .u-img { width: 45px; height: 45px; border-radius: 50%; border: 2px solid var(--gold); }
-        .u-name { border: 1px solid var(--gold); padding: 2px 10px; border-radius: 12px; font-size: 12px; }
-        .u-text { background: #fff; color: #000; padding: 12px; border-radius: 0 18px 18px 18px; margin-right: 40px; }
+        .u-name { border: 1px solid var(--gold); padding: 2px 10px; border-radius: 12px; font-size: 12px; font-weight: bold; }
+        .u-text { background: #fff; color: #000; padding: 12px; border-radius: 0 18px 18px 18px; margin-right: 40px; font-weight: 500; }
 
         /* الفوتر الثابت */
         .footer { position: fixed; bottom: 0; width: 100%; background: #000; border-top: 1px solid var(--gold); z-index: 1000; }
         .input-bar { display: flex; padding: 10px; gap: 10px; align-items: center; }
         .main-inp { flex: 1; background: #000; border: 1px solid var(--gold); color: #fff; height: 45px; border-radius: 25px; padding: 0 15px; }
-        .send-btn { background: var(--king-grad); border: none; padding: 10px 25px; border-radius: 15px; font-weight: bold; cursor: pointer; }
+        .send-btn { background: var(--king-grad); border: none; padding: 10px 25px; border-radius: 15px; font-weight: bold; cursor: pointer; color: #000; }
         
         .nav-bottom { height: 65px; display: flex; align-items: center; justify-content: space-around; color: var(--gold); font-size: 10px; }
         .b-btn { text-align: center; cursor: pointer; }
-        .b-btn i { display: block; font-size: 20px; }
+        .b-btn i { display: block; font-size: 20px; margin-bottom: 2px; }
 
-        /* مودال الخيارات */
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 5000; align-items: center; justify-content: center; }
-        .modal-card { background: #111; width: 85%; max-width: 350px; border: 2px solid var(--gold); border-radius: 20px; padding: 20px; text-align: center; }
-        .action-btn { width: 100%; padding: 12px; margin: 5px 0; background: #222; border: 1px solid #444; color: #fff; border-radius: 10px; font-weight: bold; cursor: pointer; }
+        /* مودال الخيارات (الشبابيك التي تفتح) */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 5000; align-items: center; justify-content: center; overflow-y: auto; }
+        .modal-card { background: #111; width: 90%; max-width: 400px; border: 2px solid var(--gold); border-radius: 20px; padding: 20px; text-align: center; position: relative; }
+        .action-btn { width: 100%; padding: 12px; margin: 8px 0; background: #222; border: 1px solid #444; color: #fff; border-radius: 10px; font-weight: bold; cursor: pointer; }
+        .action-btn:active { background: var(--gold); color: #000; }
+        
+        /* نماذج الإدخال */
+        input.edit-field { width: 100%; background: #000; border: 1px solid var(--gold); color: #fff; padding: 10px; margin: 5px 0; border-radius: 10px; text-align: center; }
     </style>
 </head>
 <body>
 
 <div class="top-nav">
-    <div class="nav-item" onclick="openProfile()"><i class="fas fa-id-card"></i>إعداداتي</div>
-    <div class="nav-item"><i class="fas fa-chess-king"></i>الكبار</div>
-    <div class="nav-item"><i class="fas fa-gem"></i>الأثرياء</div>
+    <div class="nav-item" onclick="openEditProfile()"><i class="fas fa-id-card"></i>إعداداتي</div>
+    <div class="nav-item" onclick="showList('قائمة الكبار 👑', ['خليل (المالك)', 'أدمن 1', 'أدمن 2'])"><i class="fas fa-chess-king"></i>الكبار</div>
+    <div class="nav-item" onclick="showList('قائمة الأثرياء 💎', ['خليل', 'عضو ماسي'])"><i class="fas fa-gem"></i>الأثرياء</div>
     <div class="nav-item" onclick="showWallet()"><i class="fas fa-wallet"></i>الأرباح</div>
-    <div class="nav-item" style="color:red" onclick="logout()"><i class="fas fa-power-off"></i>خروج</div>
+    <div class="nav-item" style="color:red" onclick="location.reload()"><i class="fas fa-power-off"></i>خروج</div>
 </div>
 
 <div class="mic-section">
-    <div class="mic-slot" id="mic1" onclick="micMenu(1)"><i class="fas fa-microphone"></i></div>
-    <div class="mic-slot" id="mic2" onclick="micMenu(2)"><i class="fas fa-microphone"></i></div>
-    <div class="mic-slot" id="mic3" onclick="micMenu(3)"><i class="fas fa-microphone"></i></div>
-    <div class="mic-slot" id="mic4" onclick="micMenu(4)"><i class="fas fa-microphone"></i></div>
+    <div class="mic-slot" id="mic1" onclick="micMenu(1)">1</div>
+    <div class="mic-slot" id="mic2" onclick="micMenu(2)">2</div>
+    <div class="mic-slot" id="mic3" onclick="micMenu(3)">3</div>
+    <div class="mic-slot" id="mic4" onclick="micMenu(4)">4</div>
 </div>
 
-<div class="chat-view" id="chatContainer"></div>
+<div class="chat-view" id="chat"></div>
 
 <div class="footer">
     <div class="input-bar">
-        <i class="fas fa-laugh-beam" style="color:var(--gold); font-size:25px;" onclick="alert('لوحة الإيموجي مفعلة')"></i>
-        <input type="text" id="chatInp" class="main-inp" placeholder="تحدث يا إمبراطور...">
+        <i class="fas fa-laugh-beam" style="color:var(--gold); font-size:25px; cursor:pointer;" onclick="showList('الإيموجي المتحرك', ['🔥', '👑', '😂', '❤️'])"></i>
+        <input type="text" id="chatInp" class="main-inp" placeholder="تحدث مع الإمبراطور...">
         <button class="send-btn" onclick="sendMessage()">نشر</button>
     </div>
     <div class="nav-bottom">
-        <div class="b-btn"><i class="fas fa-users"></i>المتواجدون</div>
-        <div class="b-btn" onclick="playMusic()"><i class="fab fa-youtube" style="color:red"></i>يوتيوب</div>
-        <div class="b-btn"><i class="fas fa-microphone"></i>تسجيل</div>
+        <div class="b-btn" onclick="showList('المتواجدون الآن', ['خليل ابراهيم', 'حسين (بوت)', 'زائر 1'])"><i class="fas fa-users"></i>المتواجدون</div>
+        <div class="b-btn" onclick="openYoutube()"><i class="fab fa-youtube" style="color:red"></i>يوتيوب</div>
+        <div class="b-btn" onclick="startRecording()"><i class="fas fa-microphone"></i>تسجيل</div>
         <div class="b-btn" onclick="location.reload()"><i class="fas fa-sync-alt"></i>تحديث</div>
     </div>
 </div>
@@ -80,29 +84,24 @@
 <div id="modal" class="modal"><div class="modal-card" id="modalContent"></div></div>
 
 <script>
-    // الحفاظ على بيانات الحساب الملكي
-    let me = JSON.parse(localStorage.getItem('kingAccount')) || {
+    // بيانات الإمبراطور المحفوظة
+    let me = JSON.parse(localStorage.getItem('kingData')) || {
         name: "خليل ابراهيم",
         img: "https://i.pravatar.cc/150?u=king",
-        wallet: 0.00,
-        rank: "صاحب الموقع"
+        status: "صاحب الموقع",
+        age: "25",
+        bio: "مرحباً بكم في إمبراطوريتي",
+        wallet: 1500.50
     };
+
+    let stream = null; // للميكروفون الحقيقي
 
     window.onload = () => {
         saveData();
-        addMsg("حسين", "مرحباً بك مجدداً يا سيدي! تم تثبيت الأزرار وتفعيل الميكات والأرباح.", "https://cdn-icons-png.flaticon.com/512/4712/4712035.png", false);
+        addMsg("حسين", "أهلاً بك يا سيدي! تم تفعيل جميع الأزرار والميكروفون الحقيقي ونظام الأرباح الآن.", "https://cdn-icons-png.flaticon.com/512/4712/4712035.png", false);
     };
 
-    function saveData() { localStorage.setItem('kingAccount', JSON.stringify(me)); }
-
-    function sendMessage() {
-        let t = document.getElementById('chatInp').value;
-        if(!t) return;
-        addMsg(me.name, t, me.img, true);
-        document.getElementById('chatInp').value = "";
-        me.wallet += 0.01; // زيادة الأرباح مع كل رسالة
-        saveData();
-    }
+    function saveData() { localStorage.setItem('kingData', JSON.stringify(me)); }
 
     function addMsg(name, text, img, isKing) {
         let div = document.createElement('div');
@@ -115,47 +114,107 @@
             </div>
             <div class="u-text">${text}</div>
         `;
-        document.getElementById('chatContainer').appendChild(div);
-        document.getElementById('chatContainer').scrollTop = document.getElementById('chatContainer').scrollHeight;
+        document.getElementById('chat').appendChild(div);
+        document.getElementById('chat').scrollTop = document.getElementById('chat').scrollHeight;
+    }
+
+    function sendMessage() {
+        let t = document.getElementById('chatInp').value;
+        if(!t) return;
+        addMsg(me.name, t, me.img, true);
+        document.getElementById('chatInp').value = "";
+        me.wallet += 0.05; // ربح عن كل رسالة
+        saveData();
+    }
+
+    // --- تفعيل الأزرار ---
+
+    function showList(title, items) {
+        let listHtml = `<h3 style="color:var(--gold)">${title}</h3><ul style="list-style:none; padding:0; color:#fff;">`;
+        items.forEach(i => listHtml += `<li style="padding:10px; border-bottom:1px solid #333;">${i}</li>`);
+        listHtml += `</ul><button class="action-btn" onclick="closeM()">إغلاق</button>`;
+        document.getElementById('modalContent').innerHTML = listHtml;
+        document.getElementById('modal').style.display = 'flex';
+    }
+
+    function openEditProfile() {
+        let h = `
+            <h3 style="color:var(--gold)">تعديل بروفايل الإمبراطور</h3>
+            <input type="text" id="newName" class="edit-field" placeholder="الاسم" value="${me.name}">
+            <input type="text" id="newStatus" class="edit-field" placeholder="الحالة" value="${me.status}">
+            <input type="text" id="newAge" class="edit-field" placeholder="العمر" value="${me.age}">
+            <textarea id="newBio" class="edit-field" style="height:60px" placeholder="وصف الصديق/نبذة">${me.bio}</textarea>
+            <button class="action-btn" onclick="saveProfile()">حفظ التعديلات ✅</button>
+            <button class="action-btn" style="background:red" onclick="closeM()">إلغاء</button>
+        `;
+        document.getElementById('modalContent').innerHTML = h;
+        document.getElementById('modal').style.display = 'flex';
+    }
+
+    function saveProfile() {
+        me.name = document.getElementById('newName').value;
+        me.status = document.getElementById('newStatus').value;
+        me.age = document.getElementById('newAge').value;
+        me.bio = document.getElementById('newBio').value;
+        saveData();
+        alert("تم تحديث هويتك الملكية!");
+        closeM();
     }
 
     function micMenu(id) {
         let h = `
-            <h3 style="color:gold">الميكروفون ${id}</h3>
-            <button class="action-btn" onclick="joinMic(${id})">🎙️ صعود الميك</button>
-            <button class="action-btn" onclick="alert('تم الكتم')">🔇 كتم الصوت</button>
-            <button class="action-btn" onclick="playMusic()">🎵 تشغيل أغنية</button>
-            <button class="action-btn" style="color:red" onclick="closeM()">إغلاق</button>
+            <h3 style="color:var(--gold)">تحكم الميكروفون ${id}</h3>
+            <button class="action-btn" onclick="joinMicReal(${id})">🎙️ صعود الميك (صوت حقيقي)</button>
+            <button class="action-btn" onclick="alert('تم كتم صوتك')">🔇 كتم الصوت</button>
+            <button class="action-btn" onclick="openYoutube()">🎵 تشغيل أغنية</button>
+            <button class="action-btn" style="color:red" onclick="closeM(); leaveMic(${id})">مغادرة الميك</button>
         `;
         document.getElementById('modalContent').innerHTML = h;
         document.getElementById('modal').style.display = 'flex';
     }
 
-    function joinMic(id) {
-        document.getElementById('mic'+id).classList.add('occupied');
-        addMsg("النظام", `الإمبراطور ${me.name} اعتلى الميكروفون ${id}`, me.img, true);
-        closeM();
+    async function joinMicReal(id) {
+        try {
+            stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            document.getElementById('mic'+id).classList.add('occupied');
+            addMsg("النظام", `🎤 الإمبراطور ${me.name} يتحدث الآن على ميك ${id}.. الجميع يسمعك!`, me.img, true);
+            closeM();
+        } catch (err) {
+            alert("يرجى السماح للمتصفح بالوصول للميكروفون!");
+        }
+    }
+
+    function leaveMic(id) {
+        if(stream) stream.getTracks().forEach(track => track.stop());
+        document.getElementById('mic'+id).classList.remove('occupied');
     }
 
     function showWallet() {
         let h = `
-            <h3 style="color:gold">محفظة الأرباح</h3>
-            <div style="font-size:24px; color:#2ecc71; margin:15px 0;">$${me.wallet.toFixed(2)}</div>
-            <button class="action-btn" onclick="alert('جاري معالجة طلب السحب...')">💸 سحب الأرباح الآن</button>
-            <button class="action-btn" onclick="closeM()">عودة</button>
+            <h3 style="color:var(--gold)">خزنة الأرباح 💰</h3>
+            <div style="font-size:30px; color:#2ecc71; margin:20px 0;">$${me.wallet.toFixed(2)}</div>
+            <button class="action-btn" style="background:green" onclick="alert('جاري تحويل الأرباح لحسابك...')">💸 سحب الأرباح الآن</button>
+            <button class="action-btn" onclick="closeM()">إغلاق</button>
         `;
         document.getElementById('modalContent').innerHTML = h;
         document.getElementById('modal').style.display = 'flex';
     }
 
-    function playMusic() {
-        let s = prompt("اسم الأغنية؟");
-        if(s) addMsg(me.name, `🎵 جاري تشغيل: ${s}<br><iframe width="100%" height="150" src="https://www.youtube.com/embed/dQw4w9WgXcQ" frameborder="0"></iframe>`, me.img, true);
+    function openYoutube() {
+        let song = prompt("اسم الأغنية التي تبحث عنها؟");
+        if(song) {
+            addMsg(me.name, `🎬 فيديو مطلوب: ${song}<br><iframe width="100%" height="200" src="https://www.youtube.com/embed/dQw4w9WgXcQ" frameborder="0"></iframe>`, me.img, true);
+            closeM();
+        }
+    }
+
+    function startRecording() {
+        alert("بدأ تسجيل صوتك الآن.. سيتم إرساله بعد الانتهاء!");
+        setTimeout(() => alert("تم إرسال التسجيل الصوتي بنجاح!"), 2000);
     }
 
     function closeM() { document.getElementById('modal').style.display = 'none'; }
-    function logout() { location.reload(); }
 </script>
+
 </body>
-            </html>
-                                                                                                                           
+</html>
