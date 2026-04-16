@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Empire Chat - النسخة النهائية</title>
+    <title>Chat Empire - النسخة النهائية</title>
     <style>
         :root {
-            --main-bg: #1a1a1a;
-            --panel-bg: #2d2d2d;
-            --accent-gold: #ffd700;
+            --bg-color: #0d0d0d; /* نفس خلفية الصورة */
+            --panel-bg: #1c1c1c;
+            --main-accent: #ffcc00; /* لون الذهب للكأس */
+            --green-active: #2ecc71;
             --text-color: #ffffff;
         }
 
@@ -16,35 +17,36 @@
             margin: 0;
             padding: 0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--main-bg);
+            background-color: var(--bg-color);
             color: var(--text-color);
-            overflow-x: hidden;
+            overflow: hidden; /* لمنع السكرول الخارجي */
         }
 
-        /* --- واجهة الدخول --- */
+        /* --- واجهة الدخول المدمجة --- */
         #login-screen {
             display: flex;
-            flex-direction: column;
-            align-items: center;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.9);
+            z-index: 1000;
             justify-content: center;
-            height: 100vh;
-            background: linear-gradient(145deg, #121212, #252525);
+            align-items: center;
+            transition: 0.5s;
         }
 
         .login-box {
-            background: var(--panel-bg);
-            padding: 20px;
+            background: #2d2d2d;
+            padding: 30px;
             border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            width: 90%;
-            max-width: 400px;
             text-align: center;
+            width: 350px;
         }
 
         .tabs {
             display: flex;
             margin-bottom: 20px;
-            border-bottom: 2px solid #444;
+            border-bottom: 2px solid #555;
         }
 
         .tab-btn {
@@ -58,8 +60,8 @@
         }
 
         .tab-btn.active {
-            color: var(--accent-gold);
-            border-bottom: 2px solid var(--accent-gold);
+            color: var(--main-accent);
+            border-bottom: 2px solid var(--main-accent);
         }
 
         .input-group {
@@ -71,7 +73,7 @@
             padding: 12px;
             border-radius: 8px;
             border: 1px solid #444;
-            background: #1a1a1a;
+            background: #111;
             color: #fff;
             box-sizing: border-box;
         }
@@ -79,7 +81,7 @@
         .btn-main {
             width: 100%;
             padding: 12px;
-            background: var(--accent-gold);
+            background: var(--main-accent);
             color: #000;
             border: none;
             border-radius: 8px;
@@ -87,99 +89,126 @@
             cursor: pointer;
         }
 
-        /* --- واجهة الشات الرئيسية --- */
+        /* --- واجهة الشات الرئيسية (نفس المضهر) --- */
         #chat-interface {
-            display: none; /* مخفي حتى يتم الدخول */
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
         }
 
+        /* الهيدر العلوي */
         .header {
             background: #000;
             padding: 10px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            border-bottom: 1px solid #333;
+            border-bottom: 1px solid #222;
         }
 
-        .user-info {
+        .user-top {
             display: flex;
             align-items: center;
             gap: 10px;
         }
 
-        .rank-badge {
+        .top-icons {
+            display: flex;
+            gap: 15px;
             font-size: 20px;
-            display: block;
-            text-align: center;
-            color: var(--accent-gold);
+            color: #fff;
         }
 
-        .name-style {
+        /* الاسم المزخرف وتنسيقه */
+        .name-wrapper {
             background: rgba(45, 45, 45, 0.9);
-            padding: 4px 12px;
+            padding: 2px 10px;
             border-radius: 4px;
             border: 1px solid #555;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .rank-tag {
+            color: var(--main-accent);
             font-size: 14px;
             font-weight: bold;
         }
 
+        .styled-name {
+            font-size: 15px;
+            font-weight: bold;
+        }
+
         .avatar {
-            width: 45px;
-            height: 45px;
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
-            border: 2px solid #4caf50; /* الدائرة الخضراء كما في الصورة */
+            border: 2px solid var(--green-active); /* الإطار الأخضر للمتصل */
         }
 
-        /* --- القائمة الجانبية (الأزرار) --- */
-        .side-menu {
-            position: fixed;
-            left: 0;
-            top: 60px;
-            width: 250px;
-            background: #fff;
-            color: #333;
-            height: calc(100vh - 120px);
-            z-index: 100;
-            border-radius: 0 15px 15px 0;
-            box-shadow: 5px 0 15px rgba(0,0,0,0.3);
-            padding-top: 10px;
+        /* منطقة رسائل الشات */
+        .chat-container {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            background: var(--bg-color);
         }
 
-        .menu-item {
-            padding: 12px 20px;
+        /* حقل الإدخال السفلي (كما في الصورة) */
+        .input-area {
             display: flex;
+            background: #000;
+            padding: 15px 10px;
+            border-top: 1px solid #222;
             align-items: center;
-            gap: 15px;
-            border-bottom: 1px solid #eee;
-            cursor: pointer;
-            font-size: 14px;
+            gap: 10px;
+            position: fixed;
+            bottom: 60px; /* فوق البار السفلي */
+            width: 100%;
+            box-sizing: border-box;
         }
 
-        .menu-item:hover { background: #f9f9f9; }
-        .menu-item i { font-size: 18px; color: #555; }
-        .text-red { color: #f44336; font-weight: bold; }
+        .btn-action { font-size: 20px; color: #aaa; cursor: pointer; }
 
-        /* --- الشريط السفلي --- */
+        .message-input {
+            flex: 1;
+            padding: 12px;
+            border-radius: 25px;
+            border: 1px solid #444;
+            background: #1c1c1c;
+            color: #fff;
+        }
+
+        .btn-send {
+            font-size: 24px;
+            color: #2ecc71; /* لون أخضر للإرسال */
+            cursor: pointer;
+        }
+
+        /* الشريط السفلي الرئيسي */
         .bottom-nav {
             position: fixed;
             bottom: 0;
             width: 100%;
-            background: #111;
+            background: #000;
             display: flex;
             justify-content: space-around;
             padding: 10px 0;
             border-top: 1px solid #333;
+            z-index: 10;
         }
 
-        .nav-btn {
+        .nav-item {
             text-align: center;
             color: #aaa;
             font-size: 11px;
             flex: 1;
         }
 
-        .nav-btn i { font-size: 20px; display: block; margin-bottom: 3px; }
-        .nav-btn.active { color: #fff; }
+        .nav-item i { font-size: 20px; display: block; margin-bottom: 3px; }
+        .nav-item.active { color: #fff; }
 
     </style>
 </head>
@@ -207,37 +236,35 @@
 
     <div id="chat-interface">
         <div class="header">
-            <div class="user-info">
+            <div class="user-top">
                 <img src="https://via.placeholder.com/50" class="avatar">
-                <div>
-                    <span class="rank-badge">🏆 Developer</span>
-                    <div class="name-style">⊱ كـ🌹ــارلـوس ⊰</div>
+                <div class="name-wrapper">
+                    <span class="rank-tag">🏆 Developer</span>
+                    <div class="styled-name">⊱ كـ🌹ــارلـوس ⊰</div>
                 </div>
             </div>
-            <div style="font-size: 20px; gap: 15px; display: flex;">
+            <div class="top-icons">
                 <span>🔔</span><span>✉️</span><span>👑</span>
             </div>
         </div>
 
-        <div class="side-menu">
-            <div class="menu-item">💠 معلومات المستوى</div>
-            <div class="menu-item">💳 محفظة</div>
-            <div class="menu-item">🧹 مسح الغرفة</div>
-            <div class="menu-item">👤 تحرير الملف الشخصي</div>
-            <div class="menu-item">🔄 تبديل نقاط المسابقة</div>
-            <div class="menu-item text-red">🔘 الوضع البسيط</div>
-            <div class="menu-item">✨ تحديث الشات للجميع</div>
-            <div class="menu-item">📢 إرسال إشعار جماعي</div>
-            <div class="menu-item">💻 Console</div>
-            <div class="menu-item" style="color: #00bcd4;">⚙️ لوحة التحكم</div>
+        <div class="chat-container">
+            </div>
+
+        <div class="input-area">
+            <span class="btn-action">⊕</span>
+            <span class="btn-action">🎙️</span>
+            <input type="text" class="message-input" placeholder="اكتب هنا...">
+            <span class="btn-action">😊</span>
+            <span class="btn-send">➤</span>
         </div>
 
         <div class="bottom-nav">
-            <div class="nav-btn active"><i>⚙️</i>الخيارات</div>
-            <div class="nav-btn"><i>👥</i>متواجدين</div>
-            <div class="nav-btn"><i>🏠</i>الغرف</div>
-            <div class="nav-btn"><i>🎤</i>صوتيات</div>
-            <div class="nav-btn"><i>📻</i>الراديو</div>
+            <div class="nav-item active"><i>⚙️</i>الخيارات</div>
+            <div class="nav-item"><i>👥</i>متواجدين</div>
+            <div class="nav-item"><i>🏠</i>الغرف</div>
+            <div class="nav-item"><i>🎤</i>صوتيات</div>
+            <div class="nav-item"><i>📻</i>الراديو</div>
         </div>
     </div>
 
@@ -255,10 +282,12 @@
         }
 
         function enterChat() {
-            document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('chat-interface').style.display = 'block';
+            document.getElementById('login-screen').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('login-screen').style.display = 'none';
+            }, 500);
         }
     </script>
 </body>
     </html>
-            
+    
