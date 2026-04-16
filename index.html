@@ -3,14 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>إمبراطورية الشات - النسخة الملكية</title>
+    <title>إمبراطورية الشات - النسخة الدائمة</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --gold: #f1c40f; --king-grad: linear-gradient(180deg, #ffd700, #b8860b); }
         * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; outline: none; }
         body, html { margin: 0; padding: 0; height: 100vh; background: #000; overflow: hidden; position: relative; }
 
-        /* شاشة الدخول الاحترافية - (زائر، عضوية، تسجيل جديد) */
         #loginOverlay { position: fixed; inset: 0; background: radial-gradient(circle, #444, #000); z-index: 100000; display: flex; align-items: center; justify-content: center; padding: 10px; }
         .login-card { background: #fff; width: 100%; max-width: 400px; padding: 20px; border-radius: 20px; border: 4px solid var(--gold); text-align: center; box-shadow: 0 0 20px gold; }
         .login-tabs { display: flex; gap: 5px; margin-bottom: 15px; }
@@ -19,45 +18,35 @@
         .login-form { display: none; } .login-form.active { display: block; }
         input { width: 100%; padding: 10px; margin-bottom: 8px; border-radius: 8px; border: 1px solid #ccc; text-align: center; }
 
-        /* الواجهة الرئيسية */
         #chatApp { display: none; height: 100vh; flex-direction: column; background-size: cover; background-position: center; }
         
-        /* الشريط العلوي */
         .top-nav { height: 65px; background: rgba(0,0,0,0.9); display: flex; justify-content: space-around; align-items: center; border-bottom: 2px solid gold; z-index: 100; }
         .nav-btn { color: gold; text-align: center; font-size: 10px; cursor: pointer; flex: 1; }
         .nav-btn i { display: block; font-size: 22px; margin-bottom: 2px; }
 
-        /* منطقة المايكات */
         .mic-section { height: 90px; background: rgba(255,255,255,0.1); backdrop-filter: blur(5px); display: flex; justify-content: space-around; align-items: center; padding: 5px; border-bottom: 1px solid gold; }
         .user-mic { width: 60px; height: 60px; border-radius: 50%; border: 2px solid #fff; position: relative; cursor: pointer; }
         .user-mic img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
         .lvl-badge { position: absolute; top: -8px; left: 50%; transform: translateX(-50%); background: gold; color: #000; font-size: 10px; font-weight: bold; padding: 1px 5px; border-radius: 5px; border: 1px solid #000; }
 
-        /* منطقة الشات - التركيز على فصل الكأس والأيقونة الدائرية */
         .chat-view { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 15px; }
-        .msg-bubble { align-self: flex-start; max-width: 90%; display: flex; flex-direction: column; }
+        .msg-bubble { align-self: flex-start; max-width: 90%; display: flex; flex-direction: column; position: relative; }
         
-        /* تصميم الرأس: أيقونة دائرية + كأس منفصل + خلفية اسم */
         .msg-header-container { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
-        
-        /* الأيقونة الدائرية المتوضعة (بجانب الكأس) */
         .header-circle-icon { width: 28px; height: 28px; border-radius: 50%; border: 2px solid gold; background: #fff; overflow: hidden; box-shadow: 0 0 5px gold; }
         .header-circle-icon img { width: 100%; height: 100%; object-fit: cover; }
-        
-        /* الكأس المنفصل */
         .trophy-standalone { color: gold; font-size: 18px; filter: drop-shadow(1px 1px 2px #000); }
-        
-        /* خلفية الاسم المستقلة */
         .name-background { background: #000; color: gold; border: 1.5px solid gold; padding: 2px 12px; border-radius: 12px; font-size: 12px; font-weight: bold; }
 
         .msg-text { background: #fff; padding: 10px 15px; border-radius: 0 15px 15px 15px; border: 1px solid #ddd; font-size: 14px; box-shadow: 2px 2px 8px rgba(0,0,0,0.2); color: #000; }
+        
+        .delete-msg { position: absolute; left: -25px; top: 50%; transform: translateY(-50%); color: red; font-size: 12px; cursor: pointer; display: none; }
+        .is-admin .delete-msg { display: block; }
 
-        /* لوحة الكتابة السفلية - علم اليمن */
         .bottom-panel { height: 75px; background: linear-gradient(to bottom, #FF0000 33.3%, #FFFFFF 33.3%, #FFFFFF 66.6%, #000000 66.6%); display: flex; align-items: center; padding: 0 10px; gap: 10px; border-top: 2px solid gold; }
         .msg-input { flex: 1; height: 45px; border-radius: 25px; border: 2px solid gold; padding: 0 15px; font-weight: bold; }
         .icon-btn { font-size: 26px; color: #000; cursor: pointer; filter: drop-shadow(1px 1px 1px #fff); }
 
-        /* المودالات */
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000; align-items: center; justify-content: center; padding: 15px; }
         .modal-box { background: #fff; width: 100%; max-width: 400px; border-radius: 20px; border: 4px solid gold; overflow: hidden; }
         .m-header { background: #000; color: gold; padding: 12px; text-align: center; font-weight: bold; }
@@ -65,9 +54,7 @@
         .admin-btn { padding: 12px; border: none; border-radius: 8px; font-weight: bold; color: #fff; cursor: pointer; width: 100%; margin-top: 5px; }
     </style>
 </head>
-<body>
-
-<div id="loginOverlay">
+<body class="is-admin"> <div id="loginOverlay">
     <div class="login-card">
         <i class="fas fa-crown" style="font-size: 50px; color: gold; margin-bottom: 10px;"></i>
         <div class="login-tabs">
@@ -80,13 +67,11 @@
             <input type="text" id="visName" placeholder="أدخل اسم الزائر">
             <button class="tab-btn active" style="width:100%" onclick="login('visitor')">دخول سريع 🚀</button>
         </div>
-
         <div id="member" class="login-form">
             <input type="email" id="memEmail" placeholder="البريد الإلكتروني">
             <input type="password" id="memPass" placeholder="كلمة المرور">
             <button class="tab-btn active" style="width:100%" onclick="login('member')">دخول العضوية 🔐</button>
         </div>
-
         <div id="new" class="login-form">
             <input type="text" id="newName" placeholder="الاسم الملكي">
             <input type="email" id="newEmail" placeholder="البريد الإلكتروني">
@@ -100,16 +85,15 @@
     <div class="top-nav">
         <div class="nav-btn" onclick="openMyProfile()"><i class="fas fa-user-shield"></i>بروفايلي</div>
         <div class="nav-btn" onclick="openAppearance()"><i class="fas fa-image"></i>الخلفية</div>
-        <div class="nav-btn" onclick="openRooms()"><i class="fas fa-door-open"></i>الغرف</div>
+        <div class="nav-btn" onclick="openAdminPanel()"><i class="fas fa-tools"></i>لوحة التحكم</div>
         <div class="nav-btn" onclick="openList('الأثرياء')"><i class="fas fa-gem"></i>الأثرياء</div>
         <div class="nav-btn" onclick="openList('الكبار')"><i class="fas fa-medal"></i>الكبار</div>
         <div class="nav-btn" onclick="location.reload()"><i class="fas fa-power-off"></i>خروج</div>
     </div>
 
     <div class="mic-section">
-        <div class="user-mic" onclick="adminControl('الإمبراطور')"><img src="https://i.pravatar.cc/150?u=1" id="mainAv"><span class="lvl-badge">1000</span></div>
-        <div class="user-mic" onclick="adminControl('عاشق اليمن')"><img src="https://i.pravatar.cc/150?u=2"><span class="lvl-badge">500</span></div>
-        <div class="user-mic" onclick="adminControl('صقر العرب')"><img src="https://i.pravatar.cc/150?u=3"><span class="lvl-badge">220</span></div>
+        <div class="user-mic" onclick="adminControl('الإمبراطور')"><img src="https://i.pravatar.cc/150?u=1" id="mainAv"><span class="lvl-badge">👑 1000</span></div>
+        <div class="user-mic" onclick="adminControl('عضو جديد')"><img src="https://i.pravatar.cc/150?u=2"><span class="lvl-badge">1</span></div>
     </div>
 
     <div class="chat-view" id="chatBox"></div>
@@ -132,15 +116,17 @@
 </div>
 
 <script>
-    // بيانات المستخدم مع أيقونة الرأس الدائرية
+    // نظام تخزين الرسائل والبيانات
     let myData = { 
         name: "زائر", 
         avatar: "https://i.pravatar.cc/150?u=v", 
-        headerCircle: "https://i.pravatar.cc/150?u=icon", // الأيقونة الدائرية بجانب الكأس
+        headerCircle: "https://i.pravatar.cc/150?u=icon",
         bg: "", 
         level: 1, 
-        type: "visitor" 
+        role: "user" 
     };
+
+    let chatHistory = JSON.parse(localStorage.getItem('impChatHistory')) || [];
 
     function switchTab(id, btn) {
         document.querySelectorAll('.login-form').forEach(f => f.classList.remove('active'));
@@ -152,41 +138,74 @@
     function login(type) {
         const nameInput = (type === 'visitor') ? document.getElementById('visName').value : (type === 'new' ? document.getElementById('newName').value : "عضو ملكي");
         myData.name = nameInput || "إمبراطور مجهول";
-        myData.type = type;
-        myData.level = (type === 'visitor') ? 1 : 1000;
+        myData.role = (myData.name.includes("خليل") || myData.name.includes("إمبراطور")) ? "admin" : "user";
+        myData.level = (myData.role === "admin") ? 1000 : 1;
         startApp();
     }
 
     function startApp() {
         document.getElementById('loginOverlay').style.display = 'none';
         document.getElementById('chatApp').style.display = 'flex';
-        if(myData.bg) document.getElementById('chatApp').style.backgroundImage = `url(${myData.bg})`;
-        document.getElementById('mainAv').src = myData.avatar;
-        sendKingMsg("دخل الإمبراطور للسيطرة على الأجواء! 🛡️");
+        loadChat();
     }
 
     function sendKingMsg(customText = null) {
         const inp = document.getElementById('mainMsgInp');
         const val = customText || inp.value;
         if(!val) return;
+
+        const newMsg = {
+            id: Date.now(),
+            name: myData.name,
+            text: val,
+            icon: myData.headerCircle,
+            level: myData.level
+        };
+
+        chatHistory.push(newMsg);
+        localStorage.setItem('impChatHistory', JSON.stringify(chatHistory));
+        renderMsg(newMsg);
+        inp.value = "";
+        document.getElementById('chatBox').scrollTop = document.getElementById('chatBox').scrollHeight;
+    }
+
+    function renderMsg(msg) {
         const box = document.getElementById('chatBox');
         const div = document.createElement('div');
         div.className = 'msg-bubble';
-        
-        // هنا التصميم المطلوب: أيقونة دائرية + كأس منفصل + خلفية اسم
+        div.id = 'msg-' + msg.id;
         div.innerHTML = `
             <div class="msg-header-container">
-                <div class="header-circle-icon">
-                    <img src="${myData.headerCircle}">
-                </div>
+                <div class="header-circle-icon"><img src="${msg.icon}"></div>
                 <i class="fas fa-trophy trophy-standalone"></i>
-                <div class="name-background">${myData.name}</div>
+                <div class="name-background">${msg.name} <span style="font-size:8px; color:#fff">[LVL ${msg.level}]</span></div>
             </div>
-            <div class="msg-text">${val}</div>
+            <div class="msg-text">${msg.text}</div>
+            <i class="fas fa-trash delete-msg" onclick="deleteMsg(${msg.id})"></i>
         `;
         box.appendChild(div);
-        inp.value = "";
-        box.scrollTop = box.scrollHeight;
+    }
+
+    function loadChat() {
+        document.getElementById('chatBox').innerHTML = "";
+        chatHistory.forEach(renderMsg);
+    }
+
+    function deleteMsg(id) {
+        chatHistory = chatHistory.filter(m => m.id !== id);
+        localStorage.setItem('impChatHistory', JSON.stringify(chatHistory));
+        loadChat();
+    }
+
+    function openAdminPanel() {
+        showGlobalMod("لوحة تحكم الإمبراطور 🛡️", `
+            <h3 style="text-align:center; color:gold;">إدارة الأعضاء</h3>
+            <div style="background:#eee; padding:10px; border-radius:10px; margin-bottom:10px;">
+                <p>اسم العضو: <b>عاشق اليمن</b></p>
+                <button class="admin-btn" style="background:green" onclick="alert('تم تفعيل الاشتراك وترقية الرتبة!')">تفعيل اشتراك العضو ✅</button>
+            </div>
+            <button class="admin-btn" style="background:red" onclick="if(confirm('حذف كل الرسائل؟')) { localStorage.removeItem('impChatHistory'); chatHistory=[]; loadChat(); }">حذف سجل الشات بالكامل 🧨</button>
+        `);
     }
 
     function uploadToChat(input, mode) {
@@ -196,16 +215,11 @@
                 const res = e.target.result;
                 if(mode === 'img') sendKingMsg(`<img src="${res}" style="max-width:100%; border-radius:10px; border:2px solid gold;">`);
                 else if(mode === 'bg') {
-                    myData.bg = res;
                     document.getElementById('chatApp').style.backgroundImage = `url(${res})`;
                 }
                 else if(mode === 'av') {
                     myData.avatar = res;
                     document.getElementById('mainAv').src = res;
-                }
-                else if(mode === 'hCircle') {
-                    myData.headerCircle = res; // تعديل الأيقونة بجانب الكأس
-                    alert("تم تحديث أيقونة الاسم الدائرية!");
                 }
             };
             reader.readAsDataURL(input.files[0]);
@@ -213,55 +227,23 @@
     }
 
     function openMyProfile() {
-        showGlobalMod("تعديل البروفايل الملكي", `
+        showGlobalMod("تعديل البروفايل", `
             <label>تغيير الصورة الشخصية:</label>
             <input type="file" onchange="uploadToChat(this, 'av')">
-            
-            <label>تغيير الأيقونة الدائرية (بجانب الكأس):</label>
-            <input type="file" onchange="uploadToChat(this, 'hCircle')">
-            
-            <label>الاسم الملكي:</label>
-            <input type="text" id="editN" value="${myData.name}">
-            
-            <button class="admin-btn" style="background:var(--king-grad); color:#000" onclick="saveP()">حفظ التغييرات ✅</button>
+            <label>الاسم:</label><input type="text" id="editN" value="${myData.name}">
+            <button class="admin-btn" style="background:var(--king-grad); color:#000" onclick="myData.name=document.getElementById('editN').value; closeGlobalMod();">حفظ ✅</button>
         `);
     }
 
     function openAppearance() {
-        showGlobalMod("تغيير خلفية الشات", `
-            <label>اختر صورة من ملفاتك:</label>
-            <input type="file" onchange="uploadToChat(this, 'bg')">
-        `);
+        showGlobalMod("الخلفية", `<label>اختر صورة:</label><input type="file" onchange="uploadToChat(this, 'bg')">`);
     }
 
-    function adminControl(target) {
-        showGlobalMod("إدارة العضو: " + target, `
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                <button class="admin-btn" style="background:#e67e22" onclick="alert('تم الكتم')">كتم 🔇</button>
-                <button class="admin-btn" style="background:#d35400" onclick="alert('تم الطرد')">طرد 🚪</button>
-                <button class="admin-btn" style="background:#c0392b" onclick="alert('حظر IP')">حظر 🚫</button>
-                <button class="admin-btn" style="background:#2c3e50" onclick="alert('تم الحجب')">حجب 🧱</button>
-            </div>
-        `);
-    }
-
-    function saveP() { 
-        myData.name = document.getElementById('editN').value; 
-        closeGlobalMod(); 
-        sendKingMsg("تم تحديث ملفي الشخصي بنجاح ✨"); 
-    }
-
-    function youtubeTrigger() {
-        const id = prompt("أدخل كود اليوتيوب:");
-        if(id) sendKingMsg(`<iframe width="100%" height="180" src="https://www.youtube.com/embed/${id}" frameborder="0" allowfullscreen></iframe>`);
-    }
-
-    function openRooms() { showGlobalMod("الغرف", `<button class="admin-btn" style="background:#222">غرفة الإدارة 🛡️</button>`); }
-    function openList(t) { showGlobalMod("قائمة " + t, `<div style="text-align:center;">1. الإمبراطور (1000 LVL)</div>`); }
     function showGlobalMod(t, c) { document.getElementById('modalTitle').innerText = t; document.getElementById('modalBody').innerHTML = c; document.getElementById('globalModal').style.display = 'flex'; }
     function closeGlobalMod() { document.getElementById('globalModal').style.display = 'none'; }
     document.getElementById('mainMsgInp').onkeypress = (e) => { if(e.key === 'Enter') sendKingMsg(); };
 </script>
 
 </body>
-</html>
+    </html>
+    
