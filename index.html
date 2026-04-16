@@ -10,235 +10,218 @@
         * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; outline: none; }
         body, html { margin: 0; padding: 0; height: 100%; background: #000; overflow: hidden; }
 
-        /* شاشة الدخول الملكية */
-        #loginOverlay { position: fixed; inset: 0; background: radial-gradient(circle, #333, #000); z-index: 100000; display: flex; align-items: center; justify-content: center; }
-        .login-card { background: white; width: 90%; max-width: 400px; padding: 30px; border-radius: 25px; border: 5px solid var(--gold); text-align: center; box-shadow: 0 0 30px var(--gold); }
-        .login-card input { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 10px; border: 1px solid #ddd; text-align: center; }
-
-        /* الواجهة الرئيسية الخلفية */
-        #chatApp { display: none; height: 100vh; flex-direction: column; position: relative; background-size: cover; background-position: center; transition: 0.5s; }
+        /* شاشة تسجيل الدخول المتقدمة - بناءً على طلبك */
+        #loginOverlay { position: fixed; inset: 0; background: url('https://images.unsplash.com/photo-1510511459019-5dda7724fd87?auto=format&fit=crop&q=80') center/cover; z-index: 100000; display: flex; align-items: center; justify-content: center; }
+        .login-card { background: rgba(255, 255, 255, 0.95); width: 92%; max-width: 400px; padding: 30px; border-radius: 25px; border: 5px solid var(--gold); text-align: center; box-shadow: 0 0 30px var(--gold); }
+        .login-card input { width: 100%; padding: 12px; margin-bottom: 12px; border-radius: 10px; border: 1px solid #ccc; text-align: center; font-size: 14px; }
         
-        /* الشريط العلوي الذهبي */
-        .top-nav { background: rgba(0,0,0,0.9); color: gold; display: flex; justify-content: space-around; padding: 10px 0; border-bottom: 3px solid gold; z-index: 10; }
-        .nav-btn { text-align: center; font-size: 11px; cursor: pointer; color: gold; transition: 0.3s; }
-        .nav-btn:hover { transform: scale(1.1); text-shadow: 0 0 10px gold; }
-        .nav-btn i { display: block; font-size: 24px; margin-bottom: 3px; }
+        /* الواجهة الرئيسية */
+        #chatApp { display: none; height: 100vh; flex-direction: column; position: relative; background: #eee center/cover; }
+        
+        /* الشريط العلوي - نسخة 75668.png */
+        .top-nav { background: #000; color: gold; display: flex; justify-content: space-around; padding: 10px 0; border-bottom: 3px solid gold; z-index: 10; }
+        .nav-btn { text-align: center; font-size: 11px; cursor: pointer; color: gold; }
+        .nav-btn i { display: block; font-size: 24px; margin-bottom: 4px; color: gold; }
 
-        /* المايكات والمستويات */
-        .mic-grid { background: rgba(255,255,255,0.1); backdrop-filter: blur(5px); padding: 15px; display: flex; justify-content: space-around; border-bottom: 2px solid gold; }
-        .mic-box { width: 65px; height: 65px; border-radius: 50%; border: 3px solid gold; position: relative; cursor: pointer; box-shadow: 0 0 15px rgba(241, 196, 15, 0.5); }
+        /* منطقة المايكات والمستويات */
+        .mic-grid { background: rgba(200, 200, 200, 0.8); padding: 15px; display: flex; justify-content: space-around; border-bottom: 2px solid gold; }
+        .mic-box { width: 70px; height: 70px; border-radius: 50%; border: 3px solid #fff; position: relative; cursor: pointer; background: #fff; }
         .mic-box img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
-        .level-badge { position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%); background: var(--king-grad); color: #000; font-size: 9px; font-weight: bold; padding: 2px 6px; border-radius: 10px; border: 1px solid #fff; }
+        .lvl-tag { position: absolute; top: -5px; right: -5px; background: var(--king-grad); color: #000; font-size: 10px; font-weight: bold; padding: 2px 5px; border-radius: 5px; border: 1px solid #000; }
 
-        /* منطقة الرسائل */
-        .chat-area { flex: 1; overflow-y: auto; padding: 15px; background: rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 15px; }
-        .msg-row { display: flex; align-items: flex-start; gap: 10px; animation: slideIn 0.3s ease; }
-        .name-strip { padding: 5px 15px; border-radius: 15px; color: white; font-weight: bold; font-size: 13px; border: 1px solid gold; box-shadow: 2px 2px 5px rgba(0,0,0,0.2); position: relative; }
-        .msg-content { background: rgba(255,255,255,0.9); padding: 8px 15px; border-radius: 15px; font-size: 14px; color: #333; max-width: 70%; line-height: 1.4; border: 1px solid #ddd; }
+        /* منطقة الشات */
+        .chat-area { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 15px; }
+        .msg-container { display: flex; align-items: flex-start; gap: 10px; animation: fadeIn 0.3s; }
+        .user-info-box { background: #000; color: gold; border: 1px solid gold; border-radius: 12px; padding: 5px 12px; font-size: 12px; font-weight: bold; min-width: 100px; text-align: center; }
 
-        /* لوحة الكتابة الإمبراطورية (علم اليمن) */
-        .write-area { 
-            padding: 15px; 
+        /* لوحة الكتابة - علم اليمن */
+        .write-panel { 
             background: linear-gradient(to bottom, #FF0000 33.3%, #FFFFFF 33.3%, #FFFFFF 66.6%, #000000 66.6%); 
-            display: flex; align-items: center; gap: 10px; border-top: 3px solid gold; position: relative;
+            padding: 15px; display: flex; align-items: center; gap: 10px; border-top: 3px solid gold;
         }
-        .write-area::before { content: "3rab.chat - إمبراطورية الشات"; position: absolute; top: -18px; left: 50%; transform: translateX(-50%); color: gold; font-size: 10px; font-weight: bold; text-shadow: 1px 1px #000; }
-        .msg-input { flex: 1; background: #fff; border-radius: 25px; padding: 12px 20px; border: 2px solid gold; font-weight: bold; font-size: 15px; }
-        .send-btn { width: 50px; height: 50px; background: var(--king-grad); border: none; border-radius: 50%; color: #000; font-size: 20px; cursor: pointer; box-shadow: 0 0 10px gold; }
+        .msg-input { flex: 1; padding: 12px 20px; border-radius: 25px; border: 2px solid gold; font-weight: bold; }
+        .action-icon { font-size: 25px; color: #000; cursor: pointer; transition: 0.2s; }
+        .action-icon:hover { color: gold; transform: scale(1.1); }
 
-        /* مودال المظهر والبروفايل */
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 200000; align-items: center; justify-content: center; }
-        .modal-card { background: #fff; width: 95%; max-width: 450px; border-radius: 30px; border: 5px solid gold; overflow: hidden; animation: zoomIn 0.3s; }
-        .m-header { background: #000; color: gold; padding: 20px; text-align: center; font-size: 20px; font-weight: bold; border-bottom: 2px solid gold; }
-        .m-body { padding: 25px; display: flex; flex-direction: column; gap: 15px; max-height: 75vh; overflow-y: auto; }
-        .m-body input, .m-body textarea { width: 100%; padding: 12px; border-radius: 12px; border: 2px solid #eee; font-size: 15px; }
-        
-        @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
-        @keyframes zoomIn { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        /* مودال - نظام الإدارة */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 200000; align-items: center; justify-content: center; }
+        .modal-content { background: #fff; width: 95%; max-width: 450px; border-radius: 20px; border: 4px solid gold; overflow: hidden; }
+        .m-header { background: #000; color: gold; padding: 15px; text-align: center; font-weight: bold; }
+        .m-body { padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+        .admin-tools { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .btn-kick { background: #e67e22; color: #fff; border: none; padding: 10px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .btn-ban { background: #c0392b; color: #fff; border: none; padding: 10px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .btn-mute { background: #7f8c8d; color: #fff; border: none; padding: 10px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
 <div id="loginOverlay">
     <div class="login-card">
-        <i class="fas fa-chess-king" style="font-size: 60px; color: gold; margin-bottom: 15px;"></i>
-        <h2>دخول الإدارة العليا</h2>
-        <input type="text" id="logUser" placeholder="الاسم الملكي">
+        <h2 style="margin-top:0;">إنشاء حساب / دخول</h2>
+        <input type="text" id="logUser" placeholder="اسم المستخدم">
+        <input type="email" id="logEmail" placeholder="البريد الإلكتروني">
         <input type="password" id="logPass" placeholder="كلمة المرور">
-        <button class="gold-btn" onclick="login()">دخول وسيطرة 🏆</button>
+        <button class="btn-kick" style="width:100%; font-size:18px; background:var(--king-grad); color:#000;" onclick="handleLogin()">إرسال ودخول 👑</button>
+        <p style="font-size:11px; color:#666; margin-top:10px;">بتسجيلك أنت توافق على شروط الاستخدام</p>
     </div>
 </div>
 
 <div id="chatApp">
     <div class="top-nav">
-        <div class="nav-btn" onclick="openProfile()"><i class="fas fa-id-card"></i>بروفايلي</div>
-        <div class="nav-btn" onclick="openAppearance()"><i class="fas fa-palette"></i>المظهر</div>
-        <div class="nav-btn" onclick="openRooms()"><i class="fas fa-gem"></i>الغرف</div>
-        <div class="nav-btn" onclick="openElite('الأثرياء')"><i class="fas fa-coins"></i>الأثرياء</div>
-        <div class="nav-btn" onclick="openElite('الكبار')"><i class="fas fa-user-shield"></i>الكبار</div>
-        <div class="nav-btn" onclick="location.reload()"><i class="fas fa-sign-out-alt"></i>خروج</div>
+        <div class="nav-btn" onclick="openProfile()"><i class="fas fa-user-circle"></i>بروفايلي</div>
+        <div class="nav-btn" onclick="openSettings()"><i class="fas fa-edit"></i>المظهر</div>
+        <div class="nav-btn" onclick="openRooms()"><i class="fas fa-door-open"></i>الغرف</div>
+        <div class="nav-btn" onclick="openList('الأثرياء')"><i class="fas fa-money-bill-wave"></i>الأثرياء</div>
+        <div class="nav-btn" onclick="openList('الكبار')"><i class="fas fa-crown"></i>الكبار</div>
+        <div class="nav-btn" onclick="location.reload()"><i class="fas fa-power-off"></i>خروج</div>
     </div>
 
     <div class="mic-grid">
-        <div class="mic-box" onclick="openProfile()"><img src="https://i.pravatar.cc/150?u=king" id="myAv"><div class="level-badge">LVL 1000</div></div>
-        <div class="mic-box"><img src="https://i.pravatar.cc/150?u=a"><div class="level-badge">LVL 450</div></div>
-        <div class="mic-box"><img src="https://i.pravatar.cc/150?u=b"><div class="level-badge">LVL 220</div></div>
+        <div class="mic-box" onclick="manageUser('الإمبراطور')"><img src="https://i.pravatar.cc/150?u=1"><span class="lvl-tag">1000</span></div>
+        <div class="mic-box" onclick="manageUser('عضو 1')"><img src="https://i.pravatar.cc/150?u=2"><span class="lvl-tag">500</span></div>
+        <div class="mic-box" onclick="manageUser('عضو 2')"><img src="https://i.pravatar.cc/150?u=3"><span class="lvl-tag">120</span></div>
     </div>
 
     <div class="chat-area" id="chatBox"></div>
 
-    <div class="write-area">
-        <input type="file" id="fileInp" hidden onchange="uploadImg(this)">
-        <i class="fas fa-camera" style="font-size: 26px; color: #333; cursor: pointer;" onclick="document.getElementById('fileInp').click()"></i>
-        <i class="fab fa-youtube" style="font-size: 26px; color: #ff0000; cursor: pointer;" onclick="playYoutube()"></i>
-        <input type="text" id="mainInp" class="msg-input" placeholder="اكتب رسالتك يا ملك...">
-        <button class="send-btn" onclick="sendMsg()"><i class="fas fa-paper-plane"></i></button>
+    <div class="write-panel">
+        <input type="file" id="uploadFile" hidden onchange="processFile(this)">
+        <i class="fas fa-image action-icon" onclick="document.getElementById('uploadFile').click()"></i>
+        <i class="fab fa-youtube action-icon" style="color:red;" onclick="playYoutube()"></i>
+        <input type="text" id="msgInput" class="msg-input" placeholder="اكتب رسالتك الملكية...">
+        <i class="fas fa-paper-plane action-icon" onclick="sendMsg()"></i>
     </div>
 </div>
 
-<div id="mainModal" class="modal">
-    <div class="modal-card">
-        <div class="m-header" id="mTitle">الإعدادات</div>
+<div id="genModal" class="modal">
+    <div class="modal-content">
+        <div class="m-header" id="mTitle">لوحة التحكم</div>
         <div class="m-body" id="mBody"></div>
-        <button onclick="closeMod()" style="width:100%; padding:15px; background:#f8f9fa; border:none; color:#d63031; font-weight:bold; cursor:pointer;">إغلاق القائمة</button>
+        <button onclick="closeMod()" style="width:100%; padding:15px; background:#eee; border:none; cursor:pointer; font-weight:bold;">إغلاق</button>
     </div>
 </div>
 
 <script>
-    let myData = JSON.parse(localStorage.getItem('kingUser')) || {
-        name: "الإمبراطور",
-        avatar: "https://i.pravatar.cc/150?u=king",
-        status: "في صدارة المشهد 🛡️",
-        bio: "إمبراطور شات 3rab.chat",
-        bg: "https://images.unsplash.com/photo-1519750783826-e2420f4d687f",
-        lvl: 1000,
-        color: "#000000"
-    };
+    let user = JSON.parse(localStorage.getItem('kingSession')) || null;
 
-    function login() {
-        const u = document.getElementById('logUser').value;
-        if(u) myData.name = u;
-        localStorage.setItem('kingUser', JSON.stringify(myData));
-        document.getElementById('loginOverlay').style.display = 'none';
-        document.getElementById('chatApp').style.display = 'flex';
-        document.getElementById('chatApp').style.backgroundImage = `url('${myData.bg}')`;
-        sendMsg("دخل الملك الساحة.. تحية إجلال! 👑");
+    window.onload = () => { if(user) loadApp(); };
+
+    function handleLogin() {
+        const name = document.getElementById('logUser').value;
+        const email = document.getElementById('logEmail').value;
+        const pass = document.getElementById('logPass').value;
+        if(!name || !email || !pass) return alert("اكمل البيانات!");
+        user = { name, email, avatar: 'https://i.pravatar.cc/150?u='+name, bg: '', status: 'ملك الشات' };
+        localStorage.setItem('kingSession', JSON.stringify(user));
+        loadApp();
     }
 
-    function sendMsg(txt = null) {
-        const inp = document.getElementById('mainInp');
-        const val = txt || inp.value;
+    function loadApp() {
+        document.getElementById('loginOverlay').style.display = 'none';
+        document.getElementById('chatApp').style.display = 'flex';
+        if(user.bg) document.getElementById('chatApp').style.backgroundImage = `url(${user.bg})`;
+        sendMsg("تم تسجيل الدخول بنجاح عبر البريد والاسم 🛡️");
+    }
+
+    function sendMsg(text = null) {
+        const inp = document.getElementById('msgInput');
+        const val = text || inp.value;
         if(!val) return;
         const box = document.getElementById('chatBox');
-        const row = document.createElement('div');
-        row.className = 'msg-row';
-        row.innerHTML = `
-            <img src="${myData.avatar}" style="width:45px; height:45px; border-radius:50%; border:2px solid gold;">
+        const div = document.createElement('div');
+        div.className = 'msg-container';
+        div.innerHTML = `
+            <img src="${user.avatar}" style="width:40px;height:40px;border-radius:50%; border:2px solid gold;">
             <div>
-                <div class="name-strip" style="background:${myData.color}">
-                    <i class="fas fa-crown" style="color:gold;"></i> ${myData.name} 
-                    <span style="font-size:9px; background:gold; color:#000; padding:1px 4px; border-radius:5px; margin-right:5px;">LVL ${myData.lvl}</span>
-                </div>
-                <div class="msg-content">${val}</div>
+                <div class="user-info-box">${user.name} 🏆</div>
+                <div style="background:#fff; padding:8px 12px; border-radius:0 15px 15px 15px; margin-top:5px; border:1px solid #ddd;">${val}</div>
             </div>
         `;
-        box.appendChild(row);
+        box.appendChild(div);
         inp.value = "";
         box.scrollTop = box.scrollHeight;
     }
 
-    function openProfile() {
-        showMod("تعديل البروفايل الملكي", `
-            <label>الاسم المستعار:</label><input type="text" id="upName" value="${myData.name}">
-            <label>الحالة الشخصية:</label><input type="text" id="upStatus" value="${myData.status}">
-            <label>نبذة عنك:</label><textarea id="upBio">${myData.bio}</textarea>
-            <label>رابط صورتك:</label><input type="text" id="upAv" value="${myData.avatar}">
-            <label>لون الاسم (هوية ملكية):</label><input type="color" id="upColor" value="${myData.color}">
-            <button class="gold-btn" onclick="saveProfile()">حفظ التعديلات 💾</button>
-        `);
-    }
-
-    function openAppearance() {
-        showMod("ديكور الإمبراطورية", `
-            <label>اختر صورة خلفية من جهازك:</label>
-            <input type="file" accept="image/*" onchange="changeBgFile(this)">
-            <label>أو ضع رابط خلفية مباشرة:</label>
-            <input type="text" id="bgLink" placeholder="http://...">
-            <button class="gold-btn" onclick="saveBg()">تحديث الخلفية 🎨</button>
-        `);
-    }
-
-    function saveProfile() {
-        myData.name = document.getElementById('upName').value;
-        myData.status = document.getElementById('upStatus').value;
-        myData.bio = document.getElementById('upBio').value;
-        myData.avatar = document.getElementById('upAv').value;
-        myData.color = document.getElementById('upColor').value;
-        document.getElementById('myAv').src = myData.avatar;
-        localStorage.setItem('kingUser', JSON.stringify(myData));
-        closeMod();
-        sendMsg("تم تحديث هويتي الملكية بنجاح ✅");
-    }
-
-    function changeBgFile(input) {
+    // تفعيل رفع الصور من الملفات
+    function processFile(input) {
         if (input.files && input.files[0]) {
-            let reader = new FileReader();
-            reader.onload = (e) => {
-                myData.bg = e.target.result;
-                document.getElementById('chatApp').style.backgroundImage = `url('${myData.bg}')`;
-            };
+            const reader = new FileReader();
+            reader.onload = (e) => sendMsg(`<img src="${e.target.result}" style="max-width:200px; border-radius:10px;">`);
             reader.readAsDataURL(input.files[0]);
         }
     }
 
-    function saveBg() {
-        const link = document.getElementById('bgLink').value;
-        if(link) {
-            myData.bg = link;
-            document.getElementById('chatApp').style.backgroundImage = `url('${link}')`;
-        }
-        closeMod();
+    // نظام الإدارة (حظر، طرد، كتم، حجب) - نسخة 75659.png
+    function manageUser(targetName) {
+        showMod("إدارة العضو: " + targetName, `
+            <div class="admin-tools">
+                <button class="btn-mute" onclick="adminAct('${targetName}', 'كتم')">كتم العضو 🔇</button>
+                <button class="btn-kick" onclick="adminAct('${targetName}', 'طرد')">طرد العضو 🚪</button>
+                <button class="btn-ban" onclick="adminAct('${targetName}', 'حظر نهائي')">حظر (IP) 🚫</button>
+                <button class="btn-ban" style="background:#000;" onclick="adminAct('${targetName}', 'حجب')">حجب الرؤية 🧱</button>
+            </div>
+            <hr>
+            <button class="btn-kick" style="background:gold; color:#000; width:100%;" onclick="giftRank('${targetName}')">إهداء رتبة (تاج/بريمو)</button>
+        `);
     }
 
-    function openElite(type) {
-        showMod(`قائمة ${type}`, `
-            <div style="text-align:center;">
-                <i class="fas fa-trophy" style="font-size:40px; color:gold;"></i>
-                <p>يتم الآن جلب بيانات صفوة الإمبراطورية...</p>
-                <div style="background:#f1c40f; color:#000; padding:10px; border-radius:10px; font-weight:bold;">1- الإمبراطور (LVL 1000)</div>
-            </div>
+    function adminAct(u, act) { 
+        alert(`تم تنفيذ [${act}] على العضو [${u}] بنجاح`); 
+        closeMod(); 
+    }
+
+    function openProfile() {
+        showMod("تعديل ملفي الشخصي", `
+            <label>تغيير الاسم:</label><input type="text" id="newN" value="${user.name}">
+            <label>الحالة:</label><input type="text" id="newS" value="${user.status}">
+            <label>صورة الخلفية من ملفاتك:</label><input type="file" onchange="updateBg(this)">
+            <button class="btn-kick" style="width:100%; margin-top:10px;" onclick="saveProf()">حفظ التغييرات</button>
         `);
+    }
+
+    function updateBg(input) {
+        const reader = new FileReader();
+        reader.onload = (e) => { 
+            user.bg = e.target.result; 
+            document.getElementById('chatApp').style.backgroundImage = `url(${user.bg})`;
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+
+    function saveProf() {
+        user.name = document.getElementById('newN').value;
+        user.status = document.getElementById('newS').value;
+        localStorage.setItem('kingSession', JSON.stringify(user));
+        closeMod();
+        sendMsg("قمت بتحديث معلوماتي بنجاح ✨");
     }
 
     function openRooms() {
-        showMod("غرف الدردشة", `
-            <button class="gold-btn" onclick="sendMsg('دخلت غرفة: مجلس الإمبراطورية 🏰'); closeMod();">مجلس الإمبراطورية 🏰</button>
-            <button class="gold-btn" style="margin-top:10px;" onclick="sendMsg('دخلت غرفة: يمانيون صقور 🦅'); closeMod();">يمانيون صقور 🦅</button>
-        `);
+        showMod("قائمة الغرف", `<button class="btn-kick" style="width:100%; margin-bottom:10px;" onclick="sendMsg('دخلت غرفة اليمن السعيد'); closeMod();">غرفة اليمن السعيد 🇾🇪</button>
+                               <button class="btn-kick" style="width:100%; background:#222;" onclick="sendMsg('دخلت غرفة الإدارة'); closeMod();">غرفة الإدارة العليا 🛡️</button>`);
+    }
+
+    function openList(type) {
+        showMod("قائمة " + type, `<div style="text-align:center;">يتم عرض قائمة ${type} من قاعدة البيانات...<br><b>1. الإمبراطور (LVL 1000)</b></div>`);
     }
 
     function playYoutube() {
-        const id = prompt("أدخل كود فيديو اليوتيوب:");
-        if(id) sendMsg(`<iframe width="100%" height="200" src="https://www.youtube.com/embed/${id}" frameborder="0" allowfullscreen></iframe>`);
+        const id = prompt("أدخل كود يوتيوب:");
+        if(id) sendMsg(`<iframe width="200" height="150" src="https://www.youtube.com/embed/${id}" frameborder="0"></iframe>`);
     }
 
-    function uploadImg(input) {
-        if (input.files && input.files[0]) {
-            let reader = new FileReader();
-            reader.onload = (e) => sendMsg(`<img src="${e.target.result}" style="width:100%; border-radius:10px;">`);
-            reader.readAsDataURL(input.files[0]);
-        }
+    function showMod(t, c) {
+        document.getElementById('mTitle').innerText = t;
+        document.getElementById('mBody').innerHTML = c;
+        document.getElementById('genModal').style.display = 'flex';
     }
-
-    function showMod(title, html) {
-        document.getElementById('mTitle').innerText = title;
-        document.getElementById('mBody').innerHTML = html;
-        document.getElementById('mainModal').style.display = 'flex';
-    }
-    function closeMod() { document.getElementById('mainModal').style.display = 'none'; }
-    document.getElementById('mainInp').onkeypress = (e) => { if(e.key === 'Enter') sendMsg(); };
+    function closeMod() { document.getElementById('genModal').style.display = 'none'; }
+    document.getElementById('msgInput').onkeypress = (e) => { if(e.key === 'Enter') sendMsg(); };
 </script>
 
 </body>
-                                                                 </html>
-        
+                                                                                                                                        </html>
+    
