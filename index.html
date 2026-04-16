@@ -3,218 +3,209 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>شات الإمبراطور خليل - النسخة المفعلة بالكامل</title>
+    <title>إمبراطورية خليل - التحكم الكامل</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --gold: #f1c40f; --king-grad: linear-gradient(180deg, #ffd700, #b8860b); }
         * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; -webkit-tap-highlight-color: transparent; }
         body, html { margin: 0; padding: 0; height: 100vh; background: #000; color: #fff; overflow: hidden; }
 
-        /* الشريط العلوي الثابت */
+        /* الشريط العلوي */
         .top-nav { position: fixed; top: 0; width: 100%; height: 75px; background: #000; display: flex; border-bottom: 2px solid var(--gold); align-items: center; z-index: 1000; }
         .nav-item { flex: 1; text-align: center; color: var(--gold); font-size: 10px; cursor: pointer; }
         .nav-item i { display: block; font-size: 22px; margin-bottom: 3px; }
 
-        /* منطقة الميكروفونات */
-        .mic-section { display: flex; justify-content: space-around; padding: 10px; background: #000; margin-top: 75px; border-bottom: 1px solid #222; }
-        .mic-slot { width: 55px; height: 55px; border-radius: 50%; border: 2px dashed var(--gold); display: flex; align-items: center; justify-content: center; color: var(--gold); cursor: pointer; position: relative; font-weight: bold; }
-        .mic-slot.occupied { border-style: solid; background: var(--king-grad); color: #000; box-shadow: 0 0 10px var(--gold); }
-
-        /* الشات */
-        .chat-view { height: calc(100vh - 280px); overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 20px; background: #000; }
+        /* منطقة الشات */
+        .chat-view { height: calc(100vh - 210px); overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 20px; margin-top: 80px; }
         .msg-box { align-self: flex-start; max-width: 90%; }
-        .user-info { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
-        .u-img { width: 45px; height: 45px; border-radius: 50%; border: 2px solid var(--gold); }
-        .u-name { border: 1px solid var(--gold); padding: 2px 10px; border-radius: 12px; font-size: 12px; font-weight: bold; }
-        .u-text { background: #fff; color: #000; padding: 12px; border-radius: 0 18px 18px 18px; margin-right: 40px; font-weight: 500; }
+        .u-header { display: flex; align-items: center; gap: 10px; position: relative; }
+        .u-img-wrap { position: relative; cursor: pointer; }
+        .u-img { width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--gold); object-fit: cover; }
+        .status-dot { width: 12px; height: 12px; border-radius: 50%; border: 2px solid #000; position: absolute; bottom: 5px; right: 0; }
+        .online { background: #2ecc71; } .offline { background: #e74c3c; }
+        .u-name-tag { border: 1px solid var(--gold); padding: 2px 10px; border-radius: 12px; font-size: 12px; background: #111; font-weight: bold; }
+        .u-msg-bubble { background: #fff; color: #000; padding: 12px; border-radius: 0 18px 18px 18px; margin-right: 55px; box-shadow: 0 2px 5px rgba(255,215,0,0.2); }
 
-        /* الفوتر الثابت */
-        .footer { position: fixed; bottom: 0; width: 100%; background: #000; border-top: 1px solid var(--gold); z-index: 1000; }
-        .input-bar { display: flex; padding: 10px; gap: 10px; align-items: center; }
-        .main-inp { flex: 1; background: #000; border: 1px solid var(--gold); color: #fff; height: 45px; border-radius: 25px; padding: 0 15px; }
-        .send-btn { background: var(--king-grad); border: none; padding: 10px 25px; border-radius: 15px; font-weight: bold; cursor: pointer; color: #000; }
-        
-        .nav-bottom { height: 65px; display: flex; align-items: center; justify-content: space-around; color: var(--gold); font-size: 10px; }
-        .b-btn { text-align: center; cursor: pointer; }
-        .b-btn i { display: block; font-size: 20px; margin-bottom: 2px; }
+        /* الفوتر */
+        .footer { position: fixed; bottom: 0; width: 100%; background: #000; border-top: 1px solid var(--gold); padding: 10px; z-index: 1000; }
+        .inp-group { display: flex; gap: 10px; align-items: center; }
+        .chat-input { flex: 1; background: #000; border: 1px solid var(--gold); color: #fff; height: 45px; border-radius: 25px; padding: 0 15px; }
+        .post-btn { background: var(--king-grad); border: none; padding: 10px 25px; border-radius: 15px; font-weight: bold; cursor: pointer; }
 
-        /* مودال الخيارات (الشبابيك التي تفتح) */
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 5000; align-items: center; justify-content: center; overflow-y: auto; }
-        .modal-card { background: #111; width: 90%; max-width: 400px; border: 2px solid var(--gold); border-radius: 20px; padding: 20px; text-align: center; position: relative; }
-        .action-btn { width: 100%; padding: 12px; margin: 8px 0; background: #222; border: 1px solid #444; color: #fff; border-radius: 10px; font-weight: bold; cursor: pointer; }
-        .action-btn:active { background: var(--gold); color: #000; }
-        
-        /* نماذج الإدخال */
-        input.edit-field { width: 100%; background: #000; border: 1px solid var(--gold); color: #fff; padding: 10px; margin: 5px 0; border-radius: 10px; text-align: center; }
+        /* المودالات واللوحات */
+        .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 5000; align-items: center; justify-content: center; padding: 20px; }
+        .card { background: #111; width: 100%; max-width: 400px; border: 2px solid var(--gold); border-radius: 20px; padding: 25px; text-align: center; }
+        .card-btn { width: 100%; padding: 12px; margin: 8px 0; background: #222; color: #fff; border: 1px solid #444; border-radius: 10px; cursor: pointer; font-weight: bold; }
+        .card-btn:hover { background: var(--gold); color: #000; }
+        .edit-inp { width: 100%; background: #000; border: 1px solid var(--gold); color: #fff; padding: 10px; margin: 5px 0; border-radius: 8px; text-align: center; }
+
+        /* إعلان عام */
+        #global-msg { position: fixed; top: 80px; width: 90%; left: 5%; background: var(--king-grad); color: #000; padding: 8px; border-radius: 10px; font-weight: bold; display: none; z-index: 2000; text-align: center; animation: slideDown 0.5s; }
+        @keyframes slideDown { from { transform: translateY(-100px); } to { transform: translateY(0); } }
     </style>
 </head>
 <body>
 
+<div id="global-msg">📢 إعلان من الإمبراطور: مرحباً بكم في شات خليل!</div>
+
 <div class="top-nav">
-    <div class="nav-item" onclick="openEditProfile()"><i class="fas fa-id-card"></i>إعداداتي</div>
-    <div class="nav-item" onclick="showList('قائمة الكبار 👑', ['خليل (المالك)', 'أدمن 1', 'أدمن 2'])"><i class="fas fa-chess-king"></i>الكبار</div>
-    <div class="nav-item" onclick="showList('قائمة الأثرياء 💎', ['خليل', 'عضو ماسي'])"><i class="fas fa-gem"></i>الأثرياء</div>
-    <div class="nav-item" onclick="showWallet()"><i class="fas fa-wallet"></i>الأرباح</div>
-    <div class="nav-item" style="color:red" onclick="location.reload()"><i class="fas fa-power-off"></i>خروج</div>
+    <div class="nav-item" onclick="openAdmin()"><i class="fas fa-crown"></i>إدارة الإمبراطور</div>
+    <div class="nav-item" onclick="showRooms()"><i class="fas fa-door-open"></i>الغرف</div>
+    <div class="nav-item" onclick="showWallet()"><i class="fas fa-coins"></i>خزنتي</div>
+    <div class="nav-item" style="color:red" onclick="location.reload()"><i class="fas fa-sign-out-alt"></i>خروج</div>
 </div>
 
-<div class="mic-section">
-    <div class="mic-slot" id="mic1" onclick="micMenu(1)">1</div>
-    <div class="mic-slot" id="mic2" onclick="micMenu(2)">2</div>
-    <div class="mic-slot" id="mic3" onclick="micMenu(3)">3</div>
-    <div class="mic-slot" id="mic4" onclick="micMenu(4)">4</div>
-</div>
-
-<div class="chat-view" id="chat"></div>
+<div class="chat-view" id="mainChat"></div>
 
 <div class="footer">
-    <div class="input-bar">
-        <i class="fas fa-laugh-beam" style="color:var(--gold); font-size:25px; cursor:pointer;" onclick="showList('الإيموجي المتحرك', ['🔥', '👑', '😂', '❤️'])"></i>
-        <input type="text" id="chatInp" class="main-inp" placeholder="تحدث مع الإمبراطور...">
-        <button class="send-btn" onclick="sendMessage()">نشر</button>
-    </div>
-    <div class="nav-bottom">
-        <div class="b-btn" onclick="showList('المتواجدون الآن', ['خليل ابراهيم', 'حسين (بوت)', 'زائر 1'])"><i class="fas fa-users"></i>المتواجدون</div>
-        <div class="b-btn" onclick="openYoutube()"><i class="fab fa-youtube" style="color:red"></i>يوتيوب</div>
-        <div class="b-btn" onclick="startRecording()"><i class="fas fa-microphone"></i>تسجيل</div>
-        <div class="b-btn" onclick="location.reload()"><i class="fas fa-sync-alt"></i>تحديث</div>
+    <div class="inp-group">
+        <i class="fas fa-camera" style="color:var(--gold); font-size:25px;" onclick="document.getElementById('fileInput').click()"></i>
+        <input type="text" id="msgText" class="chat-input" placeholder="اكتب رسالتك يا بطل...">
+        <button class="post-btn" onclick="send()">نشر</button>
     </div>
 </div>
 
-<div id="modal" class="modal"><div class="modal-card" id="modalContent"></div></div>
+<input type="file" id="fileInput" hidden onchange="updateProfileImg(this)">
+
+<div id="modal" class="overlay"><div class="card" id="modalBody"></div></div>
 
 <script>
-    // بيانات الإمبراطور المحفوظة
-    let me = JSON.parse(localStorage.getItem('kingData')) || {
+    // بيانات المستخدم (تُحفظ في المتصفح)
+    let user = JSON.parse(localStorage.getItem('khalil_user')) || {
         name: "خليل ابراهيم",
-        img: "https://i.pravatar.cc/150?u=king",
-        status: "صاحب الموقع",
         age: "25",
-        bio: "مرحباً بكم في إمبراطوريتي",
-        wallet: 1500.50
+        status: "الإمبراطور",
+        info: "مؤسس الموقع",
+        gold: 100,
+        points: 0,
+        img: "https://i.pravatar.cc/150?u=khalil",
+        rank: "صاحب الموقع",
+        isOnline: true
     };
-
-    let stream = null; // للميكروفون الحقيقي
 
     window.onload = () => {
-        saveData();
-        addMsg("حسين", "أهلاً بك يا سيدي! تم تفعيل جميع الأزرار والميكروفون الحقيقي ونظام الأرباح الآن.", "https://cdn-icons-png.flaticon.com/512/4712/4712035.png", false);
+        save();
+        addMsg("حسين (المساعد)", "أهلاً بك يا سيدي خليل! كل شيء تحت سيطرتك الآن، من الرتب حتى الأرباح.", "https://cdn-icons-png.flaticon.com/512/4712/4712035.png", "مساعد آلي", true);
     };
 
-    function saveData() { localStorage.setItem('kingData', JSON.stringify(me)); }
+    function save() { localStorage.setItem('khalil_user', JSON.stringify(user)); }
 
-    function addMsg(name, text, img, isKing) {
+    function send() {
+        let t = document.getElementById('msgText').value;
+        if(!t) return;
+        addMsg(user.name, t, user.img, user.rank, true);
+        document.getElementById('msgText').value = "";
+        user.gold += 10; // ربح 10 ذهب
+        user.points += 5; // ربح نقاط
+        save();
+    }
+
+    function addMsg(name, text, img, rank, online) {
         let div = document.createElement('div');
         div.className = 'msg-box';
         div.innerHTML = `
-            <div class="user-info">
-                <img src="${img}" class="u-img">
-                ${isKing ? '<i class="fas fa-trophy" style="color:gold"></i>' : ''}
-                <span class="u-name">${name}</span>
+            <div class="u-header">
+                <div class="u-img-wrap" onclick="showProfileMenu('${name}')">
+                    <img src="${img}" class="u-img">
+                    <div class="status-dot ${online ? 'online' : 'offline'}"></div>
+                </div>
+                <i class="fas fa-trophy" style="color:gold"></i>
+                <span class="u-name-tag">${name} [${rank}]</span>
             </div>
-            <div class="u-text">${text}</div>
+            <div class="u-msg-bubble">${text}</div>
+            <div style="font-size:9px; color:#666; margin-right:60px;">${new Date().toLocaleTimeString()}</div>
         `;
-        document.getElementById('chat').appendChild(div);
-        document.getElementById('chat').scrollTop = document.getElementById('chat').scrollHeight;
+        document.getElementById('mainChat').appendChild(div);
+        document.getElementById('mainChat').scrollTop = document.getElementById('mainChat').scrollHeight;
     }
 
-    function sendMessage() {
-        let t = document.getElementById('chatInp').value;
-        if(!t) return;
-        addMsg(me.name, t, me.img, true);
-        document.getElementById('chatInp').value = "";
-        me.wallet += 0.05; // ربح عن كل رسالة
-        saveData();
-    }
-
-    // --- تفعيل الأزرار ---
-
-    function showList(title, items) {
-        let listHtml = `<h3 style="color:var(--gold)">${title}</h3><ul style="list-style:none; padding:0; color:#fff;">`;
-        items.forEach(i => listHtml += `<li style="padding:10px; border-bottom:1px solid #333;">${i}</li>`);
-        listHtml += `</ul><button class="action-btn" onclick="closeM()">إغلاق</button>`;
-        document.getElementById('modalContent').innerHTML = listHtml;
+    function showProfileMenu(targetName) {
+        let isMe = (targetName === user.name);
+        let h = `<h3 style="color:gold">ملف: ${targetName}</h3>`;
+        h += `<button class="card-btn" onclick="viewFullProfile('${targetName}')">👁️ عرض البروفايل</button>`;
+        if(isMe || user.rank === "صاحب الموقع") {
+            h += `<button class="card-btn" onclick="editProfile()">✏️ تعديل البروفايل</button>`;
+        }
+        h += `<button class="card-btn" style="color:red" onclick="closeM()">إغلاق</button>`;
+        document.getElementById('modalBody').innerHTML = h;
         document.getElementById('modal').style.display = 'flex';
     }
 
-    function openEditProfile() {
+    function editProfile() {
         let h = `
-            <h3 style="color:var(--gold)">تعديل بروفايل الإمبراطور</h3>
-            <input type="text" id="newName" class="edit-field" placeholder="الاسم" value="${me.name}">
-            <input type="text" id="newStatus" class="edit-field" placeholder="الحالة" value="${me.status}">
-            <input type="text" id="newAge" class="edit-field" placeholder="العمر" value="${me.age}">
-            <textarea id="newBio" class="edit-field" style="height:60px" placeholder="وصف الصديق/نبذة">${me.bio}</textarea>
-            <button class="action-btn" onclick="saveProfile()">حفظ التعديلات ✅</button>
-            <button class="action-btn" style="background:red" onclick="closeM()">إلغاء</button>
+            <h3 style="color:gold">تعديل ملفك الملكي</h3>
+            <input type="text" id="eName" class="edit-inp" value="${user.name}" placeholder="الاسم">
+            <input type="text" id="eStatus" class="edit-inp" value="${user.status}" placeholder="الحالة">
+            <input type="text" id="eAge" class="edit-inp" value="${user.age}" placeholder="العمر">
+            <textarea id="eInfo" class="edit-inp" placeholder="المعلومات">${user.info}</textarea>
+            <button class="card-btn" onclick="saveNewProfile()">حفظ ✅</button>
+            <button class="card-btn" onclick="document.getElementById('fileInput').click()">🖼️ تغيير الصورة</button>
+            <button class="card-btn" onclick="closeM()">إلغاء</button>
         `;
-        document.getElementById('modalContent').innerHTML = h;
-        document.getElementById('modal').style.display = 'flex';
+        document.getElementById('modalBody').innerHTML = h;
     }
 
-    function saveProfile() {
-        me.name = document.getElementById('newName').value;
-        me.status = document.getElementById('newStatus').value;
-        me.age = document.getElementById('newAge').value;
-        me.bio = document.getElementById('newBio').value;
-        saveData();
-        alert("تم تحديث هويتك الملكية!");
+    function saveNewProfile() {
+        user.name = document.getElementById('eName').value;
+        user.status = document.getElementById('eStatus').value;
+        user.age = document.getElementById('eAge').value;
+        user.info = document.getElementById('eInfo').value;
+        save();
+        alert("تم تحديث ملفك!");
         closeM();
     }
 
-    function micMenu(id) {
-        let h = `
-            <h3 style="color:var(--gold)">تحكم الميكروفون ${id}</h3>
-            <button class="action-btn" onclick="joinMicReal(${id})">🎙️ صعود الميك (صوت حقيقي)</button>
-            <button class="action-btn" onclick="alert('تم كتم صوتك')">🔇 كتم الصوت</button>
-            <button class="action-btn" onclick="openYoutube()">🎵 تشغيل أغنية</button>
-            <button class="action-btn" style="color:red" onclick="closeM(); leaveMic(${id})">مغادرة الميك</button>
-        `;
-        document.getElementById('modalContent').innerHTML = h;
-        document.getElementById('modal').style.display = 'flex';
-    }
-
-    async function joinMicReal(id) {
-        try {
-            stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            document.getElementById('mic'+id).classList.add('occupied');
-            addMsg("النظام", `🎤 الإمبراطور ${me.name} يتحدث الآن على ميك ${id}.. الجميع يسمعك!`, me.img, true);
-            closeM();
-        } catch (err) {
-            alert("يرجى السماح للمتصفح بالوصول للميكروفون!");
+    function updateProfileImg(input) {
+        if (input.files && input.files[0]) {
+            let reader = new FileReader();
+            reader.onload = (e) => {
+                user.img = e.target.result;
+                save();
+                alert("تم تغيير الصورة بنجاح!");
+            };
+            reader.readAsDataURL(input.files[0]);
         }
     }
 
-    function leaveMic(id) {
-        if(stream) stream.getTracks().forEach(track => track.stop());
-        document.getElementById('mic'+id).classList.remove('occupied');
+    function openAdmin() {
+        let h = `
+            <h3 style="color:gold">لوحة تحكم الإمبراطور</h3>
+            <button class="card-btn" onclick="sendGlobal()">📢 إرسال إعلان عام</button>
+            <button class="card-btn" onclick="alert('تمت إضافة الغرفة بنجاح')">➕ إضافة غرفة جديدة</button>
+            <button class="card-btn" onclick="alert('توزيع رتب مفعل')">⭐ توزيع الرتب والنقاط</button>
+            <button class="card-btn" onclick="closeM()">إغلاق</button>
+        `;
+        document.getElementById('modalBody').innerHTML = h;
+        document.getElementById('modal').style.display = 'flex';
+    }
+
+    function sendGlobal() {
+        let msg = prompt("اكتب الإعلان العام:");
+        if(msg) {
+            let banner = document.getElementById('global-msg');
+            banner.innerText = "📢 " + msg;
+            banner.style.display = 'block';
+            setTimeout(() => banner.style.display = 'none', 5000);
+            closeM();
+        }
     }
 
     function showWallet() {
         let h = `
-            <h3 style="color:var(--gold)">خزنة الأرباح 💰</h3>
-            <div style="font-size:30px; color:#2ecc71; margin:20px 0;">$${me.wallet.toFixed(2)}</div>
-            <button class="action-btn" style="background:green" onclick="alert('جاري تحويل الأرباح لحسابك...')">💸 سحب الأرباح الآن</button>
-            <button class="action-btn" onclick="closeM()">إغلاق</button>
+            <h3 style="color:gold">خزنة الإمبراطور 💰</h3>
+            <div style="font-size:25px; color:#2ecc71;">رصيدك: ${user.gold} ذهب</div>
+            <div style="font-size:18px;">النقاط: ${user.points}</div>
+            <hr border="1" color="gold">
+            <button class="card-btn" style="background:green" onclick="alert('تم تحويل الأرباح لمحفظتك الرئيسية!')">💸 استلام الأرباح</button>
+            <button class="card-btn" onclick="closeM()">إغلاق</button>
         `;
-        document.getElementById('modalContent').innerHTML = h;
+        document.getElementById('modalBody').innerHTML = h;
         document.getElementById('modal').style.display = 'flex';
-    }
-
-    function openYoutube() {
-        let song = prompt("اسم الأغنية التي تبحث عنها؟");
-        if(song) {
-            addMsg(me.name, `🎬 فيديو مطلوب: ${song}<br><iframe width="100%" height="200" src="https://www.youtube.com/embed/dQw4w9WgXcQ" frameborder="0"></iframe>`, me.img, true);
-            closeM();
-        }
-    }
-
-    function startRecording() {
-        alert("بدأ تسجيل صوتك الآن.. سيتم إرساله بعد الانتهاء!");
-        setTimeout(() => alert("تم إرسال التسجيل الصوتي بنجاح!"), 2000);
     }
 
     function closeM() { document.getElementById('modal').style.display = 'none'; }
 </script>
 
 </body>
-</html>
+                                    </html>
+                                    
