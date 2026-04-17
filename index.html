@@ -3,107 +3,119 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>إمبراطورية خليل - الإصدار الأخير</title>
+    <title>إمبراطورية خليل - النظام المتكامل</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --gold: #f1c40f; --king-grad: linear-gradient(180deg, #ffd700, #b8860b); --dark-bg: #000000; }
         * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; -webkit-tap-highlight-color: transparent; }
         body, html { margin: 0; padding: 0; height: 100vh; background: var(--dark-bg); color: #fff; overflow: hidden; }
 
-        /* الشريط العلوي المطور */
+        /* الهيدر */
         .header-bar { position: fixed; top: 0; width: 100%; height: 75px; background: #222; display: flex; border-bottom: 2px solid var(--gold); align-items: center; z-index: 1000; justify-content: space-around; padding: 0 5px; }
-        .h-btn { text-align: center; color: #fff; font-size: 10px; cursor: pointer; min-width: 45px; }
+        .h-btn { text-align: center; color: #fff; font-size: 10px; cursor: pointer; min-width: 45px; transition: 0.3s; }
+        .h-btn:active { transform: scale(0.9); }
         .h-btn i { display: block; font-size: 20px; margin-bottom: 3px; }
-        .profit-btn { color: #2ecc71; font-weight: bold; } /* أرباح الخير */
-        .wealth-btn { color: #81ecec; } /* الأثرياء */
-        .vips-btn { color: #fff; } /* الكبار */
+        .profit-btn { color: #2ecc71; font-weight: bold; }
 
-        /* منطقة المحادثة */
-        .chat-scroll { height: calc(100vh - 195px); overflow-y: auto; padding: 85px 10px 10px 10px; display: flex; flex-direction: column; gap: 15px; background: #000; }
+        /* منطقة الدردشة */
+        .chat-scroll { height: calc(100vh - 195px); overflow-y: auto; padding: 85px 10px 10px 10px; display: flex; flex-direction: column; gap: 15px; background: #000; scroll-behavior: smooth; }
         .msg-wrap { align-self: flex-start; max-width: 90%; animation: slideIn 0.3s; }
-        @keyframes slideIn { from { opacity:0; transform:translateX(10px); } to { opacity:1; transform:translateX(0); } }
+        @keyframes slideIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
         .msg-top { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
-        .pfp { width: 42px; height: 42px; border-radius: 50%; border: 2px solid var(--gold); object-fit: cover; }
-        .trophy-rank { color: var(--gold); font-size: 18px; filter: drop-shadow(0 0 3px gold); margin: 0 5px; }
-        .name-tag { background: #222; border: 1px solid var(--gold); color: #fff; padding: 2px 10px; border-radius: 10px; font-size: 12px; }
-        .bubble { background: #fff; color: #000; padding: 10px 15px; border-radius: 0 15px 15px 15px; font-size: 14px; box-shadow: 2px 2px 5px rgba(0,0,0,0.3); }
+        .pfp { width: 42px; height: 42px; border-radius: 50%; border: 2px solid var(--gold); object-fit: cover; cursor: pointer; }
+        .trophy-rank { color: var(--gold); font-size: 16px; filter: drop-shadow(0 0 2px gold); }
+        .name-tag { background: #222; border: 1px solid var(--gold); color: #fff; padding: 2px 10px; border-radius: 10px; font-size: 11px; }
+        .bubble { background: #fff; color: #000; padding: 10px 15px; border-radius: 0 15px 15px 15px; font-size: 14px; box-shadow: 2px 2px 5px rgba(0,0,0,0.3); line-height: 1.4; }
 
-        /* منطقة الكتابة (فوق الشريط السفلي) */
+        /* الإدخال */
         .input-section { position: fixed; bottom: 65px; width: 100%; background: #111; padding: 8px 12px; border-top: 1px solid #333; display: flex; align-items: center; gap: 10px; z-index: 1001; }
         .chat-input { flex: 1; background: #222; border: 1px solid var(--gold); color: #fff; height: 40px; border-radius: 20px; padding: 0 15px; outline: none; }
-        .action-icon { color: var(--gold); font-size: 22px; cursor: pointer; }
-        .send-btn { background: var(--king-grad); border: none; padding: 8px 20px; border-radius: 15px; font-weight: bold; color: #000; cursor: pointer; }
+        .send-btn { background: var(--king-grad); border: none; padding: 8px 18px; border-radius: 15px; font-weight: bold; cursor: pointer; }
 
-        /* الشريط السفلي - مطابق للصورة */
-        .footer-nav { position: fixed; bottom: 0; width: 100%; height: 65px; background: #222; border-top: 2px solid var(--gold); display: flex; align-items: center; justify-content: space-around; z-index: 1000; padding: 0 5px; }
+        /* الفوتر */
+        .footer-nav { position: fixed; bottom: 0; width: 100%; height: 65px; background: #222; border-top: 2px solid var(--gold); display: flex; align-items: center; justify-content: space-around; z-index: 1000; }
         .f-btn { text-align: center; color: #fff; font-size: 10px; cursor: pointer; flex: 1; }
-        .f-btn i { display: block; font-size: 20px; margin-bottom: 2px; }
-        .radio-unit { display: flex; align-items: center; gap: 8px; background: #333; padding: 5px 12px; border-radius: 20px; color: #fff; border: 1px solid #444; }
+        .f-btn i { display: block; font-size: 18px; margin-bottom: 2px; }
 
-        /* المودال */
-        .king-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 5000; align-items: center; justify-content: center; }
-        .king-card { background: #111; width: 90%; max-width: 360px; border: 2px solid var(--gold); border-radius: 20px; padding: 20px; text-align: center; }
-        .k-btn { width: 100%; padding: 12px; margin: 5px 0; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; }
+        /* مودال البروفايل المطوّر */
+        .king-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 5000; align-items: center; justify-content: center; padding: 20px; }
+        .king-card { background: #111; width: 100%; max-width: 350px; border: 2px solid var(--gold); border-radius: 25px; padding: 20px; text-align: center; position: relative; }
+        .card-pfp { width: 110px; height: 110px; border-radius: 50%; border: 3px solid var(--gold); margin-bottom: 10px; object-fit: cover; }
+        .status-dot { width: 12px; height: 12px; background: #2ecc71; border-radius: 50%; display: inline-block; margin-right: 5px; }
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0; font-size: 12px; text-align: right; background: #222; padding: 10px; border-radius: 10px; }
+        .k-btn { width: 100%; padding: 10px; margin: 4px 0; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; font-size: 13px; }
         .btn-gold { background: var(--king-grad); color: #000; }
-        .btn-red { background: #c0392b; color: #fff; }
+        .btn-red { background: #e74c3c; color: #fff; }
+        .btn-outline { background: transparent; border: 1px solid var(--gold); color: var(--gold); }
     </style>
 </head>
 <body>
 
 <div class="header-bar">
-    <div class="h-btn profit-btn" onclick="showWallet()"><i class="fas fa-wallet"></i>أرباح الخير</div>
-    <div class="h-btn wealth-btn" onclick="alert('قائمة الأثرياء')"><i class="fas fa-crown"></i>الأثرياء</div>
-    <div class="h-btn vips-btn" onclick="alert('قائمة الكبار')"><i class="fas fa-gem"></i>الكبار</div>
-    <div class="h-btn" onclick="alert('الرسائل')"><i class="fas fa-envelope"></i>رسالة</div>
-    <div class="h-btn" onclick="alert('الإشعارات')"><i class="fas fa-bell"></i>إشعار</div>
-    <div class="h-btn" onclick="alert('البلاغات')"><i class="fas fa-flag"></i>إبلاغ</div>
-    <div class="h-btn" onclick="openProfile()"><i class="fas fa-cog"></i>إعدادات</div>
+    <div class="h-btn profit-btn" onclick="showWallet()"><i class="fas fa-wallet"></i>الأرباح</div>
+    <div class="h-btn" onclick="sysMsg('فتح قائمة الأثرياء...')"><i class="fas fa-crown" style="color:gold"></i>الأثرياء</div>
+    <div class="h-btn" onclick="sysMsg('عرض قائمة كبار الشخصيات...')"><i class="fas fa-gem" style="color:#81ecec"></i>الكبار</div>
+    <div class="h-btn" onclick="sysMsg('صندوق الرسائل الخاصة فارغ')"><i class="fas fa-envelope"></i>رسالة</div>
+    <div class="h-btn" onclick="sysMsg('لا توجد إشعارات جديدة')"><i class="fas fa-bell"></i>إشعار</div>
+    <div class="h-btn" onclick="openProfile()"><i class="fas fa-user-circle"></i>بروفايلي</div>
 </div>
 
 <div class="chat-scroll" id="box"></div>
 
 <div class="input-section">
-    <i class="fas fa-camera action-icon" onclick="document.getElementById('fileInp').click()"></i>
-    <input type="text" id="msgInp" class="chat-input" placeholder="اكتب رسالتك يا إمبراطور...">
+    <i class="fas fa-image action-icon" style="color:var(--gold); font-size:22px;" onclick="document.getElementById('fileInp').click()"></i>
+    <input type="text" id="msgInp" class="chat-input" placeholder="اكتب شيئاً يا إمبراطور...">
     <button class="send-btn" onclick="sendMsg()">نشر</button>
 </div>
 
 <div class="footer-nav">
-    <div class="f-btn" onclick="alert('قائمة الخيارات')"><i class="fas fa-th-large"></i>خيارات</div>
+    <div class="f-btn" onclick="sysMsg('القائمة الرئيسية قيد التطوير')"><i class="fas fa-th-large"></i>خيارات</div>
     <div class="f-btn" onclick="location.reload()"><i class="fas fa-sync-alt"></i>تحديث</div>
-    <div class="f-btn" onclick="playYT()"><i class="fab fa-youtube" style="color:red"></i>يوتيوب</div>
-    <div class="f-btn" onclick="alert('إضافة أصدقاء')"><i class="fas fa-user-plus"></i>الأصدقاء</div>
-    <div class="f-btn" onclick="alert('المتواجدون الآن')"><i class="fas fa-users"></i>المتصلين</div>
-    <div class="f-btn" onclick="alert('الغرف')"><i class="fas fa-home"></i>الغرف</div>
-    <div class="radio-unit">
-        <i class="fas fa-play-circle" style="font-size:24px; cursor:pointer;" onclick="alert('تشغيل الراديو...')"></i>
-        <span style="font-size:12px;">Radio</span>
-    </div>
-    <div class="f-btn" onclick="alert('تعديل الزخرفة')"><i class="fas fa-magic"></i>زخرفة</div>
+    <div class="f-btn" onclick="sysMsg('جاري تشغيل مشغل اليوتيوب...')"><i class="fab fa-youtube" style="color:red"></i>يوتيوب</div>
+    <div class="f-btn" onclick="sysMsg('البحث عن أصدقاء جدد...')"><i class="fas fa-user-plus"></i>الأصدقاء</div>
+    <div class="f-btn" onclick="sysMsg('المتصلون الآن: 1240 مستخدم')"><i class="fas fa-users"></i>المتصلين</div>
+    <div class="f-btn" onclick="sysMsg('الزخرفة الملكية مفعلة')"><i class="fas fa-magic"></i>زخرفة</div>
 </div>
 
 <input type="file" id="fileInp" hidden onchange="uploadImg(this)">
-<div id="modal" class="king-modal"><div class="king-card" id="mContent"></div></div>
+<input type="file" id="pfpChangeInp" hidden onchange="changeMyPfp(this)">
+
+<div id="modal" class="king-modal">
+    <div class="king-card" id="mContent"></div>
+</div>
 
 <script>
-    let me = JSON.parse(localStorage.getItem('king_khalil_final')) || {
-        name: "خليل ابراهيم",
-        gold: 750000,
-        img: "https://i.pravatar.cc/150?u=khalil",
-        role: "صاحب الموقع"
+    // بيانات المستخدم (خليل)
+    let userStats = {
+        name: "الإمبراطور خليل إبراهيم",
+        img: "https://i.pravatar.cc/150?u=khalil", // صورة افتراضية
+        gold: 1250000,
+        flowers: 450,
+        age: 25,
+        status: "متصل الآن 🟢",
+        joinDate: "2026/04/10",
+        friends: 89
     };
+
+    // تحميل البيانات المحفوظة
+    if(localStorage.getItem('khalil_data')) {
+        userStats = JSON.parse(localStorage.getItem('khalil_data'));
+    }
 
     window.onload = () => {
-        save();
-        renderMsg("المساعد حسين", "سيدي خليل، لوحة الكتابة مفعلة، والأثرياء والكبار في أماكنهم الصحيحة. كل شيء جاهز لأمرك.", "https://cdn-icons-png.flaticon.com/512/4712/4712035.png", false);
+        sysMsg("مرحباً بك في إمبراطوريتك الخاصة. النظام جاهز للعمل.");
     };
 
-    function save() { localStorage.setItem('king_khalil_final', JSON.stringify(me)); }
+    function save() { localStorage.setItem('khalil_data', JSON.stringify(userStats)); }
+
+    function sysMsg(txt) {
+        renderMsg("نظام الإمبراطورية", txt, "https://cdn-icons-png.flaticon.com/512/4712/4712035.png", false);
+    }
 
     function sendMsg() {
         let txt = document.getElementById('msgInp').value;
         if(!txt) return;
-        renderMsg(me.name, txt, me.img, true);
+        renderMsg(userStats.name, txt, userStats.img, true);
         document.getElementById('msgInp').value = "";
     }
 
@@ -112,42 +124,68 @@
         div.className = 'msg-wrap';
         div.innerHTML = `
             <div class="msg-top">
-                <img src="${img}" class="pfp" onclick="viewUser('${user}', '${img}')">
-                ${isKing ? '<i class="fas fa-trophy trophy-rank"></i>' : ''}
+                <img src="${img}" class="pfp" onclick="openProfile()">
+                ${isKing ? '<i class="fas fa-crown trophy-rank"></i>' : ''}
                 <span class="name-tag">${user}</span>
             </div>
             <div class="bubble">${txt}</div>
         `;
-        document.getElementById('box').appendChild(div);
-        document.getElementById('box').scrollTop = document.getElementById('box').scrollHeight;
+        let box = document.getElementById('box');
+        box.appendChild(div);
+        box.scrollTop = box.scrollHeight;
     }
 
-    function viewUser(name, img) {
-        let isMe = (name === me.name);
+    function openProfile() {
         let h = `
-            <img src="${img}" style="width:100px; height:100px; border-radius:50%; border:3px solid gold;">
-            <h2 style="color:gold">${name}</h2>
-            <div style="margin:10px 0; font-size:13px;">الرتبة: ${isMe ? 'صاحب الموقع 🏆' : 'عضو ملكي'}</div>
-            <hr style="border-color:#333">
-            ${isMe ? `
-                <button class="k-btn btn-gold" onclick="alert('تغيير الصورة')">🖼️ تغيير الصورة</button>
-                <button class="k-btn btn-gold" onclick="showWallet()">💰 حقيبة الأرباح</button>
-            ` : `
-                <button class="k-btn btn-red" onclick="alert('تم الطرد')">طرد</button>
-                <button class="k-btn btn-red" onclick="alert('تم الحظر')">حظر</button>
-                <button class="k-btn btn-gold" onclick="alert('تم منح رتبة برنس')">إهداء رتبة 👑</button>
-            `}
+            <div onclick="document.getElementById('pfpChangeInp').click()" style="cursor:pointer">
+                <img src="${userStats.img}" class="card-pfp">
+                <div style="font-size:10px; color:var(--gold)">إضغط لتغيير الصورة</div>
+            </div>
+            <h2 style="color:var(--gold); margin:5px 0;">${userStats.name}</h2>
+            <div style="font-size:13px; margin-bottom:10px;"><span class="status-dot"></span>${userStats.status}</div>
+            
+            <div class="info-grid">
+                <div><b>العمر:</b> ${userStats.age} عام</div>
+                <div><b>الورد:</b> ${userStats.flowers} 🌹</div>
+                <div><b>الأصدقاء:</b> ${userStats.friends}</div>
+                <div><b>التسجيل:</b> ${userStats.joinDate}</div>
+            </div>
+
+            <button class="k-btn btn-gold" onclick="addFlower()">إهداء وردة 🌹</button>
+            <button class="k-btn btn-outline" onclick="sysMsg('تم إرسال طلب الصداقة')">إضافة صديق ➕</button>
             <button class="k-btn btn-red" onclick="closeM()">إغلاق</button>
         `;
         document.getElementById('mContent').innerHTML = h;
         document.getElementById('modal').style.display = 'flex';
     }
 
+    function changeMyPfp(input) {
+        if(input.files[0]) {
+            let reader = new FileReader();
+            reader.onload = (e) => {
+                userStats.img = e.target.result;
+                save();
+                openProfile(); // تحديث العرض
+                sysMsg("تم تحديث صورتك الشخصية بنجاح ✅");
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function addFlower() {
+        userStats.flowers++;
+        save();
+        openProfile();
+        sysMsg("شكراً على الوردة! تم تحديث رصيد الورد.");
+    }
+
     function showWallet() {
         let h = `
-            <h3 style="color:#2ecc71">حقيبة أرباح الخير 💰</h3>
-            <h1 style="color:gold">${me.gold.toLocaleString()} ذهبة</h1>
-            <button class="k-btn btn-gold" onclick="alert('تم السحب بنجاح')">💸 استلام الأرباح</button>
+            <i class="fas fa-wallet" style="font-size:50px; color:#2ecc71"></i>
+            <h3>محفظة الأرباح</h3>
+            <h1 style="color:gold">${userStats.gold.toLocaleString()} ذهبة</h1>
+            <p style="font-size:12px">يمكنك سحب أرباحك عند وصولك للمستوى التاجي</p>
+            <button class="k-btn btn-gold" onclick="sysMsg('طلب السحب قيد المراجعة')">سحب الأرباح</button>
             <button class="k-btn btn-red" onclick="closeM()">إغلاق</button>
         `;
         document.getElementById('mContent').innerHTML = h;
@@ -157,19 +195,13 @@
     function uploadImg(input) {
         if(input.files[0]) {
             let r = new FileReader();
-            r.onload = e => renderMsg(me.name, `<img src="${e.target.result}" style="width:100%; border-radius:10px;">`, me.img, true);
+            r.onload = e => renderMsg(userStats.name, `<img src="${e.target.result}" style="width:100%; border-radius:10px; margin-top:5px;">`, userStats.img, true);
             r.readAsDataURL(input.files[0]);
         }
     }
 
-    function playYT() { 
-        let s = prompt("يوتيوب:"); 
-        if(s) renderMsg(me.name, `📺 شاهدوا معي: ${s}<br><iframe width="100%" height="180" src="https://www.youtube.com/embed/dQw4w9WgXcQ"></iframe>`, me.img, true); 
-    }
-
     function closeM() { document.getElementById('modal').style.display = 'none'; }
-    function openProfile() { viewUser(me.name, me.img); }
 </script>
 </body>
-                                                           </html>
-        
+        </html>
+    
