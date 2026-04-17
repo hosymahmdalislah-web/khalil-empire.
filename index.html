@@ -3,57 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>إمبراطورية خليل - النظام الحاكم</title>
+    <title>إمبراطورية خليل - الإصدار الإداري</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --gold: #f1c40f; --king-grad: linear-gradient(145deg, #ffd700, #b8860b, #8a6d3b); --dark-bg: #050505; }
         * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; -webkit-tap-highlight-color: transparent; }
         body, html { margin: 0; padding: 0; height: 100vh; background: var(--dark-bg); color: #fff; overflow: hidden; }
 
-        /* الهيدر العلوي - 5 أيقونات مفعلة */
+        /* الهيدر العلوي - 5 أيقونات */
         .header-bar { position: fixed; top: 0; width: 100%; height: 70px; background: rgba(15, 15, 15, 0.98); display: flex; align-items: center; justify-content: space-around; z-index: 1000; border-bottom: 2px solid var(--gold); }
         
+        /* الكأس المنفصل */
+        .sep-cup { font-size: 20px; color: var(--gold); filter: drop-shadow(0 0 5px gold); margin: 0 5px; animation: shine 1.5s infinite; }
+        @keyframes shine { 0% { opacity: 0.7; } 50% { opacity: 1; } 100% { opacity: 0.7; } }
+
         /* الشات */
         #chatBox { height: calc(100vh - 135px); overflow-y: auto; padding: 80px 15px 120px; display: flex; flex-direction: column; gap: 12px; }
         
-        .msg-wrap { display: flex; flex-direction: column; align-self: flex-start; max-width: 85%; position: relative; }
-        .msg-header { display: flex; align-items: center; margin-bottom: 4px; cursor: pointer; }
-        .pfp-main { width: 45px; height: 45px; border-radius: 50%; border: 2px solid var(--gold); object-fit: cover; }
-        .king-name-tag { background: rgba(255, 215, 0, 0.15); border: 1px solid var(--gold); color: #fff; padding: 2px 12px; border-radius: 20px; font-weight: bold; margin-right: 8px; }
+        /* تصميم الرسالة مع الكأس المنفصل */
+        .msg-wrap { display: flex; flex-direction: column; align-self: flex-start; max-width: 85%; }
+        .msg-header { display: flex; align-items: center; margin-bottom: 4px; }
+        .pfp-main { width: 45px; height: 45px; border-radius: 50%; border: 2px solid var(--gold); }
+        .king-name-tag { background: rgba(255, 215, 0, 0.15); border: 1px solid var(--gold); color: #fff; padding: 2px 12px; border-radius: 20px; font-weight: bold; text-shadow: 0 0 5px gold; }
 
-        /* المودال والبروفايل */
+        /* بروفايل ملكي */
         .king-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 5000; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
-        .king-card { background: #111; width: 92%; max-width: 400px; border: 2px solid var(--gold); border-radius: 25px; overflow: hidden; position: relative; }
+        .king-card { background: #111; width: 92%; max-width: 400px; border: 2px solid var(--gold); border-radius: 25px; max-height: 85vh; overflow-y: auto; }
         
-        /* أزرار الإدارة المتقدمة */
-        .admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 15px; }
-        .tool-btn { padding: 12px; border: none; border-radius: 8px; font-size: 13px; cursor: pointer; color: white; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.3s; }
+        /* أزرار الإدارة (الأمور) */
+        .admin-tools { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 15px; background: rgba(255,0,0,0.1); border-top: 1px solid #333; }
+        .tool-btn { padding: 10px; border: none; border-radius: 8px; font-size: 12px; cursor: pointer; color: white; display: flex; align-items: center; justify-content: center; gap: 5px; }
 
-        /* الشريط السفلي - 5 أيقونات مفعلة */
+        /* الشريط السفلي - 5 أيقونات */
         .footer-nav { position: fixed; bottom: 0; width: 100%; height: 65px; background: #111; display: flex; align-items: center; justify-content: space-around; border-top: 2px solid var(--gold); }
-        .f-btn { text-align: center; font-size: 10px; color: #fff; cursor: pointer; flex: 1; }
-        .f-btn i { display: block; font-size: 22px; margin-bottom: 2px; }
+        .f-btn { text-align: center; font-size: 10px; color: #fff; cursor: pointer; }
+        .f-btn i { display: block; font-size: 20px; margin-bottom: 2px; }
 
         .input-section { position: fixed; bottom: 65px; width: 100%; background: #111; padding: 10px; display: flex; align-items: center; gap: 8px; border-top: 1px solid #222; }
         .chat-input { flex: 1; background: #1a1a1a; border: 1px solid var(--gold); color: #fff; height: 42px; border-radius: 20px; padding: 0 15px; outline: none; }
-        
-        /* تسجيل الدخول */
-        #loginOverlay { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
 
-<div id="loginOverlay">
-    <h2 style="color:var(--gold)">إمبراطورية خليل</h2>
-    <input type="text" id="userNameInp" placeholder="أدخل اسمك الملكي..." style="padding:15px; border-radius:10px; border:none; width:80%;">
-    <button onclick="startApp()" style="margin-top:20px; padding:15px 40px; background:var(--king-grad); border:none; border-radius:10px; font-weight:bold;">دخول العرش</button>
-    <p id="counter" style="margin-top:20px; color: #888;">المتواجدون الآن: 1,240</p>
-</div>
-
 <div class="header-bar">
-    <div class="f-btn" onclick="openNotify()"><i class="fas fa-bell"></i>إشعارات</div>
-    <div class="f-btn" onclick="openReports()"><i class="fas fa-flag"></i>بلاغات</div>
-    <div class="f-btn" onclick="openPrivate()"><i class="fas fa-comments"></i>الخاص</div>
+    <div class="f-btn" onclick="alert('لا توجد إشعارات')"><i class="fas fa-bell"></i>إشعارات</div>
+    <div class="f-btn" onclick="alert('قسم البلاغات الإدارية')"><i class="fas fa-flag"></i>بلاغات</div>
+    <div class="f-btn" onclick="showPrivate()"><i class="fas fa-comments"></i>الخاص</div>
     <div class="f-btn" onclick="showList('الأثرياء')"><i class="fas fa-gem"></i>الأثرياء</div>
     <div class="f-btn" onclick="showList('الكبار')"><i class="fas fa-crown"></i>الكبار</div>
 </div>
@@ -76,32 +71,30 @@
 
 <div id="modal" class="king-modal"><div class="king-card" id="mContent"></div></div>
 
+<input type="file" id="pfpFile" hidden onchange="updateFile(this, 'img')">
+<input type="file" id="coverFile" hidden onchange="updateFile(this, 'cover')">
+<input type="file" id="bgFile" hidden onchange="changeRoomBg(this)">
 <input type="file" id="msgFile" hidden onchange="uploadMsgImg(this)">
 
 <script>
-    // بيانات الإمبراطور
-    let me = {
+    // بيانات المستخدم (خليل الإمبراطور)
+    let me = JSON.parse(localStorage.getItem('khalil_king_final')) || {
         name: "خليل إبراهيم",
         img: "https://i.pravatar.cc/150?u=kh",
-        role: "إمبراطور",
-        isBanned: false
+        cover: "https://images.unsplash.com/photo-1614850523296-d8c1af93d400",
+        gold: 100000000,
+        points: 50000,
+        rank: "إمبراطور خليل",
+        status: "👑 الحاكم الفعلي للمنصة 👑"
     };
 
-    // منع VPN (برمجياً عبر فحص التوقيت واللغة)
-    function checkConnection() {
-        const isVpn = (Intl.DateTimeFormat().resolvedOptions().timeZone === 'UTC');
-        if(isVpn) { console.warn("تنبيه: اتصال مشفر مكتشف."); }
-    }
+    function save() { localStorage.setItem('khalil_king_final', JSON.stringify(me)); }
 
-    function startApp() {
-        let name = document.getElementById('userNameInp').value;
-        if(name) {
-            me.name = name;
-            document.getElementById('loginOverlay').style.display = 'none';
-            renderMsg("النظام", `مرحباً بك يا ${name} في عرش خليل.`, me.img, true);
-            checkConnection();
-        }
-    }
+    window.onload = () => {
+        let savedBg = localStorage.getItem('room_bg');
+        if(savedBg) document.getElementById('chatBox').style.backgroundImage = `linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url(${savedBg})`;
+        renderMsg("النظام", "تم فك قيود الشبكة.. أهلاً بك يا إمبراطور.", "https://cdn-icons-png.flaticon.com/512/1042/1042291.png", false);
+    };
 
     function sendMsg() {
         let t = document.getElementById('msgInp').value;
@@ -112,8 +105,9 @@
         let div = document.createElement('div');
         div.className = 'msg-wrap';
         div.innerHTML = `
-            <div class="msg-header" onclick="viewProfile('${user}', '${img}')">
-                <img src="${img}" class="pfp-main">
+            <div class="msg-header">
+                <img src="${img}" class="pfp-main" onclick="viewProfile('${user}', '${img}')">
+                ${isKing ? '<i class="fas fa-trophy sep-cup"></i>' : ''}
                 <span class="king-name-tag">${user}</span>
             </div>
             <div style="background:#fff; color:#000; padding:10px 15px; border-radius:0 15px 15px 15px; font-size:14px; margin-right:50px;">${txt}</div>
@@ -123,73 +117,86 @@
     }
 
     function viewProfile(name, img) {
-        const timeNow = new Date().toLocaleTimeString('ar-EG');
+        let isMe = (name === me.name);
         let h = `
-            <div style="height:80px; background:var(--king-grad)"></div>
-            <center style="margin-top:-40px">
-                <img src="${img}" style="width:80px; height:80px; border-radius:50%; border:3px solid #111;">
-                <h3 style="color:var(--gold)">${name}</h3>
-                <p style="font-size:12px">الوقت: ${timeNow} | الحالة: متصل ✅</p>
-                <div style="display:flex; justify-content:center; gap:10px; margin:10px;">
-                    <button class="tool-btn" style="background:#444" onclick="alert('تم إرسال طلب صداقة')">➕ صديق</button>
-                    <button class="tool-btn" style="background:#444" onclick="alert('تم الإعجاب')">👍 1.2k</button>
-                </div>
+            <div style="height:100px; background:url(${me.cover}) center/cover"></div>
+            <center>
+                <img src="${img}" style="width:80px; height:80px; border-radius:50%; border:3px solid var(--gold); margin-top:-40px; background:#000;">
+                <h3 style="color:var(--gold); margin:5px;">${name}</h3>
+                <p style="font-size:12px; color:#888;">${isMe ? me.status : 'عضو في الإمبراطورية'}</p>
             </center>
-
-            <div class="admin-grid">
-                <button class="tool-btn" style="background:#c0392b" onclick="adminAction('طرد نهائي')"><i class="fas fa-user-slash"></i> طرد نهائي</button>
-                <button class="tool-btn" style="background:#e67e22" onclick="adminAction('كتم/فك')"><i class="fas fa-microphone-slash"></i> كتم/فك</button>
-                <button class="tool-btn" style="background:#2980b9" onclick="adminAction('حظر/فك')"><i class="fas fa-ban"></i> حظر/فك</button>
-                <button class="tool-btn" style="background:#8e44ad" onclick="openRankMenu('${name}')"><i class="fas fa-crown"></i> منح رتبة</button>
+            
+            <div class="admin-tools">
+                <button class="tool-btn" style="background:#c0392b" onclick="adminAction('حظر')"><i class="fas fa-ban"></i> حظر/فك</button>
+                <button class="tool-btn" style="background:#d35400" onclick="adminAction('كتم')"><i class="fas fa-microphone-slash"></i> كتم/فك</button>
+                <button class="tool-btn" style="background:#2980b9" onclick="adminAction('طرد')"><i class="fas fa-user-times"></i> طرد</button>
+                <button class="tool-btn" style="background:#8e44ad" onclick="adminAction('رتبة')"><i class="fas fa-level-up-alt"></i> رفع رتبة</button>
+                <button class="tool-btn" style="background:var(--gold); color:#000;" onclick="adminAction('إهداء')"><i class="fas fa-gift"></i> إهداء نقاط</button>
+                <button class="tool-btn" style="background:#27ae60" onclick="alert('تم إرسال هدية ملكية')"><i class="fas fa-heart"></i> هدية</button>
             </div>
-            <button onclick="closeM()" style="width:100%; padding:15px; background:red; border:none; color:#fff;">إغلاق</button>
+
+            <div style="padding:15px; text-align:center;">
+                ${isMe ? `<button onclick="editProfile()" style="width:100%; padding:10px; background:#333; color:#fff; border:none; border-radius:10px;">تعديل الهوية</button>` : ''}
+                <button onclick="closeM()" style="width:100%; padding:10px; background:red; color:#fff; border:none; border-radius:10px; margin-top:5px;">إغلاق</button>
+            </div>
         `;
         document.getElementById('mContent').innerHTML = h;
         document.getElementById('modal').style.display = 'flex';
     }
 
-    function openRankMenu(target) {
-        let h = `
-            <div style="padding:20px; text-align:center;">
-                <h3 style="color:var(--gold)">منح رتبة لـ ${target}</h3>
-                <button class="tool-btn" style="background:linear-gradient(to right, #ffd700, #b8860b); color:black; width:100%; margin-bottom:5px;" onclick="setRank('كأس ملكي')">🏆 كأس ملكي</button>
-                <button class="tool-btn" style="background:gold; color:black; width:100%; margin-bottom:5px;" onclick="setRank('تاج الإمبراطورية')">👑 تاج</button>
-                <button class="tool-btn" style="background:#2ecc71; width:100%; margin-bottom:5px;" onclick="setRank('أدمن مطور')">🛡️ أدمن</button>
-                <button class="tool-btn" style="background:#3498db; width:100%; margin-bottom:5px;" onclick="setRank('أونر الغرفة')">💎 أونر</button>
-                <button onclick="viewProfile('${target}', '${me.img}')" style="margin-top:10px; background:none; border:1px solid #555; color:white;">عودة</button>
-            </div>
-        `;
-        document.getElementById('mContent').innerHTML = h;
-    }
+    function adminAction(type) { alert(`الأمر الملكي [${type}] قيد التنفيذ على العضو...`); }
 
-    // تفعيل الأزرار العلوية والسفلية
-    function openNotify() { alert("🔔 لا توجد تنبيهات جديدة في سجل الإمبراطورية."); }
-    function openReports() { alert("🚩 تقرير الإدارة: جميع الأعضاء ملتزمون بالقوانين."); }
-    function openPrivate() { alert("💬 صندوق الرسائل الخاصة مشفر عسكرياً."); }
-    function showList(type) { alert(`قائمة ${type}: خليل، أحمد، سارة، إبراهيم... (قائمة نشطة)`); }
-    function showWallet() { alert("💰 رصيدك الحالي: 100,000,000 ذهبة ملكية."); }
-    function openYouTube() { 
-        let url = prompt("أدخل رابط اليوتيوب:"); 
-        if(url) renderMsg(me.name, `<iframe width="100%" src="${url.replace('watch?v=', 'embed/')}" frameborder="0"></iframe>`, me.img, true);
-    }
-    
     function showRoomMenu() {
         let h = `
             <div style="padding:20px;">
-                <h3 style="color:var(--gold)">إعدادات التحكم</h3>
-                <button class="tool-btn" style="background:#333; width:100%; margin-bottom:10px;" onclick="location.reload()">تغيير الهوية</button>
-                <button class="tool-btn" style="background:#c0392b; width:100%;" onclick="alert('تم تنظيف الشات')">مسح الرسائل</button>
-                <button onclick="closeM()" style="width:100%; margin-top:20px; background:none; border:none; color:red;">إلغاء</button>
+                <h3 style="color:var(--gold); text-align:center;">إعدادات الإمبراطورية</h3>
+                <div class="menu-item" onclick="document.getElementById('chatBox').innerHTML=''; closeM();"><i class="fas fa-broom"></i> تنظيف الغرفة</div>
+                <div class="menu-item" onclick="addNewRoom()"><i class="fas fa-door-open"></i> إضافة غرفة جديدة</div>
+                <div class="menu-item" onclick="changeRoomName()"><i class="fas fa-edit"></i> تغيير اسم الغرفة</div>
+                <div class="menu-item" onclick="document.getElementById('bgFile').click()"><i class="fas fa-image"></i> تغيير الخلفية</div>
+                <div class="menu-item" onclick="showBag()"><i class="fas fa-briefcase"></i> المحفظة (نقاط وذهب)</div>
+                <div class="menu-item" onclick="location.reload()" style="color:red;"><i class="fas fa-sign-out-alt"></i> خروج من الشات</div>
+                <button class="tool-btn" style="background:#333; width:100%; margin-top:10px;" onclick="closeM()">إغلاق</button>
             </div>`;
         document.getElementById('mContent').innerHTML = h;
         document.getElementById('modal').style.display = 'flex';
     }
 
-    function adminAction(act) { alert(`تم إصدار أمر ملكي بـ: ${act}`); }
-    function setRank(rank) { alert(`تم منح العضو رتبة: ${rank}`); closeM(); }
+    function showBag() {
+        alert(`حقيبة الإمبراطور:\nالذهب: ${me.gold.toLocaleString()}\nالنقاط: ${me.points.toLocaleString()}`);
+    }
+
+    function openYouTube() {
+        let link = prompt("ضع رابط فيديو اليوتيوب:");
+        if(link) {
+            let id = link.split('v=')[1] || link.split('/').pop();
+            renderMsg(me.name, `<iframe width="100%" height="200" src="https://www.youtube.com/embed/${id}" frameborder="0" allowfullscreen></iframe>`, me.img, true);
+        }
+    }
+
+    function showWallet() { alert(`أرباحك المحققة: ${me.gold / 1000} دولار أمريكي`); }
     function closeM() { document.getElementById('modal').style.display = 'none'; }
+    function showList(t) { alert(`قائمة ${t} قيد التحديث...`); }
+    function showPrivate() { alert("صندوق الرسائل الخاصة مشفر وآمن."); }
+    function addNewRoom() { alert("تم طلب إنشاء غرفة جديدة للإدارة."); }
+    function changeRoomName() { let n = prompt("الاسم الجديد للغرفة:"); if(n) alert("تم تغيير اسم الغرفة إلى: " + n); }
+
+    // تغيير ملفات
+    function updateFile(input, type) { if(input.files[0]) { let r = new FileReader(); r.onload = e => { if(type==='img') me.img=e.target.result; else me.cover=e.target.result; save(); location.reload(); }; r.readAsDataURL(input.files[0]); } }
+    function changeRoomBg(i) { if(i.files[0]) { let r = new FileReader(); r.onload = e => { localStorage.setItem('room_bg', e.target.result); location.reload(); }; r.readAsDataURL(i.files[0]); } }
     function uploadMsgImg(i) { if(i.files[0]) { let r = new FileReader(); r.onload = e => renderMsg(me.name, `<img src="${e.target.result}" style="width:100%; border-radius:10px;">`, me.img, true); r.readAsDataURL(i.files[0]); } }
+    
+    function editProfile() {
+        let h = `
+            <div style="padding:20px;">
+                <button onclick="document.getElementById('pfpFile').click()" style="width:100%; padding:10px; margin-bottom:5px;">تغيير الصورة</button>
+                <button onclick="document.getElementById('coverFile').click()" style="width:100%; padding:10px;">تغيير الغلاف</button>
+                <input type="text" id="nn" value="${me.name}" style="width:100%; margin-top:10px; padding:10px; background:#222; color:#fff; border:1px solid gold;">
+                <button onclick="me.name=document.getElementById('nn').value; save(); location.reload();" style="width:100%; margin-top:10px; background:var(--king-grad); padding:10px; border:none;">حفظ</button>
+            </div>`;
+        document.getElementById('mContent').innerHTML = h;
+    }
 </script>
 
 </body>
-</html>
+                                                            </html>
