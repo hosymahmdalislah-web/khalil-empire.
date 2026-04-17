@@ -17,15 +17,21 @@
         .h-btn, .f-btn { text-align: center; color: #fff; font-size: 10px; cursor: pointer; }
         .h-btn i, .f-btn i { display: block; font-size: 20px; margin-bottom: 2px; }
 
+        /* زر إعدادات الغرفة الجديد */
+        .room-settings { position: absolute; top: 15px; right: 15px; background: var(--king-grad); color: #000; padding: 5px 10px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 12px; z-index: 1001; }
+
         /* منطقة الرسائل */
         .chat-scroll { height: calc(100vh - 195px); overflow-y: auto; padding: 85px 10px 10px; display: flex; flex-direction: column; gap: 20px; }
         
         /* تصميم الرسالة المطور */
         .msg-wrap { display: flex; flex-direction: column; gap: 5px; align-self: flex-start; max-width: 85%; }
         .msg-header { display: flex; align-items: center; gap: 8px; }
-        .pfp-container { position: relative; cursor: pointer; }
-        .pfp { width: 50px; height: 50px; border-radius: 15px; border: 2px solid var(--gold); object-fit: cover; }
-        .trophy-mini { position: absolute; top: -8px; right: -8px; color: var(--gold); font-size: 18px; filter: drop-shadow(0 0 3px #000); }
+        .pfp-container { position: relative; }
+        .pfp { width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--gold); object-fit: cover; }
+        
+        /* الكأس بجانب الاسم */
+        .trophy-icon { color: var(--gold); font-size: 16px; margin: 0 5px; text-shadow: 0 0 5px rgba(241, 196, 15, 0.5); }
+        
         .name-box { background: rgba(255, 215, 0, 0.1); border: 1px solid var(--gold); padding: 2px 10px; border-radius: 8px; color: var(--gold); font-weight: bold; font-size: 12px; }
         .bubble { background: #fff; color: #000; padding: 12px; border-radius: 0 15px 15px 15px; font-size: 14px; box-shadow: 4px 4px 10px rgba(0,0,0,0.5); }
         .msg-time { font-size: 9px; color: #777; margin-top: 4px; display: block; }
@@ -53,41 +59,43 @@
 <body>
 
 <div class="header-bar">
-    <div class="h-btn" onclick="alert('الأرباح: ' + me.gold)"><i class="fas fa-wallet" style="color:#2ecc71"></i>أرباح الخير</div>
+    <div class="room-settings" onclick="showRoomSettings()"><i class="fas fa-cog"></i> إعدادات الغرفة</div>
+    <div class="h-btn" onclick="alert('نقاطك الملكية: ' + me.gold)"><i class="fas fa-coins" style="color:var(--gold)"></i>النقاط</div>
     <div class="h-btn" onclick="alert('قائمة الأثرياء')"><i class="fas fa-crown" style="color:var(--gold)"></i>الأثرياء</div>
-    <div class="h-btn" onclick="alert('قائمة الكبار')"><i class="fas fa-gem"></i>الكبار</div>
-    <div class="h-btn" onclick="alert('الرسائل')"><i class="fas fa-envelope"></i>رسائل</div>
+    <div class="h-btn" onclick="alert('الرسائل الشخصية')"><i class="fas fa-envelope"></i>الرسائل</div>
     <div class="h-btn" onclick="location.reload()"><i class="fas fa-sync-alt"></i>تحديث</div>
 </div>
 
 <div class="chat-scroll" id="box"></div>
 
 <div class="input-section">
-    <i class="fas fa-camera" style="color:var(--gold); font-size:24px;" onclick="document.getElementById('msgFile').click()"></i>
-    <input type="text" id="msgInp" class="chat-input" placeholder="اكتب أمرك يا إمبراطور...">
+    <i class="fas fa-image" style="color:var(--gold); font-size:24px; cursor:pointer;" onclick="document.getElementById('msgFile').click()"></i>
+    <input type="text" id="msgInp" class="chat-input" placeholder="تحدث يا إمبراطور...">
     <button class="k-btn btn-gold" onclick="sendMsg()" style="border-radius:20px; width:70px;">نشر</button>
 </div>
 
 <div class="footer-nav">
-    <div class="f-btn" onclick="alert('الخيارات')"><i class="fas fa-th-large"></i>خيارات</div>
+    <div class="f-btn" onclick="alert('قائمة المهام')"><i class="fas fa-th-large"></i>المهام</div>
     <div class="f-btn" onclick="openYouTube()"><i class="fab fa-youtube" style="color:red"></i>يوتيوب</div>
-    <div class="f-btn" onclick="showChoiceModal()"><i class="fas fa-user-shield"></i>إدارتي</div>
-    <div class="f-btn" onclick="alert('المتصلين')"><i class="fas fa-users"></i>المتواجدون</div>
-    <div class="f-btn" onclick="alert('زخرفة الاسم')"><i class="fas fa-magic"></i>الزخرفة</div>
+    <div class="f-btn" onclick="showChoiceModal()"><i class="fas fa-user-shield"></i>الملف</div>
+    <div class="f-btn" onclick="alert('المتواجدون الآن: 1')"><i class="fas fa-users"></i>المتواجدون</div>
+    <div class="f-btn" onclick="alert('خدمة الزخرفة الملكية')"><i class="fas fa-magic"></i>الزخرفة</div>
 </div>
 
 <div id="modal" class="king-modal"><div class="king-card" id="mContent"></div></div>
+
 <input type="file" id="pfpFile" hidden onchange="updateProfileFile(this, 'img')">
 <input type="file" id="coverFile" hidden onchange="updateProfileFile(this, 'cover')">
 <input type="file" id="msgFile" hidden onchange="uploadMsgImg(this)">
 
 <script>
+    // بياناتك الأساسية
     let me = JSON.parse(localStorage.getItem('khalil_king_v2')) || {
         name: "خليل إبراهيم",
         img: "https://i.pravatar.cc/150?u=khalil",
-        cover: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e",
-        gold: 1500000,
-        status: "إمبراطور المنصة 👑",
+        cover: "https://images.unsplash.com/photo-1511367461989-f85a21fda167",
+        gold: 5000000,
+        status: "إمبراطور ومؤسس المنصة 👑",
         age: 25,
         joinDate: "2026/04/17"
     };
@@ -95,7 +103,7 @@
     function save() { localStorage.setItem('khalil_king_v2', JSON.stringify(me)); }
 
     window.onload = () => {
-        renderMsg("بوت الإمبراطورية", "أهلاً بك يا خليل، جميع الأنظمة تحت أمرك الآن.", "https://cdn-icons-png.flaticon.com/512/8943/8943377.png", true);
+        renderMsg(me.name, "مرحباً بك في عرشك يا إمبراطور خليل. كل الصلاحيات مفعلة لك الآن.", me.img, true);
     };
 
     function sendMsg() {
@@ -113,8 +121,8 @@
             <div class="msg-header">
                 <div class="pfp-container" onclick="showChoiceModal('${user}', '${img}')">
                     <img src="${img}" class="pfp">
-                    ${isKing ? '<i class="fas fa-trophy trophy-mini"></i>' : ''}
                 </div>
+                ${isKing ? '<i class="fas fa-trophy trophy-icon"></i>' : ''}
                 <span class="name-box">${user}</span>
             </div>
             <div class="bubble">${txt} <span class="msg-time">${now}</span></div>
@@ -123,13 +131,27 @@
         document.getElementById('box').scrollTop = document.getElementById('box').scrollHeight;
     }
 
-    // خيار تعديل أو عرض
+    // إعدادات الغرفة (جديد)
+    function showRoomSettings() {
+        let h = `
+            <div style="padding:20px;">
+                <h3 style="color:var(--gold)"><i class="fas fa-fort-awesome"></i> إدارة الغرفة الإمبراطورية</h3>
+                <button class="k-btn btn-blue" style="width:100%; margin:5px 0;" onclick="alert('تم فتح غرفة جديدة')">➕ إضافة غرفة جديدة</button>
+                <button class="k-btn btn-gold" style="width:100%; margin:5px 0;" onclick="let n = prompt('الاسم الجديد للغرفة:'); if(n) alert('تم تغيير الاسم إلى ' + n)">📝 تعديل اسم الغرفة</button>
+                <button class="k-btn btn-red" style="width:100%; margin:5px 0;" onclick="confirm('هل أنت متأكد من مسح الغرفة؟')">🗑️ مسح الغرفة الحالية</button>
+                <button class="k-btn btn-red" style="width:100%; margin-top:10px;" onclick="closeM()">إغلاق</button>
+            </div>
+        `;
+        document.getElementById('mContent').innerHTML = h;
+        document.getElementById('modal').style.display = 'flex';
+    }
+
     function showChoiceModal(name = me.name, img = me.img) {
         let isMe = (name === me.name);
         let h = `
             <div style="padding:20px;">
-                <h3 style="color:var(--gold)">خيارات الحساب</h3>
-                <button class="k-btn btn-gold" style="width:100%; margin:5px 0;" onclick="viewProfile('${name}', '${img}')">👁️ عرض البروفايل</button>
+                <h3 style="color:var(--gold)">خيارات المستخدم</h3>
+                <button class="k-btn btn-gold" style="width:100%; margin:5px 0;" onclick="viewProfile('${name}', '${img}')">👁️ عرض الملف الشخصي</button>
                 ${isMe ? `<button class="k-btn btn-blue" style="width:100%; margin:5px 0;" onclick="editProfile()">⚙️ تعديل بياناتي</button>` : ''}
                 <button class="k-btn btn-red" style="width:100%; margin:5px 0;" onclick="closeM()">إغلاق</button>
             </div>
@@ -141,42 +163,51 @@
     function viewProfile(name, img) {
         let isMe = (name === me.name);
         let h = `
-            <img src="${isMe ? me.cover : ''}" class="cover-img">
+            <img src="${isMe ? me.cover : 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e'}" class="cover-img">
             <center>
                 <img src="${img}" class="profile-pfp">
                 <h2 style="color:var(--gold); margin:5px;">${name}</h2>
-                <p style="font-size:12px; color:#aaa;">${isMe ? me.status : 'عضو في الإمبراطورية'}</p>
+                <p style="font-size:12px; color:#aaa;">${isMe ? me.status : 'أحد رعايا الإمبراطورية'}</p>
             </center>
             <div class="info-grid">
-                <div class="info-item"><b>العمر:</b> ${isMe ? me.age : '20'}</div>
-                <div class="info-item"><b>الحالة:</b> متصل 🟢</div>
-                <div class="info-item"><b>الدخول:</b> ${me.joinDate}</div>
-                <div class="info-item"><b>الرتبة:</b> ${isMe ? 'المؤسس' : 'عضو ملكي'}</div>
+                <div class="info-item"><b>النقاط:</b> ${isMe ? me.gold : '500'}</div>
+                <div class="info-item"><b>الرتبة:</b> ${isMe ? 'المؤسس الأول' : 'عضو جديد'}</div>
+                <div class="info-item"><b>تاريخ الانضمام:</b> ${me.joinDate}</div>
+                <div class="info-item"><b>الحالة:</b> متصل الآن</div>
             </div>
             <div class="btn-group">
-                <button class="k-btn btn-gold" onclick="alert('تمت إضافة صديق')">➕ إضافة صديق</button>
-                <button class="k-btn btn-gold" onclick="alert('🌹 وردة ملكية')">🌹 إهداء وردة</button>
-                ${!isMe ? `<button class="k-btn btn-red" onclick="showAdminCommands('${name}')">⚡ زر الأمور</button>` : ''}
-                <button class="k-btn btn-blue" onclick="giftRank('${name}')">👑 إهداء رتبة</button>
+                <button class="k-btn btn-gold" onclick="givePoints('${name}')">💰 منح نقاط</button>
+                <button class="k-btn btn-blue" onclick="giftRank('${name}')">👑 منح رتبة</button>
+                ${!isMe ? `<button class="k-btn btn-red" onclick="showAdminCommands('${name}')">🔒 التحكم</button>` : ''}
+                <button class="k-btn btn-red" onclick="closeM()">إغلاق</button>
             </div>
-            <button class="k-btn btn-red" style="width:95%; margin:5px auto; display:block;" onclick="closeM()">إغلاق</button>
         `;
         document.getElementById('mContent').innerHTML = h;
+    }
+
+    // أنت من تمنح النقاط
+    function givePoints(name) {
+        let amount = prompt("أدخل عدد النقاط التي تريد منحها لـ " + name);
+        if(amount) alert("تم منح " + amount + " نقطة إلى " + name);
+    }
+
+    // أنت من تمنح الرتبة بالاسم الذي تريده
+    function giftRank(name) {
+        let rankName = prompt("أدخل اسم الرتبة الجديدة (مثال: أمير، مستشار، كينج):");
+        if(rankName) alert("بأمر من الإمبراطور خليل، تم منح " + name + " رتبة: " + rankName);
     }
 
     function showAdminCommands(target) {
         let h = `
             <div style="padding:20px;">
-                <h3 style="color:#e74c3c">لوحة تحكم الأوامر (على ${target})</h3>
+                <h3 style="color:#e74c3c">لوحة الحظر والتحكم (${target})</h3>
                 <div class="btn-group">
-                    <button class="k-btn btn-red" onclick="alert('تم الحظر')">🚫 حظر</button>
-                    <button class="k-btn btn-blue" onclick="alert('فك الحظر')">🔓 فك حظر</button>
-                    <button class="k-btn btn-red" onclick="alert('تم الكتم')">🔇 كتم</button>
-                    <button class="k-btn btn-blue" onclick="alert('فك الكتم')">🔊 فك كتم</button>
-                    <button class="k-btn btn-gold" onclick="alert('إرسال تحذير')">⚠️ تحذير</button>
-                    <button class="k-btn btn-red" onclick="alert('تم الطرد')">👞 طرد</button>
+                    <button class="k-btn btn-red" onclick="alert('تم طرد المستخدم')">👞 طرد</button>
+                    <button class="k-btn btn-red" onclick="alert('تم كتم الصوت')">🔇 كتم</button>
+                    <button class="k-btn btn-blue" onclick="alert('تم فك الكتم')">🔊 فك كتم</button>
+                    <button class="k-btn btn-gold" onclick="alert('تم إرسال تحذير ملكي')">⚠️ تحذير</button>
                 </div>
-                <button class="k-btn btn-gold" style="width:100%" onclick="viewProfile('${target}', '')">رجوع</button>
+                <button class="k-btn btn-gold" style="width:100%" onclick="closeM()">تم</button>
             </div>
         `;
         document.getElementById('mContent').innerHTML = h;
@@ -185,12 +216,12 @@
     function editProfile() {
         let h = `
             <div style="padding:15px;">
-                <h3 style="color:var(--gold)">تعديل الملف الشخصي</h3>
+                <h3 style="color:var(--gold)">تعديل ملفك الملكي</h3>
                 <button class="k-btn btn-blue" style="width:100%; margin-bottom:5px;" onclick="document.getElementById('pfpFile').click()">🖼️ تغيير الصورة الشخصية</button>
                 <button class="k-btn btn-blue" style="width:100%; margin-bottom:5px;" onclick="document.getElementById('coverFile').click()">📱 تغيير صورة الغلاف</button>
-                <input type="text" id="newName" class="chat-input" style="width:100%; margin-bottom:5px;" placeholder="الاسم الجديد" value="${me.name}">
-                <input type="text" id="newStatus" class="chat-input" style="width:100%; margin-bottom:5px;" placeholder="الحالة الجديدة" value="${me.status}">
-                <button class="k-btn btn-gold" style="width:100%" onclick="saveEdits()">حفظ التعديلات</button>
+                <input type="text" id="newName" class="chat-input" style="width:100%; margin-bottom:5px;" placeholder="الاسم" value="${me.name}">
+                <input type="text" id="newStatus" class="chat-input" style="width:100%; margin-bottom:5px;" placeholder="الحالة" value="${me.status}">
+                <button class="k-btn btn-gold" style="width:100%" onclick="saveEdits()">حفظ التغييرات</button>
             </div>
         `;
         document.getElementById('mContent').innerHTML = h;
@@ -200,8 +231,8 @@
         me.name = document.getElementById('newName').value;
         me.status = document.getElementById('newStatus').value;
         save();
-        alert("تم الحفظ بنجاح!");
-        closeM();
+        alert("تم تحديث هويتك الملكية!");
+        location.reload();
     }
 
     function updateProfileFile(input, type) {
@@ -211,27 +242,22 @@
                 if(type === 'img') me.img = e.target.result;
                 else me.cover = e.target.result;
                 save();
-                alert("تم تحديث الصورة!");
+                alert("تم تحديث الصورة بنجاح!");
                 editProfile();
             };
             r.readAsDataURL(input.files[0]);
         }
     }
 
-    function giftRank(name) {
-        let rank = prompt("أدخل اسم الرتبة (ملك، برنس، إمبراطور):");
-        if(rank) alert("تم منح " + name + " رتبة " + rank);
-    }
-
     function openYouTube() {
-        let link = prompt("رابط الفيديو:");
-        if(link) renderMsg(me.name, "شاهدوا الفيديو: <br><iframe width='100%' height='150' src='https://www.youtube.com/embed/dQw4w9WgXcQ' frameborder='0'></iframe>", me.img, true);
+        let link = prompt("ضع رابط فيديو اليوتيوب هنا:");
+        if(link) renderMsg(me.name, `شاهدوا هذا المقطع: <br><iframe width='100%' height='180' src='${link.replace("watch?v=", "embed/")}' frameborder='0' allowfullscreen></iframe>`, me.img, true);
     }
 
     function uploadMsgImg(input) {
         if(input.files[0]) {
             let r = new FileReader();
-            r.onload = e => renderMsg(me.name, `<img src="${e.target.result}" style="width:100%; border-radius:10px;">`, me.img, true);
+            r.onload = e => renderMsg(me.name, `<img src="${e.target.result}" style="width:100%; border-radius:10px; border:1px solid gold;">`, me.img, true);
             r.readAsDataURL(input.files[0]);
         }
     }
@@ -240,5 +266,5 @@
 </script>
 
 </body>
-    </html>
+        </html>
     
