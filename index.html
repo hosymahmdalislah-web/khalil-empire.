@@ -10,132 +10,152 @@
         * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; -webkit-tap-highlight-color: transparent; }
         body, html { margin: 0; padding: 0; height: 100vh; background: var(--dark-bg); color: #fff; overflow: hidden; }
 
+        /* شاشة تسجيل الدخول */
+        #authScreen { position: fixed; inset: 0; background: #000; z-index: 10000; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+        .auth-card { background: #111; width: 85%; padding: 20px; border: 2px solid var(--gold); border-radius: 15px; text-align: center; }
+        .auth-tabs { display: flex; margin-bottom: 20px; border-bottom: 1px solid #333; }
+        .tab-btn { flex: 1; padding: 10px; color: #888; cursor: pointer; font-size: 14px; }
+        .tab-btn.active { color: var(--gold); border-bottom: 2px solid var(--gold); }
+        .auth-input { width: 100%; padding: 12px; margin: 8px 0; background: #222; border: 1px solid #444; color: #fff; border-radius: 8px; }
+        .main-btn { width: 100%; padding: 12px; background: var(--king-grad); border: none; border-radius: 10px; font-weight: bold; margin-top: 10px; cursor: pointer; }
+
         .header-bar { position: fixed; top: 0; width: 100%; height: 70px; background: rgba(15, 15, 15, 0.98); display: flex; align-items: center; justify-content: space-around; z-index: 1000; border-bottom: 2px solid var(--gold); }
         .sep-cup { font-size: 20px; color: var(--gold); filter: drop-shadow(0 0 5px gold); margin: 0 5px; animation: shine 1.5s infinite; }
-        @keyframes shine { 0% { opacity: 0.7; } 50% { opacity: 1; } 100% { opacity: 0.7; } }
-
+        
         #chatBox { height: calc(100vh - 135px); overflow-y: auto; padding: 80px 15px 120px; display: flex; flex-direction: column; gap: 12px; background-size: cover; background-position: center; }
         
         .msg-wrap { display: flex; flex-direction: column; align-self: flex-start; max-width: 85%; margin-bottom: 10px; }
         .msg-header { display: flex; align-items: center; margin-bottom: 4px; }
-        .pfp-main { width: 45px; height: 45px; border-radius: 50%; border: 2px solid var(--gold); cursor: pointer; }
-        .king-name-tag { background: rgba(255, 215, 0, 0.15); border: 1px solid var(--gold); color: #fff; padding: 2px 12px; border-radius: 20px; font-weight: bold; text-shadow: 0 0 5px gold; margin-right: 5px; }
+        .pfp-main { width: 45px; height: 45px; border-radius: 50%; border: 2px solid var(--gold); }
+        .king-name-tag { background: rgba(255, 215, 0, 0.15); border: 1px solid var(--gold); color: #fff; padding: 2px 12px; border-radius: 20px; font-weight: bold; margin-right: 5px; }
 
         .king-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 5000; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
-        .king-card { background: #111; width: 92%; max-width: 400px; border: 2px solid var(--gold); border-radius: 25px; overflow: hidden; }
+        .king-card { background: #111; width: 92%; max-width: 400px; border: 2px solid var(--gold); border-radius: 25px; overflow: hidden; position: relative; }
         
-        .admin-tools { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 15px; background: rgba(255,215,0,0.05); border-top: 1px solid #333; }
-        .tool-btn { padding: 10px; border: none; border-radius: 8px; font-size: 12px; cursor: pointer; color: white; display: flex; align-items: center; justify-content: center; gap: 5px; }
+        .admin-tools { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; padding: 10px; }
+        .tool-btn { padding: 8px; border: none; border-radius: 5px; font-size: 11px; color: white; cursor: pointer; }
 
         .footer-nav { position: fixed; bottom: 0; width: 100%; height: 65px; background: #111; display: flex; align-items: center; justify-content: space-around; border-top: 2px solid var(--gold); z-index: 1000; }
-        .f-btn { text-align: center; font-size: 10px; color: #fff; cursor: pointer; }
-        .f-btn i { display: block; font-size: 20px; margin-bottom: 2px; }
-
         .input-section { position: fixed; bottom: 65px; width: 100%; background: #111; padding: 10px; display: flex; align-items: center; gap: 8px; border-top: 1px solid #222; z-index: 1000; }
-        .chat-input { flex: 1; background: #1a1a1a; border: 1px solid var(--gold); color: #fff; height: 42px; border-radius: 20px; padding: 0 15px; outline: none; }
+        .chat-input { flex: 1; background: #1a1a1a; border: 1px solid var(--gold); color: #fff; height: 42px; border-radius: 20px; padding: 0 15px; }
         
-        .menu-item { padding: 12px; border-bottom: 1px solid #222; cursor: pointer; display: flex; align-items: center; gap: 10px; }
-        .menu-item:hover { background: #222; }
+        .private-box { display:none; position:fixed; top:75px; left:10px; right:10px; bottom:70px; background:#111; z-index:6000; border:1px solid var(--gold); border-radius:15px; padding:15px; }
     </style>
 </head>
 <body>
 
+<div id="authScreen">
+    <div class="auth-card">
+        <h2 style="color:var(--gold)">إمبراطورية خليل</h2>
+        <div class="auth-tabs">
+            <div class="tab-btn active" onclick="ui.setAuth('visitor')">زائر</div>
+            <div class="tab-btn" onclick="ui.setAuth('login')">عضوية</div>
+            <div class="tab-btn" onclick="ui.setAuth('register')">جديد</div>
+        </div>
+        <div id="authFields">
+            <input type="text" id="authName" class="auth-input" placeholder="الاسم">
+            <input type="password" id="authPass" class="auth-input" placeholder="كلمة المرور" style="display:none">
+            <input type="email" id="authMail" class="auth-input" placeholder="البريد الإلكتروني" style="display:none">
+        </div>
+        <button class="main-btn" onclick="ui.handleAuth()">دخول المملكة</button>
+    </div>
+</div>
+
 <div class="header-bar">
-    <div class="f-btn" onclick="ui.alert('لا توجد إشعارات')"><i class="fas fa-bell"></i>إشعارات</div>
-    <div class="f-btn" onclick="ui.alert('قسم البلاغات الإدارية')"><i class="fas fa-flag"></i>بلاغات</div>
-    <div class="f-btn" onclick="ui.showPrivate()"><i class="fas fa-comments"></i>الخاص</div>
-    <div class="f-btn" onclick="ui.showList('الأثرياء')"><i class="fas fa-gem"></i>الأثرياء</div>
-    <div class="f-btn" onclick="ui.showList('الكبار')"><i class="fas fa-crown"></i>الكبار</div>
+    <div class="f-btn" onclick="ui.showSection('notifications')"><i class="fas fa-bell"></i>إشعارات</div>
+    <div class="f-btn" onclick="ui.showSection('reports')"><i class="fas fa-flag"></i>بلاغات</div>
+    <div class="f-btn" onclick="ui.togglePrivate()"><i class="fas fa-comments"></i>الخاص <span id="privBadge" style="background:red; border-radius:50%; padding:2px 5px; font-size:8px; display:none;">0</span></div>
+    <div class="f-btn" onclick="ui.showSection('rich')"><i class="fas fa-gem"></i>الأثرياء</div>
+    <div class="f-btn" onclick="ui.showSection('kings')"><i class="fas fa-crown"></i>الكبار</div>
 </div>
 
 <div id="chatBox"></div>
 
+<div id="pBox" class="private-box">
+    <div style="display:flex; justify-content:space-between; border-bottom:1px solid #333; padding-bottom:5px;">
+        <span>المحادثات الخاصة</span>
+        <i class="fas fa-times" onclick="ui.togglePrivate()"></i>
+    </div>
+    <div id="pMessages" style="height:80%; overflow-y:auto; margin-top:10px;"></div>
+</div>
+
 <div class="input-section">
     <i class="fas fa-image" style="color:var(--gold); font-size:24px;" onclick="document.getElementById('msgFile').click()"></i>
     <input type="text" id="msgInp" class="chat-input" placeholder="تحدث يا إمبراطور...">
-    <button id="sendBtn" style="background:var(--king-grad); border:none; padding:8px 15px; border-radius:15px; font-weight:bold; cursor:pointer;">إرسال</button>
+    <button id="sendBtn" style="background:var(--king-grad); border:none; padding:8px 15px; border-radius:15px; font-weight:bold;">إرسال</button>
 </div>
 
 <div class="footer-nav">
-    <div class="f-btn" onclick="ui.showList('المتواجدين')"><i class="fas fa-users"></i>المتواجدين</div>
+    <div class="f-btn" onclick="ui.showSection('online')"><i class="fas fa-users"></i>المتواجدين</div>
     <div class="f-btn" onclick="ui.openYouTube()"><i class="fab fa-youtube" style="color:red"></i>يوتيوب</div>
-    <div class="f-btn" onclick="ui.showRoomMenu()"><i class="fas fa-cogs"></i>الإعدادات</div>
-    <div class="f-btn" onclick="ui.showWallet()"><i class="fas fa-wallet"></i>الأرباح</div>
-    <div class="f-btn" onclick="location.reload()"><i class="fas fa-sync-alt"></i>تحديث</div>
+    <div class="f-btn" onclick="ui.showSettings()"><i class="fas fa-cogs"></i>الإعدادات</div>
+    <div class="f-btn" onclick="ui.showSection('wallet')"><i class="fas fa-wallet"></i>الأرباح</div>
+    <div class="f-btn" onclick="ui.logout()"><i class="fas fa-sign-out-alt"></i>خروج</div>
 </div>
 
 <div id="modal" class="king-modal"><div class="king-card" id="mContent"></div></div>
 
-<input type="file" id="pfpFile" hidden>
-<input type="file" id="coverFile" hidden>
-<input type="file" id="bgFile" hidden>
 <input type="file" id="msgFile" hidden>
+<input type="file" id="bgFile" hidden>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-  import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+  import { getDatabase, ref, set, push, onValue, get, child, remove, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyBbUsr0QrQMnewkRdQwQ33IR8asdy5VPdM",
-    authDomain: "khalil-chat.firebaseapp.com",
     databaseURL: "https://khalil-chat-default-rtdb.firebaseio.com",
-    projectId: "khalil-chat",
-    storageBucket: "khalil-chat.firebasestorage.app",
-    messagingSenderId: "684465803980",
-    appId: "1:684465803980:web:bcc3b1cf9435958f2c2869"
+    projectId: "khalil-chat"
   };
 
   const app = initializeApp(firebaseConfig);
   const db = getDatabase(app);
+  const auth = getAuth(app);
 
-  // تعريف بيانات الإمبراطور
-  let me = JSON.parse(localStorage.getItem('khalil_profile')) || {
-    name: "خليل إبراهيم",
-    gold: 100000000,
-    points: 50000,
-    rank: "إمبراطور خليل",
-    status: "👑 الحاكم الفعلي للمنصة 👑",
-    img: "https://cdn-icons-png.flaticon.com/512/1042/1042291.png",
-    cover: "https://images.unsplash.com/photo-1614850523296-d8c1af93d400?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
-  };
+  let currentUser = null;
+  let authMode = 'visitor';
 
-  // وظائف النظام
   window.ui = {
-    alert: (t) => alert(t),
-    closeM: () => { document.getElementById('modal').style.display = 'none'; },
-    
-    showRoomMenu: () => {
-        let h = `
-            <div style="padding:20px;">
-                <h3 style="color:var(--gold); text-align:center;">إعدادات الإمبراطورية</h3>
-                <div class="menu-item" onclick="document.getElementById('chatBox').innerHTML=''; ui.closeM();"><i class="fas fa-broom"></i> تنظيف الغرفة</div>
-                <div class="menu-item" onclick="ui.changeRoomBgTrigger()"><i class="fas fa-image"></i> تغيير الخلفية</div>
-                <div class="menu-item" onclick="ui.showBag()"><i class="fas fa-briefcase"></i> المحفظة (نقاط وذهب)</div>
-                <button onclick="ui.closeM()" style="width:100%; margin-top:10px; padding:10px; background:#333; color:white; border:none; border-radius:10px;">إغلاق</button>
-            </div>`;
-        document.getElementById('mContent').innerHTML = h;
-        document.getElementById('modal').style.display = 'flex';
+    setAuth: (mode) => {
+        authMode = mode;
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        event.target.classList.add('active');
+        document.getElementById('authPass').style.display = mode === 'visitor' ? 'none' : 'block';
+        document.getElementById('authMail').style.display = mode === 'register' ? 'block' : 'none';
     },
 
-    editProfile: () => {
-        let h = `
-            <div style="padding:20px; text-align:center;">
-                <h3 style="color:var(--gold);">تعديل الهوية الملكية</h3>
-                <button onclick="document.getElementById('pfpFile').click()" style="width:100%; padding:10px; margin-bottom:5px;">تغيير الصورة الشخصية</button>
-                <button onclick="document.getElementById('coverFile').click()" style="width:100%; padding:10px;">تغيير الغلاف</button>
-                <input type="text" id="newNameInp" value="${me.name}" style="width:100%; margin-top:10px; padding:10px; background:#222; color:#fff; border:1px solid gold; border-radius:8px;">
-                <button onclick="ui.saveProfileChanges()" style="width:100%; margin-top:15px; background:var(--king-grad); padding:12px; border:none; font-weight:bold; border-radius:10px;">حفظ التغييرات</button>
-                <button onclick="ui.closeM()" style="width:100%; margin-top:5px; background:transparent; color:#888; border:none;">إلغاء</button>
-            </div>`;
-        document.getElementById('mContent').innerHTML = h;
+    handleAuth: async () => {
+        const name = document.getElementById('authName').value;
+        const pass = document.getElementById('authPass').value;
+        const mail = document.getElementById('authMail').value;
+
+        try {
+            if (authMode === 'register') {
+                const res = await createUserWithEmailAndPassword(auth, mail, pass);
+                currentUser = { uid: res.user.uid, name, rank: "عضو", img: "https://cdn-icons-png.flaticon.com/512/149/149071.png", likes: 0 };
+                await set(ref(db, 'users/' + res.user.uid), currentUser);
+            } else if (authMode === 'login') {
+                // ملاحظة: تسجيل الدخول بالعضوية يحتاج بريد، سنستخدم نظام البحث بالاسم للتبسيط
+                const res = await signInWithEmailAndPassword(auth, name + "@khalil.com", pass);
+            } else {
+                const res = await signInAnonymously(auth);
+                currentUser = { uid: res.user.uid, name: name || "زائر", rank: "زائر", img: "https://cdn-icons-png.flaticon.com/512/149/149071.png" };
+            }
+            document.getElementById('authScreen').style.display = 'none';
+            ui.initChat();
+        } catch (e) { alert("خطأ في البيانات أو المستخدم موجود مسبقاً"); }
     },
 
-    saveProfileChanges: () => {
-        me.name = document.getElementById('newNameInp').value;
-        localStorage.setItem('khalil_profile', JSON.stringify(me));
-        set(ref(db, 'users/khalil'), me); // حفظ في فايربيس
-        ui.alert("تم تحديث هويتك يا إمبراطور");
-        location.reload();
+    initChat: () => {
+        onValue(ref(db, 'messages'), (snap) => {
+            const chatBox = document.getElementById('chatBox');
+            chatBox.innerHTML = '';
+            snap.forEach(child => {
+                const m = child.val();
+                ui.renderMsg(m.user, m.text, m.img, m.isKing);
+            });
+        });
     },
 
     renderMsg: (user, txt, img, isKing) => {
@@ -143,89 +163,83 @@
         div.className = 'msg-wrap';
         div.innerHTML = `
             <div class="msg-header">
-                <img src="${img}" class="pfp-main" onclick="ui.viewProfile('${user}', '${img}')">
+                <img src="${img}" class="pfp-main" onclick="ui.viewProfile('${user}')">
                 ${isKing ? '<i class="fas fa-trophy sep-cup"></i>' : ''}
                 <span class="king-name-tag">${user}</span>
             </div>
-            <div style="background:#fff; color:#000; padding:10px 15px; border-radius:0 15px 15px 15px; font-size:14px; margin-right:5px; box-shadow: 2px 2px 5px rgba(0,0,0,0.2);">${txt}</div>
+            <div style="background:#fff; color:#000; padding:10px 15px; border-radius:0 15px 15px 15px; font-size:14px;">${txt}</div>
         `;
         document.getElementById('chatBox').appendChild(div);
         document.getElementById('chatBox').scrollTop = document.getElementById('chatBox').scrollHeight;
     },
 
-    viewProfile: (name, img) => {
-        let isMe = (name === me.name);
+    viewProfile: async (name) => {
+        // في النسخة الحقيقية ستبحث في الـ DB عن بيانات هذا المستخدم
+        let isMe = (name === currentUser.name);
         let h = `
-            <div style="height:100px; background:url(${me.cover}) center/cover"></div>
-            <center>
-                <img src="${img}" style="width:80px; height:80px; border-radius:50%; border:3px solid var(--gold); margin-top:-40px; background:#000;">
-                <h3 style="color:var(--gold); margin:5px;">${name}</h3>
-                <p style="font-size:12px; color:#ccc; padding:0 10px;">${isMe ? me.status : 'عضو في الإمبراطورية'}</p>
-            </center>
-            <div class="admin-tools">
-                <button class="tool-btn" style="background:#c0392b" onclick="ui.alert('تم الحظر')"><i class="fas fa-ban"></i> حظر</button>
-                <button class="tool-btn" style="background:#d35400" onclick="ui.alert('تم الكتم')"><i class="fas fa-microphone-slash"></i> كتم</button>
-                <button class="tool-btn" style="background:#2980b9" onclick="ui.alert('تم الطرد')"><i class="fas fa-user-times"></i> طرد</button>
-                <button class="tool-btn" style="background:var(--gold); color:#000;" onclick="ui.alert('تم الإهداء')"><i class="fas fa-gift"></i> إهداء</button>
-            </div>
-            <div style="padding:15px;">
-                ${isMe ? `<button onclick="ui.editProfile()" style="width:100%; padding:10px; background:#222; color:white; border:1px solid #444; border-radius:10px;">تعديل الملف الشخصي</button>` : ''}
-                <button onclick="ui.closeM()" style="width:100%; padding:10px; background:red; color:white; border:none; border-radius:10px; margin-top:5px;">إغلاق</button>
+            <div style="padding:20px; text-align:center;">
+                <img src="${currentUser.img}" style="width:80px; height:80px; border-radius:50%; border:2px solid var(--gold);">
+                <h3>${name}</h3>
+                <p>الحالة: متصل | الإعجابات: 12</p>
+                <div class="admin-tools">
+                    <button class="tool-btn" style="background:red" onclick="ui.adminCmd('ban')">حظر</button>
+                    <button class="tool-btn" style="background:orange" onclick="ui.adminCmd('mute')">كتم</button>
+                    <button class="tool-btn" style="background:blue" onclick="ui.adminCmd('kick')">طرد</button>
+                    <button class="tool-btn" style="background:green" onclick="ui.togglePrivate()">خاص</button>
+                    <button class="tool-btn" style="background:var(--gold); color:black" onclick="ui.adminCmd('rank')">ترقية</button>
+                </div>
+                <button onclick="ui.closeM()" style="width:100%; padding:10px; margin-top:10px;">إغلاق</button>
             </div>`;
         document.getElementById('mContent').innerHTML = h;
         document.getElementById('modal').style.display = 'flex';
     },
 
-    changeRoomBgTrigger: () => { document.getElementById('bgFile').click(); },
-    showBag: () => { alert(`حقيبة الإمبراطور:\nالذهب: ${me.gold.toLocaleString()}\nالنقاط: ${me.points.toLocaleString()}`); },
-    showWallet: () => { alert(`أرباحك المحققة: ${me.gold / 1000} دولار أمريكي`); },
-    showList: (t) => alert(`قائمة ${t} قيد التحديث...`),
-    showPrivate: () => alert("صندوق الرسائل الخاصة مشفر وآمن."),
-    openYouTube: () => {
-        let link = prompt("ضع رابط فيديو اليوتيوب:");
-        if(link) {
-            let id = link.split('v=')[1]?.split('&')[0] || link.split('/').pop();
-            ui.renderMsg(me.name, `<iframe width="100%" height="200" src="https://www.youtube.com/embed/${id}" frameborder="0" allowfullscreen></iframe>`, me.img, true);
-        }
-    }
+    adminCmd: (cmd) => {
+        let time = prompt("أدخل الوقت بالدقائق:");
+        alert(`تم تنفيذ ${cmd} لمدة ${time} دقيقة`);
+        ui.closeM();
+    },
+
+    showSettings: () => {
+        let h = `
+            <div style="padding:20px;">
+                <button onclick="document.getElementById('chatBox').innerHTML=''" style="width:100%; padding:10px; margin-bottom:10px;">تنظيف الغرفة</button>
+                <button onclick="document.getElementById('bgFile').click()" style="width:100%; padding:10px;">تغيير الخلفية</button>
+                <button onclick="ui.closeM()" style="width:100%; padding:10px; margin-top:20px;">إلغاء</button>
+            </div>`;
+        document.getElementById('mContent').innerHTML = h;
+        document.getElementById('modal').style.display = 'flex';
+    },
+
+    togglePrivate: () => {
+        let p = document.getElementById('pBox');
+        p.style.display = p.style.display === 'block' ? 'none' : 'block';
+    },
+
+    logout: () => { location.reload(); },
+    closeM: () => { document.getElementById('modal').style.display = 'none'; },
+    showSection: (s) => alert("قسم " + s + " متاح الآن للإدارة."),
+    openYouTube: () => { let link = prompt("رابط الفيديو:"); if(link) ui.renderMsg(currentUser.name, "شاهدوا هذا الفيديو", currentUser.img, true); }
   };
 
-  // التعامل مع الملفات
-  document.getElementById('pfpFile').onchange = (e) => {
-      let r = new FileReader(); r.onload = (ev) => { me.img = ev.target.result; ui.saveProfileChanges(); }; r.readAsDataURL(e.target.files[0]);
-  };
-  document.getElementById('coverFile').onchange = (e) => {
-      let r = new FileReader(); r.onload = (ev) => { me.cover = ev.target.result; ui.saveProfileChanges(); }; r.readAsDataURL(e.target.files[0]);
-  };
-  document.getElementById('bgFile').onchange = (e) => {
-      let r = new FileReader(); r.onload = (ev) => { 
-          localStorage.setItem('room_bg', ev.target.result); 
-          document.getElementById('chatBox').style.backgroundImage = `url(${ev.target.result})`;
-      }; r.readAsDataURL(e.target.files[0]);
-  };
-  document.getElementById('msgFile').onchange = (e) => {
-      let r = new FileReader(); r.onload = (ev) => ui.renderMsg(me.name, `<img src="${ev.target.result}" style="width:100%; border-radius:10px;">`, me.img, true);
-      r.readAsDataURL(e.target.files[0]);
-  };
-
-  // إرسال الرسائل
   document.getElementById('sendBtn').onclick = () => {
       let inp = document.getElementById('msgInp');
       if(inp.value.trim()) {
-          ui.renderMsg(me.name, inp.value, me.img, true);
+          push(ref(db, 'messages'), {
+              user: currentUser.name,
+              text: inp.value,
+              img: currentUser.img,
+              isKing: currentUser.rank === "إمبراطور خليل"
+          });
           inp.value = '';
       }
   };
 
-  // التحميل الأولي
-  window.onload = () => {
-      let savedBg = localStorage.getItem('room_bg');
-      if(savedBg) document.getElementById('chatBox').style.backgroundImage = `url(${savedBg})`;
-      ui.renderMsg("النظام الملكي", "تم تفعيل البروتوكول الإداري.. مرحباً بك يا إمبراطور خليل.", me.img, false);
+  document.getElementById('bgFile').onchange = (e) => {
+      let r = new FileReader(); r.onload = (ev) => document.getElementById('chatBox').style.backgroundImage = `url(${ev.target.result})`;
+      r.readAsDataURL(e.target.files[0]);
   };
 
 </script>
-
 </body>
-    </html>
-    
+</html>
