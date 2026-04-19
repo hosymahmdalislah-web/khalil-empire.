@@ -9,8 +9,6 @@
         :root { --gold: #f1c40f; --king-grad: linear-gradient(145deg, #ffd700, #b8860b, #8a6d3b); --dark-bg: #050505; }
         * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; -webkit-tap-highlight-color: transparent; }
         body, html { margin: 0; padding: 0; height: 100vh; background: var(--dark-bg); color: #fff; overflow: hidden; }
-
-        /* شاشة تسجيل الدخول */
         #authScreen { position: fixed; inset: 0; background: #000; z-index: 10000; display: flex; align-items: center; justify-content: center; flex-direction: column; }
         .auth-card { background: #111; width: 90%; max-width: 400px; padding: 25px; border: 2px solid var(--gold); border-radius: 20px; text-align: center; box-shadow: 0 0 20px rgba(241, 196, 15, 0.2); }
         .auth-tabs { display: flex; margin-bottom: 20px; background: #222; border-radius: 10px; overflow: hidden; }
@@ -18,8 +16,6 @@
         .tab-btn.active { color: #000; background: var(--gold); font-weight: bold; }
         .auth-input { width: 100%; padding: 12px; margin: 8px 0; background: #1a1a1a; border: 1px solid #333; color: #fff; border-radius: 10px; outline: none; }
         .main-btn { width: 100%; padding: 14px; background: var(--king-grad); border: none; border-radius: 10px; font-weight: bold; margin-top: 15px; cursor: pointer; color: #000; }
-
-        /* واجهة الدردشة */
         .header-bar { position: fixed; top: 0; width: 100%; height: 70px; background: rgba(15, 15, 15, 0.98); display: flex; align-items: center; justify-content: space-around; z-index: 1000; border-bottom: 2px solid var(--gold); }
         #chatBox { height: calc(100vh - 135px); overflow-y: auto; padding: 80px 15px 120px; display: flex; flex-direction: column; gap: 12px; }
         .msg-wrap { display: flex; flex-direction: column; align-self: flex-start; max-width: 85%; }
@@ -27,10 +23,8 @@
         .msg-header { display: flex; align-items: center; margin-bottom: 4px; }
         .name-tag { font-weight: bold; font-size: 13px; color: var(--gold); }
         .bubble { background: #222; padding: 10px 15px; border-radius: 0 15px 15px 15px; border: 1px solid #333; word-wrap: break-word; }
-        
         .admin-msg { align-self: flex-end; }
         .admin-msg .bubble { background: rgba(241, 196, 15, 0.1); border: 1px solid var(--gold); }
-
         .input-section { position: fixed; bottom: 65px; width: 100%; background: #111; padding: 10px; display: flex; align-items: center; gap: 8px; border-top: 1px solid #222; }
         .chat-input { flex: 1; background: #1a1a1a; border: 1px solid var(--gold); color: #fff; height: 42px; border-radius: 20px; padding: 0 15px; }
         .footer-nav { position: fixed; bottom: 0; width: 100%; height: 65px; background: #111; display: flex; align-items: center; justify-content: space-around; border-top: 2px solid var(--gold); }
@@ -84,10 +78,15 @@
   import { getDatabase, ref, set, push, onValue, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
   import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInAnonymously, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
+  // تم تحديث الإعدادات بالكامل من لوحة التحكم الخاصة بك
   const firebaseConfig = {
     apiKey: "AIzaSyBbUsr0QrQMnewkRdQwQ33IR8asdy5VPdM",
+    authDomain: "khalil-chat.firebaseapp.com",
     databaseURL: "https://khalil-chat-default-rtdb.firebaseio.com",
-    projectId: "khalil-chat"
+    projectId: "khalil-chat",
+    storageBucket: "khalil-chat.appspot.com",
+    messagingSenderId: "684465803980",
+    appId: "1:684465803980:web:96d8e8749a99787a77df34"
   };
 
   const app = initializeApp(firebaseConfig);
@@ -133,11 +132,8 @@
                 await set(ref(db, 'users/' + res.user.uid), userData);
             }
         } catch (e) {
-            let msg = "حدث خطأ في الدخول";
-            if (e.code === 'auth/email-already-in-use') msg = "هذا البريد مسجل مسبقاً، جرب تسجيل الدخول";
-            if (e.code === 'auth/wrong-password') msg = "كلمة المرور غير صحيحة";
-            if (e.code === 'auth/user-not-found') msg = "هذا البريد غير موجود، سجل كعضو جديد";
-            alert(msg + "\n" + (e.message || ""));
+            console.error(e);
+            alert("فشل الدخول: " + e.message + "\nتأكد من تشغيل VPN إذا كنت في اليمن.");
         }
     },
 
@@ -203,4 +199,4 @@
 </script>
 </body>
     </html>
-                                                                               
+    
