@@ -78,15 +78,16 @@
   import { getDatabase, ref, set, push, onValue, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
   import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInAnonymously, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-  // إعدادات Firebase - تأكد من صحة الـ API Key من لوحة تحكم Firebase
+  // إعدادات Firebase المحدثة بناءً على لوحة التحكم الخاصة بك
   const firebaseConfig = {
-    apiKey: "AIzaSyBbUsrOQzQMmeWkRdQwQ33IR8asfY5VpdM", // تأكد من أن هذا هو المفتاح الصحيح
+    apiKey: "AIzaSyBbUsrOQzQMmeWkRdQwQ33IR8asfY5VpdM",
     authDomain: "khalil-chat.firebaseapp.com",
     databaseURL: "https://khalil-chat-default-rtdb.firebaseio.com",
     projectId: "khalil-chat",
     storageBucket: "khalil-chat.appspot.com",
     messagingSenderId: "684465803980",
-    appId: "1:684465803980:web:bcc3b1cf9435958f2c2869"
+    appId: "1:684465803980:web:bcc3b1cf9435958f2c2869",
+    measurementId: "G-HV9T1PQE52"
   };
 
   const app = initializeApp(firebaseConfig);
@@ -196,5 +197,4 @@
   };
 </script>
 </body>
-    </html>
-        
+</html>
