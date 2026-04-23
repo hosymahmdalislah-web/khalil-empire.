@@ -53,7 +53,7 @@
 </div>
 
 <div class="header-bar">
-    <div class="f-btn"><i class="fas fa-crown"></i> الإدارة</div>
+    <div class="f-btn"><i class="fas fa-trophy"></i> الإدارة</div>
     <div class="f-btn"><i class="fas fa-gem"></i> المتجر</div>
     <div class="f-btn" onclick="ui.logout()"><i class="fas fa-power-off"></i> خروج</div>
 </div>
@@ -78,16 +78,15 @@
   import { getDatabase, ref, set, push, onValue, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
   import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInAnonymously, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-  // تم تحديث الإعدادات بالقيم الصحيحة 100% لتعمل مع مشروعك
+  // إعدادات Firebase - تأكد من صحة الـ API Key من لوحة تحكم Firebase
   const firebaseConfig = {
-    apiKey: "AIzaSyBbUsrOQzQMmeWkRdQwQ33IR8asfY5VpdM",
+    apiKey: "AIzaSyBbUsrOQzQMmeWkRdQwQ33IR8asfY5VpdM", // تأكد من أن هذا هو المفتاح الصحيح
     authDomain: "khalil-chat.firebaseapp.com",
     databaseURL: "https://khalil-chat-default-rtdb.firebaseio.com",
     projectId: "khalil-chat",
     storageBucket: "khalil-chat.appspot.com",
     messagingSenderId: "684465803980",
-    appId: "1:684465803980:web:bcc3b1cf9435958f2c2869",
-    measurementId: "G-HV9T1PQBCC"
+    appId: "1:684465803980:web:bcc3b1cf9435958f2c2869"
   };
 
   const app = initializeApp(firebaseConfig);
@@ -116,10 +115,9 @@
 
         try {
             if (authMode === 'register') {
-                if (pass.length < 6) throw new Error("كلمة المرور يجب أن تكون 6 أرقام على الأقل");
                 const res = await createUserWithEmailAndPassword(auth, mail, pass);
                 const role = (mail.toLowerCase() === ADMIN_EMAIL.toLowerCase()) ? "إمبراطور خليل" : "عضو";
-                const displayName = (mail.toLowerCase() === ADMIN_EMAIL.toLowerCase()) ? "خليل ابراهيم" : name;
+                const displayName = (mail.toLowerCase() === ADMIN_EMAIL.toLowerCase()) ? "خليل ابراهيم" : (name || "عضو جديد");
                 
                 userData = { uid: res.user.uid, name: displayName, age: age || "20", rank: role, email: mail, img: "https://ui-avatars.com/api/?name="+displayName+"&background=random" };
                 await set(ref(db, 'users/' + res.user.uid), userData);
@@ -133,8 +131,7 @@
                 await set(ref(db, 'users/' + res.user.uid), userData);
             }
         } catch (e) {
-            console.error(e);
-            alert("فشل الدخول: " + e.message + "\nتأكد من تشغيل VPN إذا كنت في اليمن.");
+            alert("حدث خطأ: " + e.message);
         }
     },
 
@@ -199,4 +196,5 @@
   };
 </script>
 </body>
-</html>
+    </html>
+        
