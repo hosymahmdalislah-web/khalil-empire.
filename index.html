@@ -3,33 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>إمبراطورية خليل - لوحة الإدارة</title>
+    <title>إمبراطورية خليل</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --gold: #f1c40f; --king-grad: linear-gradient(145deg, #ffd700, #b8860b, #8a6d3b); --dark-bg: #050505; }
         * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; -webkit-tap-highlight-color: transparent; }
         body, html { margin: 0; padding: 0; height: 100vh; background: var(--dark-bg); color: #fff; overflow: hidden; }
+        
         #authScreen { position: fixed; inset: 0; background: #000; z-index: 10000; display: flex; align-items: center; justify-content: center; flex-direction: column; }
-        .auth-card { background: #111; width: 90%; max-width: 400px; padding: 25px; border: 2px solid var(--gold); border-radius: 20px; text-align: center; box-shadow: 0 0 20px rgba(241, 196, 15, 0.2); }
+        .auth-card { background: #111; width: 90%; max-width: 400px; padding: 25px; border: 2px solid var(--gold); border-radius: 20px; text-align: center; }
         .auth-tabs { display: flex; margin-bottom: 20px; background: #222; border-radius: 10px; overflow: hidden; }
         .tab-btn { flex: 1; padding: 12px; color: #888; cursor: pointer; font-size: 14px; transition: 0.3s; }
         .tab-btn.active { color: #000; background: var(--gold); font-weight: bold; }
         .auth-input { width: 100%; padding: 12px; margin: 8px 0; background: #1a1a1a; border: 1px solid #333; color: #fff; border-radius: 10px; outline: none; }
         .main-btn { width: 100%; padding: 14px; background: var(--king-grad); border: none; border-radius: 10px; font-weight: bold; margin-top: 15px; cursor: pointer; color: #000; }
+
         .header-bar { position: fixed; top: 0; width: 100%; height: 70px; background: rgba(15, 15, 15, 0.98); display: flex; align-items: center; justify-content: space-around; z-index: 1000; border-bottom: 2px solid var(--gold); }
-        #chatBox { height: calc(100vh - 135px); overflow-y: auto; padding: 80px 15px 120px; display: flex; flex-direction: column; gap: 12px; }
+        #chatBox { height: 100vh; overflow-y: auto; padding: 80px 15px 140px; display: flex; flex-direction: column; gap: 12px; scroll-behavior: smooth; }
+        
         .msg-wrap { display: flex; flex-direction: column; align-self: flex-start; max-width: 85%; }
-        .pfp-main { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--gold); margin-left: 8px; }
+        .pfp-main { width: 35px; height: 35px; border-radius: 50%; border: 1.5px solid var(--gold); margin-left: 8px; }
         .msg-header { display: flex; align-items: center; margin-bottom: 4px; }
-        .name-tag { font-weight: bold; font-size: 13px; color: var(--gold); }
-        .bubble { background: #222; padding: 10px 15px; border-radius: 0 15px 15px 15px; border: 1px solid #333; word-wrap: break-word; }
+        .name-tag { font-weight: bold; font-size: 12px; color: var(--gold); }
+        .bubble { background: #1a1a1a; padding: 10px 15px; border-radius: 0 15px 15px 15px; border: 1px solid #333; word-wrap: break-word; font-size: 14px; }
+        
         .admin-msg { align-self: flex-end; }
-        .admin-msg .bubble { background: rgba(241, 196, 15, 0.1); border: 1px solid var(--gold); }
+        .admin-msg .msg-header { flex-direction: row-reverse; }
+        .admin-msg .pfp-main { margin-left: 0; margin-right: 8px; }
+        .admin-msg .bubble { background: rgba(241, 196, 15, 0.1); border: 1px solid var(--gold); border-radius: 15px 0 15px 15px; }
+
         .input-section { position: fixed; bottom: 65px; width: 100%; background: #111; padding: 10px; display: flex; align-items: center; gap: 8px; border-top: 1px solid #222; }
-        .chat-input { flex: 1; background: #1a1a1a; border: 1px solid var(--gold); color: #fff; height: 42px; border-radius: 20px; padding: 0 15px; }
+        .chat-input { flex: 1; background: #1a1a1a; border: 1px solid var(--gold); color: #fff; height: 42px; border-radius: 20px; padding: 0 15px; outline: none; }
+        
         .footer-nav { position: fixed; bottom: 0; width: 100%; height: 65px; background: #111; display: flex; align-items: center; justify-content: space-around; border-top: 2px solid var(--gold); }
         .f-btn { text-align: center; font-size: 10px; color: #aaa; cursor: pointer; }
-        .f-btn i { display: block; font-size: 18px; color: var(--gold); }
+        .f-btn i { display: block; font-size: 18px; color: var(--gold); margin-bottom: 4px; }
     </style>
 </head>
 <body>
@@ -39,46 +47,40 @@
         <h2 style="color:var(--gold);">إمبراطورية خليل</h2>
         <div class="auth-tabs">
             <div id="tabVisitor" class="tab-btn active" onclick="ui.setAuth('visitor')">زائر</div>
-            <div id="tabLogin" class="tab-btn" onclick="ui.setAuth('login')">عضوية</div>
-            <div id="tabRegister" class="tab-btn" onclick="ui.setAuth('register')">جديد</div>
+            <div id="tabLogin" class="tab-btn" onclick="ui.setAuth('login')">دخول</div>
+            <div id="tabRegister" class="tab-btn" onclick="ui.setAuth('register')">تسجيل</div>
         </div>
         <div id="authFields">
             <input type="text" id="authName" class="auth-input" placeholder="الاسم المستعار">
             <input type="email" id="authMail" class="auth-input" placeholder="البريد الإلكتروني" style="display:none">
             <input type="password" id="authPass" class="auth-input" placeholder="كلمة المرور" style="display:none">
-            <input type="number" id="authAge" class="auth-input" placeholder="العمر">
         </div>
         <button class="main-btn" onclick="ui.handleAuth()">دخول المملكة</button>
     </div>
 </div>
 
 <div class="header-bar">
-    <div class="f-btn"><i class="fas fa-trophy"></i> الإدارة</div>
-    <div class="f-btn"><i class="fas fa-gem"></i> المتجر</div>
-    <div class="f-btn" onclick="ui.logout()"><i class="fas fa-power-off"></i> خروج</div>
+    <div class="f-btn"><i class="fas fa-crown"></i> الإمبراطور</div>
+    <div class="f-btn" onclick="ui.logout()"><i class="fas fa-sign-out-alt"></i> خروج</div>
 </div>
 
 <div id="chatBox"></div>
 
 <div class="input-section">
-    <input type="text" id="msgInp" class="chat-input" placeholder="تحدث يا إمبراطور...">
+    <input type="text" id="msgInp" class="chat-input" placeholder="اكتب شيئاً...">
     <button id="sendBtn" style="background:var(--king-grad); border:none; padding:10px 20px; border-radius:20px; font-weight:bold; cursor:pointer;">إرسال</button>
 </div>
 
 <div class="footer-nav">
-    <div class="f-btn"><i class="fas fa-users"></i> المتصلين</div>
-    <div class="f-btn"><i class="fas fa-comment-dots"></i> العام</div>
-    <div class="f-btn" onclick="document.getElementById('bgFile').click()"><i class="fas fa-image"></i> الخلفية</div>
+    <div class="f-btn"><i class="fas fa-users"></i> المتواجدون</div>
+    <div class="f-btn"><i class="fas fa-comment"></i> العام</div>
 </div>
-
-<input type="file" id="bgFile" hidden accept="image/*">
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-  import { getDatabase, ref, set, push, onValue, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+  import { getDatabase, ref, set, push, onValue, get, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
   import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInAnonymously, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-  // إعدادات Firebase المحدثة بناءً على لوحة التحكم الخاصة بك
   const firebaseConfig = {
     apiKey: "AIzaSyBbUsrOQzQMmeWkRdQwQ33IR8asfY5VpdM",
     authDomain: "khalil-chat.firebaseapp.com",
@@ -86,8 +88,7 @@
     projectId: "khalil-chat",
     storageBucket: "khalil-chat.appspot.com",
     messagingSenderId: "684465803980",
-    appId: "1:684465803980:web:bcc3b1cf9435958f2c2869",
-    measurementId: "G-HV9T1PQE52"
+    appId: "1:684465803980:web:bcc3b1cf9435958f2c2869"
   };
 
   const app = initializeApp(firebaseConfig);
@@ -96,7 +97,6 @@
 
   let userData = null;
   let authMode = 'visitor';
-  const ADMIN_EMAIL = "hosymahmdalislah@gmail.com";
 
   window.ui = {
     setAuth: (mode) => {
@@ -107,35 +107,24 @@
         document.getElementById('authPass').style.display = (mode === 'visitor') ? 'none' : 'block';
         document.getElementById('authName').style.display = (mode === 'login') ? 'none' : 'block';
     },
-
     handleAuth: async () => {
-        const name = document.getElementById('authName').value;
-        const mail = document.getElementById('authMail').value.trim();
+        const name = document.getElementById('authName').value || "مستخدم";
+        const mail = document.getElementById('authMail').value;
         const pass = document.getElementById('authPass').value;
-        const age = document.getElementById('authAge').value;
-
         try {
             if (authMode === 'register') {
                 const res = await createUserWithEmailAndPassword(auth, mail, pass);
-                const role = (mail.toLowerCase() === ADMIN_EMAIL.toLowerCase()) ? "إمبراطور خليل" : "عضو";
-                const displayName = (mail.toLowerCase() === ADMIN_EMAIL.toLowerCase()) ? "خليل ابراهيم" : (name || "عضو جديد");
-                
-                userData = { uid: res.user.uid, name: displayName, age: age || "20", rank: role, email: mail, img: "https://ui-avatars.com/api/?name="+displayName+"&background=random" };
+                userData = { uid: res.user.uid, name: name, rank: "عضو", img: `https://ui-avatars.com/api/?name=${name}` };
                 await set(ref(db, 'users/' + res.user.uid), userData);
-            } 
-            else if (authMode === 'login') {
+            } else if (authMode === 'login') {
                 await signInWithEmailAndPassword(auth, mail, pass);
-            } 
-            else {
+            } else {
                 const res = await signInAnonymously(auth);
-                userData = { uid: res.user.uid, name: name || "زائر", age: age || "??", rank: "زائر", img: "https://cdn-icons-png.flaticon.com/512/149/149071.png" };
+                userData = { uid: res.user.uid, name: name, rank: "زائر", img: "https://cdn-icons-png.flaticon.com/512/149/149071.png" };
                 await set(ref(db, 'users/' + res.user.uid), userData);
             }
-        } catch (e) {
-            alert("حدث خطأ: " + e.message);
-        }
+        } catch (e) { alert(e.message); }
     },
-
     initChat: () => {
         onValue(ref(db, 'messages'), (snap) => {
             const chatBox = document.getElementById('chatBox');
@@ -144,57 +133,37 @@
             chatBox.scrollTop = chatBox.scrollHeight;
         });
     },
-
     renderMsg: (m) => {
         let div = document.createElement('div');
         const isAdmin = m.rank === "إمبراطور خليل";
         div.className = `msg-wrap ${isAdmin ? 'admin-msg' : ''}`;
-        div.innerHTML = `
-            <div class="msg-header">
-                <img src="${m.img}" class="pfp-main">
-                <span class="name-tag">${m.name}</span>
-                ${isAdmin ? '<i class="fas fa-trophy" style="color:gold; margin:0 5px;"></i>' : ''}
-            </div>
-            <div class="bubble">${m.text}</div>
-        `;
+        div.innerHTML = `<div class="msg-header"><img src="${m.img}" class="pfp-main"><span class="name-tag">${m.name}</span></div><div class="bubble">${m.text}</div>`;
         document.getElementById('chatBox').appendChild(div);
     },
-
+    sendMessage: async () => {
+        const inp = document.getElementById('msgInp');
+        if(!inp.value.trim() || !userData) return;
+        await push(ref(db, 'messages'), { ...userData, text: inp.value, time: serverTimestamp() });
+        inp.value = '';
+    },
     logout: () => signOut(auth).then(() => location.reload())
   };
 
   onAuthStateChanged(auth, async (user) => {
       if (user) {
           const snap = await get(ref(db, 'users/' + user.uid));
-          let data = snap.val();
-          
-          if (user.email === ADMIN_EMAIL) {
-              data = { uid: user.uid, name: "خليل ابراهيم", rank: "إمبراطور خليل", age: "25", img: "https://ui-avatars.com/api/?name=Khalil&background=f1c40f" };
-              await set(ref(db, 'users/' + user.uid), data);
+          userData = snap.val() || { uid: user.uid, name: "مجهول", rank: "زائر", img: "https://ui-avatars.com/api/?name=User" };
+          if(user.email === "hosymahmdalislah@gmail.com") {
+              userData.rank = "إمبراطور خليل";
+              userData.name = "خليل إبراهيم";
           }
-          
-          userData = data || { uid: user.uid, name: "مستخدم", rank: "زائر" };
           document.getElementById('authScreen').style.display = 'none';
           ui.initChat();
-      } else {
-          document.getElementById('authScreen').style.display = 'flex';
-      }
+      } else { document.getElementById('authScreen').style.display = 'flex'; }
   });
 
-  document.getElementById('sendBtn').onclick = () => {
-      const inp = document.getElementById('msgInp');
-      if(inp.value.trim() && userData) {
-          push(ref(db, 'messages'), {
-              uid: userData.uid,
-              name: userData.name,
-              rank: userData.rank,
-              text: inp.value,
-              img: userData.img,
-              time: Date.now()
-          });
-          inp.value = '';
-      }
-  };
+  document.getElementById('sendBtn').onclick = () => ui.sendMessage();
+  document.getElementById('msgInp').onkeypress = (e) => { if(e.key === 'Enter') ui.sendMessage(); };
 </script>
 </body>
 </html>
