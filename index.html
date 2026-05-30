@@ -1,539 +1,496 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="rtl" class="notranslate" translate="no">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة شات الإمبراطور المتطورة v3.0</title>
-    <!-- استدعاء الأيقونات والخطوط الفاخرة -->
+    <meta name="google" content="notranslate">
+    <title>شات الإمبراطور الأصلي v5.0</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap">
     
     <style>
-        /* --- التصميم الإمبراطورى الفاخر المحاكي للصورة الأولى --- */
         :root {
             --gold: #f1c40f;
             --dark-gold: #d4ac0d;
-            --bg-body: #0a0a0a;
-            --bg-panel: #141414;
-            --bg-item: #1c1c1c;
+            --bg-body: #050505;
+            --bg-panel: #0a0a0a;
             --text-main: #ffffff;
-            --text-muted: #888888;
+            --text-muted: #aaaaaa;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Cairo', sans-serif;
-            user-select: none;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', sans-serif; user-select: none; }
+        body { background-color: var(--bg-body); display: flex; justify-content: center; align-items: center; height: 100vh; color: var(--text-main); overflow: hidden; }
 
-        body {
-            background-color: var(--bg-body);
-            background-image: radial-gradient(circle at center, #1a1301 0%, #050505 100%);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            color: var(--text-main);
-            overflow: hidden;
-        }
-
-        /* حاوية الهاتف الذكي الشاملة للشات */
         .app-container {
-            width: 100%;
-            max-width: 450px;
-            height: 100vh;
-            background-color: var(--bg-panel);
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            box-shadow: 0 0 50px rgba(0, 0, 0, 0.9);
-            border-left: 1px solid #222;
-            border-right: 1px solid #222;
+            width: 100%; max-width: 450px; height: 100vh; background-color: var(--bg-panel);
+            display: flex; flex-direction: column; position: relative; box-shadow: 0 0 40px rgba(0, 0, 0, 1);
         }
 
-        /* شريط الحالة العلوي للهاتف */
-        .phone-status-bar {
-            background-color: #111;
-            padding: 6px 16px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 11px;
-            color: var(--text-muted);
-            border-bottom: 1px solid #1a1a1a;
-        }
-        .phone-status-bar .icons { display: flex; gap: 6px; }
+        /* بوابة الدخول بـ 3 فروع صريحة */
+        .overlay-panel { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 200; display: flex; justify-content: center; align-items: center; padding: 15px; }
+        .auth-card { background: #141414; border: 2px solid var(--gold); width: 100%; max-width: 380px; border-radius: 20px; padding: 20px; }
+        .auth-branches { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px; }
+        .branch-btn { background: #222; border: 1px solid #444; color: var(--text-muted); padding: 8px 2px; font-size: 12px; font-weight: 700; border-radius: 8px; cursor: pointer; }
+        .branch-btn.active { background: linear-gradient(135deg, var(--gold) 0%, var(--dark-gold) 100%); color: #000; font-weight: 900; border-color: var(--gold); }
+        .branch-content { display: none; }
+        .branch-content.active { display: block; }
+        .auth-card input, .auth-card select { width: 100%; background: #000; border: 1px solid #444; padding: 10px; border-radius: 25px; color: #fff; margin-bottom: 12px; outline: none; text-align: center; }
+        .auth-card button.btn-action { width: 100%; background: linear-gradient(135deg, var(--gold) 0%, var(--dark-gold) 100%); border: none; padding: 12px; border-radius: 25px; font-weight: 900; cursor: pointer; color: #000; font-size: 14px; }
 
-        /* --- 1. القائمة العلوية الأيقونية المطابقة تماماً لطلبك --- */
-        .top-navigation {
-            background-color: #161616;
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            padding: 12px 0;
-            border-bottom: 2px solid var(--gold);
-            text-align: center;
-        }
+        /* القائمة العلوية */
+        .top-navigation { background-color: #111111; display: grid; grid-template-columns: repeat(5, 1fr); padding: 10px 0; border-bottom: 2px solid var(--gold); text-align: center; z-index: 5; }
+        .nav-tab { color: var(--text-muted); cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .nav-tab i { font-size: 18px; color: #fff; }
+        .nav-tab span { font-size: 11px; font-weight: 700; color: #aaa; }
+        .nav-tab.active i, .nav-tab.active span { color: var(--gold); }
 
-        .nav-tab {
-            color: var(--text-muted);
-            cursor: pointer;
-            transition: all 0.25s ease;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 5px;
-            position: relative;
-        }
+        /* ساحة المحادثات مع التحكم في الخلفية */
+        .chat-view-portal { flex: 1; position: relative; overflow: hidden; background-color: #050505; }
+        .chat-bg-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=600'); background-size: cover; background-position: center; opacity: 0.25; z-index: 1; pointer-events: none; }
+        .messages-list { position: absolute; top: 0; left: 0; width: 100%; height: 100%; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; z-index: 2; }
 
-        .nav-tab i { font-size: 18px; }
-        .nav-tab span { font-size: 11px; font-weight: 700; }
-
-        .nav-tab:hover, .nav-tab.active { color: var(--gold); }
-        .nav-tab:hover i { transform: scale(1.15); }
-
-        /* الإشعارات الحمراء فوق الأيقونات */
-        .notification-badge::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: 25%;
-            width: 8px;
-            height: 8px;
-            background-color: #e74c3c;
-            border-radius: 50%;
-            box-shadow: 0 0 5px #e74c3c;
-        }
-
-        /* --- 2. ساحة الدردشة الكبيرة الفاخرة بالخلفية السينمائية --- */
-        .chat-view-portal {
-            flex: 1;
-            position: relative;
-            overflow: hidden;
-            background-color: #0f0f0f;
-        }
-
-        /* تأثير الدخان والنار الخلفي ليطابق التصميم المتقدم */
-        .chat-cinematic-bg {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: url('https://images.unsplash.com/photo-1579546929518-9e396f3cc809?q=80&w=600') center center;
-            background-size: cover;
-            opacity: 0.08;
-            filter: grayscale(30%);
-            z-index: 1;
-            pointer-events: none;
-        }
-
-        .messages-list {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            padding: 16px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 18px;
-            z-index: 2;
-        }
-
-        .messages-list::-webkit-scrollbar { width: 3px; }
-        .messages-list::-webkit-scrollbar-thumb { background: #252525; border-radius: 10px; }
-
-        /* --- 3. تصميم فقاعات ورتب الأعضاء الفاخرة --- */
-        .msg-block {
-            display: flex;
-            flex-direction: column;
-            max-width: 85%;
-            animation: popMessage 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
-        }
-
-        @keyframes popMessage {
-            from { opacity: 0; transform: translateY(20px) scale(0.9); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-
-        .msg-block.incoming { align-self: flex-start; }
-        .msg-block.outgoing { align-self: flex-end; align-items: flex-end; }
-
-        /* رتبة العضو الذهبية المحيطة بالاسم */
-        .member-rank-tag {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            background: rgba(0, 0, 0, 0.7);
-            border: 1px solid var(--gold);
-            padding: 2px 12px;
-            border-radius: 20px;
-            margin-bottom: 5px;
-            box-shadow: 0 2px 8px rgba(241, 196, 15, 0.2);
-        }
-
-        .rank-title { font-size: 11px; font-weight: 900; color: var(--gold); letter-spacing: 0.5px; }
-        .rank-icon { color: var(--gold); font-size: 10px; }
-
-        /* تصميم الفقاعة النصية */
-        .text-bubble {
-            padding: 12px 18px;
-            border-radius: 18px;
-            font-size: 14.5px;
-            line-height: 1.6;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-        }
-
-        .incoming .text-bubble {
-            background: #ffffff;
-            color: #111111;
-            border-top-right-radius: 2px;
-        }
-
-        .outgoing .text-bubble {
-            background: linear-gradient(135deg, var(--gold) 0%, var(--dark-gold) 100%);
-            color: #000000;
-            border-top-left-radius: 2px;
-            font-weight: 700;
-        }
-
-        .time-stamp { font-size: 10px; color: var(--text-muted); margin-top: 5px; padding: 0 4px; }
-        .outgoing .time-stamp { text-align: left; width: 100%; }
-
-        /* الهيكل المحيط بالأفاتار الدائري والمؤطر بالذهب */
-        .avatar-layout { display: flex; gap: 12px; align-items: flex-start; }
-        .gold-avatar-frame {
-            width: 42px;
-            height: 42px;
-            border-radius: 50%;
-            border: 2px solid var(--gold);
-            padding: 2px;
-            background: #000;
-            box-shadow: 0 0 10px rgba(241, 196, 15, 0.5);
-        }
+        /* هيكلة هيدر الرسالة الفخمة مثبتة جهة اليمين تماماً كالصورة */
+        .msg-block { display: flex; flex-direction: column; width: 100%; align-items: flex-start; }
+        .msg-header-identity { display: flex; align-items: center; gap: 8px; width: 100%; justify-content: flex-start; margin-bottom: 6px; cursor: pointer; }
+        
+        /* إطار الأفاتار الدائري الذهبي */
+        .gold-avatar-frame { width: 44px; height: 44px; border-radius: 50%; border: 2px solid var(--gold); padding: 1px; background: #000; overflow: hidden; display: flex; justify-content: center; align-items: center; }
         .gold-avatar-frame img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+        
+        /* أيقونة الكأس المنفصلة */
+        .rank-trophy-icon { color: var(--gold); font-size: 18px; }
 
-        /* --- 4. لوحة الإدخال والتحكم السفلي للإرسال --- */
-        .bottom-control-panel {
-            background-color: #161616;
-            padding: 15px;
-            border-top: 1px solid #222;
-            z-index: 5;
+        /* إطار الاسم البيضاوي الذهبي */
+        .user-oval-badge { background: transparent; border: 1.5px solid var(--gold); padding: 2px 18px; border-radius: 20px; color: #fff; font-size: 13px; font-weight: bold; min-width: 75px; text-align: center; }
+
+        /* فقاعة نص الرسالة البيضاء أسفل البروفايل */
+        .text-bubble { 
+            background: #ffffff; color: #000000; padding: 12px 20px; 
+            border-radius: 16px; border-top-right-radius: 0px; 
+            font-size: 14px; font-weight: 500; max-width: 75%; 
+            margin-right: 10px; margin-left: 50px; text-align: right; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            line-height: 1.4; align-self: flex-start;
         }
 
-        .action-bar { display: flex; align-items: center; gap: 12px; }
+        /* لوحة التحكم السفلي للإرسال */
+        .bottom-control-panel { background-color: #0e0e0e; padding: 12px; border-top: 1px solid #1a1a1a; z-index: 10; }
+        .action-bar { display: flex; align-items: center; gap: 10px; }
+        
+        .submit-send-btn { background: linear-gradient(135deg, var(--gold) 0%, var(--dark-gold) 100%); border: none; color: #000; padding: 10px 20px; border-radius: 20px; font-weight: 900; cursor: pointer; font-size: 14px; }
+        .search-input-wrapper { flex: 1; background-color: #000; border: 1.5px solid #333; border-radius: 25px; display: flex; align-items: center; padding: 2px 15px; border-color: var(--dark-gold); }
+        .search-input-wrapper input { flex: 1; background: none; border: none; outline: none; color: var(--text-main); padding: 10px 0; font-size: 13px; text-align: right; }
+        .image-gallery-trigger { color: var(--gold); font-size: 22px; cursor: pointer; display: flex; align-items: center; }
 
-        .search-input-wrapper {
-            flex: 1;
-            background-color: var(--bg-body);
-            border: 1px solid #333;
-            border-radius: 30px;
-            display: flex;
-            align-items: center;
-            padding: 2px 5px 2px 15px;
-            transition: border-color 0.3s;
-        }
+        /* شريط الخيارات السفلي الأيقوني */
+        .footer-tabs-bar { background-color: #0a0a0a; display: grid; grid-template-columns: repeat(5, 1fr); padding: 10px 0; border-top: 1px solid #111; text-align: center; z-index: 5; }
+        .footer-item { color: var(--text-muted); font-size: 11px; font-weight: 700; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .footer-item i { font-size: 16px; color: #fff; }
+        .footer-item span { color: #aaa; }
+        .footer-item.active i, .footer-item.active span { color: var(--gold); }
 
-        .search-input-wrapper:focus-within {
-            border-color: var(--gold);
-            box-shadow: 0 0 12px rgba(241, 196, 15, 0.2);
-        }
+        /* النوافذ الجانبية والمنبثقة */
+        .custom-modal { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 150; display: none; justify-content: center; align-items: center; padding: 20px; }
+        .modal-content { background: #111; border: 2px solid var(--gold); width: 100%; max-width: 380px; border-radius: 15px; padding: 20px; position: relative; max-height: 90vh; overflow-y: auto; }
+        .close-modal { position: absolute; top: 12px; left: 12px; background: none; border: none; color: #ff4d4d; cursor: pointer; font-size: 18px; }
 
-        .search-input-wrapper input {
-            flex: 1;
-            background: none;
-            border: none;
-            outline: none;
-            color: var(--text-main);
-            padding: 10px 5px;
-            font-size: 14px;
-        }
-
-        .media-trigger {
-            background: none;
-            border: none;
-            color: var(--gold);
-            font-size: 18px;
-            cursor: pointer;
-            padding: 6px;
-            transition: transform 0.2s;
-        }
-        .media-trigger:hover { transform: scale(1.15); }
-
-        .submit-send-btn {
-            background: linear-gradient(135deg, var(--gold) 0%, var(--dark-gold) 100%);
-            border: none;
-            color: #000;
-            padding: 11px 26px;
-            border-radius: 30px;
-            font-weight: 900;
-            font-size: 14px;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(241, 196, 15, 0.4);
-            transition: all 0.2s;
-        }
-        .submit-send-btn:active { transform: scale(0.95); }
-
-        /* --- 5. شريط التصفح السفلي الكامل والفاخر --- */
-        .footer-tabs-bar {
-            background-color: #111111;
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            padding: 14px 0;
-            border-top: 1px solid #222;
-            text-align: center;
-        }
-
-        .footer-item {
-            color: var(--text-muted);
-            font-size: 11px;
-            font-weight: 700;
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 6px;
-            transition: color 0.3s;
-        }
-
-        .footer-item i { font-size: 16px; }
-        .footer-item:hover, .footer-item.active { color: var(--gold); }
-
-        /* --- 6. واجهة لوحة تحكم الإدارة والتسجيل المنبثقة الجاهزة --- */
-        .overlay-panel {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85);
-            backdrop-filter: blur(10px);
-            z-index: 100;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            transition: all 0.3s ease;
-        }
-
-        .auth-card {
-            background: #1c1c1c;
-            border: 2px solid var(--gold);
-            width: 100%;
-            max-width: 350px;
-            border-radius: 16px;
-            padding: 25px;
-            text-align: center;
-            box-shadow: 0 0 30px rgba(241, 196, 15, 0.3);
-        }
-
-        .auth-card h2 { color: var(--gold); margin-bottom: 15px; font-weight: 900; }
-        .auth-card input {
-            width: 100%; background: #0a0a0a; border: 1px solid #444;
-            padding: 12px; border-radius: 25px; color: #fff; margin-bottom: 15px;
-            outline: none; text-align: center;
-        }
-        .auth-card input:focus { border-color: var(--gold); }
-        .auth-card button {
-            width: 100%; background: linear-gradient(135deg, var(--gold) 0%, var(--dark-gold) 100%);
-            border: none; padding: 12px; border-radius: 25px; font-weight: 900; cursor: pointer;
-        }
+        /* الملف الشخصي المطور داخل المودال */
+        .profile-setup-header { width: 100%; height: 90px; background: linear-gradient(45deg, #222, #444); border-radius: 8px; position: relative; margin-bottom: 40px; background-size: cover; background-position: center; }
+        .profile-setup-avatar { width: 65px; height: 65px; border-radius: 50%; border: 2px solid var(--gold); position: absolute; bottom: -30px; right: 15px; background: #000; overflow: hidden; }
+        .profile-setup-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .admin-grid-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
     </style>
 </head>
 <body>
 
     <div class="app-container">
         
-        <!-- نافذة تسجيل الدخول المدمجة الفاخرة للزوار والأدمن -->
         <div class="overlay-panel" id="authOverlay">
             <div class="auth-card">
-                <h2>بوابة الإمبراطور</h2>
-                <p style="font-size: 12px; color: #aaa; margin-bottom: 20px;">سجل اسمك المستعار للدخول إلى الدردشة الحية</p>
-                <input type="text" id="usernameField" placeholder="اكتب اسمك هنا..." required>
-                <button type="button" onclick="loginSystem()">دخول المنصة</button>
+                <h3 style="color:var(--gold); text-align:center; margin-bottom:15px; font-weight:900;">بوابة تسجيل الدخول</h3>
+                <div class="auth-branches">
+                    <button class="branch-btn active" onclick="switchBranch('loginBranch', this)">عضوية</button>
+                    <button class="branch-btn" onclick="switchBranch('registerBranch', this)">تسجيل جديد</button>
+                    <button class="branch-btn" onclick="switchBranch('visitorBranch', this)">زائر</button>
+                </div>
+
+                <div class="branch-content active" id="loginBranch">
+                    <input type="text" id="loginUser" placeholder="اسم الحساب الحشداوي...">
+                    <input type="password" id="loginPass" placeholder="كلمة المرور...">
+                    <button class="btn-action" onclick="actionLogin()">دخول الحساب</button>
+                </div>
+
+                <div class="branch-content" id="registerBranch">
+                    <input type="text" id="regUser" placeholder="اسم مستعار جديد...">
+                    <input type="password" id="regPass" placeholder="كلمة المرور السرية...">
+                    <select id="regGender">
+                        <option value="ذكر">ذكر</option>
+                        <option value="أنثى">أنثى</option>
+                    </select>
+                    <button class="btn-action" onclick="actionRegister()">تسجيل ودخول فوري</button>
+                </div>
+
+                <div class="branch-content" id="visitorBranch">
+                    <p style="color:var(--text-muted); text-align:center; font-size:12px; margin-bottom:15px;">دخول سريع ومؤقت بدون باسورد</p>
+                    <button class="btn-action" onclick="actionVisitor()">دخول فوري كزائر</button>
+                </div>
             </div>
         </div>
 
-        <!-- شريط الهاتف العلوي -->
-        <div class="phone-status-bar">
-            <div class="time">3:50 ص</div>
-            <div class="icons">
-                <i class="fas fa-wifi"></i>
-                <i class="fas fa-signal"></i>
-                <i class="fas fa-battery-full"></i>
+        <div class="custom-modal" id="adminModal">
+            <div class="modal-content">
+                <button class="close-modal" onclick="closeModal('adminModal')"><i class="fas fa-times-circle"></i></button>
+                <h3 style="color:var(--gold); margin-bottom:15px; font-weight:900; text-align:center;">لوحة التحكم المتكاملة</h3>
+                
+                <button class="btn-action" style="background:#e74c3c; color:#fff; margin-bottom:10px;" onclick="clearRoomMessages()">💥 تنظيف الغرفة ومسح الرسائل</button>
+                <button class="btn-action" style="background:#2ecc71; color:#fff; margin-bottom:10px;" onclick="alert('تم إرسال طلب إنشاء غرفة إضافية للمراجعة!')">➕ إنشاء غرفة جديدة</button>
+                
+                <div style="border-top:1px solid #333; padding-top:10px; margin-top:10px;">
+                    <label style="font-size:12px; color:var(--gold);">تغيير خلفية الروم (رابط الصورة):</label>
+                    <input type="text" id="bgUrlInput" placeholder="ضع رابط صورة الخلفية الجديدة..." style="width:100%; padding:8px; margin-top:5px; background:#000; border:1.5px solid var(--gold); color:#fff; border-radius:10px;">
+                    <button class="btn-action" style="margin-top:5px; padding:6px;" onclick="changeRoomBackground()">تحديث الخلفية فوراً</button>
+                </div>
+
+                <button class="btn-action" style="background:#7f8c8d; color:#fff; margin-top:15px;" onclick="location.reload();">🚪 خروج وتسجيل مغادرة</button>
             </div>
         </div>
 
-        <!-- القائمة العلوية الأيقونية المتطورة كاملة -->
+        <div class="custom-modal" id="profileModal">
+            <div class="modal-content">
+                <button class="close-modal" onclick="closeModal('profileModal')"><i class="fas fa-times-circle"></i></button>
+                <h3 style="color:var(--gold); margin-bottom:15px; font-weight:900; text-align:center;">إعدادات ملفك الشخصي</h3>
+                
+                <div class="profile-setup-header" id="modalProfileCover">
+                    <div class="profile-setup-avatar">
+                        <img src="" id="modalProfileImg" alt="Avatar">
+                    </div>
+                </div>
+
+                <input type="text" id="uInputName" placeholder="تعديل اسمك المستعار...">
+                <input type="text" id="uInputImg" placeholder="رابط صورتك الشخصية (الأفاتار)...">
+                <input type="text" id="uInputCover" placeholder="رابط صورة غلاف البروفايل...">
+                <input type="text" id="uInputStatus" placeholder="اكتب حالتك / الستيتس الحالية...">
+                <button class="btn-action" onclick="saveUserProfile()">حفظ وتحديث البروفايل</button>
+            </div>
+        </div>
+
+        <div class="custom-modal" id="userActionModal">
+            <div class="modal-content">
+                <button class="close-modal" onclick="closeModal('userActionModal')"><i class="fas fa-times-circle"></i></button>
+                <h3 style="color:var(--gold); margin-bottom:10px; font-weight:900; text-align:center;" id="actionModalTargetTitle">التحكم بالعضو</h3>
+                <p style="font-size:11px; text-align:center; color:#aaa; margin-bottom:15px;">تطبق الإجراءات حسب مستوى قوتك الإدارية في الروم</p>
+                
+                <div id="rankManagementSection" style="display:none; margin-bottom:10px; border-bottom:1px solid #333; padding-bottom:10px;">
+                    <label style="font-size:12px; color:var(--gold);">تعديل رتبة الكأس الإمبراطورية:</label>
+                    <select id="rankTrophyStatusSelect" style="width:100%; background:#000; color:#fff; padding:8px; border-radius:10px; margin-top:5px;">
+                        <option value="false">سحب الكأس (عضو بدون رتبة)</option>
+                        <option value="true">منح الكأس الملكية 🏆</option>
+                    </select>
+                    <button class="btn-action" style="padding:6px; margin-top:5px;" onclick="applyRankTrophyChange()">حفظ وتعديل رتبة الكأس</button>
+                </div>
+
+                <div class="admin-grid-btns">
+                    <button class="btn-action" style="background:#e74c3c; color:#fff;" onclick="executePunishment('طرد')">❌ طرد من الشات</button>
+                    <button class="btn-action" style="background:#e67e22; color:#fff;" onclick="executePunishment('كتم')">🔇 كتم الحساب</button>
+                </div>
+                <button class="btn-action" style="background:#962d22; color:#fff; margin-top:10px; width:100%;" onclick="executePunishment('حظر')">🚫 حظر نهائي (باند)</button>
+            </div>
+        </div>
+
+        <div class="phone-status-bar" style="background:#000; padding:6px 16px; display:flex; justify-content:space-between; font-size:11px; color:#888;">
+            <div class="time">10:51 ص</div>
+            <div class="icons"><i class="fas fa-wifi"></i> <i class="fas fa-signal"></i> <i class="fas fa-battery-full"></i></div>
+        </div>
+
         <nav class="top-navigation">
-            <div class="nav-tab notification-badge">
-                <i class="fas fa-bell"></i>
-                <span>إشعارات</span>
-            </div>
-            <div class="nav-tab">
-                <i class="fas fa-flag"></i>
-                <span>بلاغات</span>
-            </div>
-            <div class="nav-tab active">
-                <i class="fas fa-comments"></i>
-                <span>الخاص</span>
-            </div>
-            <div class="nav-tab">
-                <i class="fas fa-gem"></i>
-                <span>الأثرياء</span>
-            </div>
-            <div class="nav-tab">
-                <i class="fas fa-crown"></i>
-                <span>الكبار</span>
-            </div>
+            <div class="nav-tab"> <i class="fas fa-bell"></i> <span>إشعارات</span> </div>
+            <div class="nav-tab"> <i class="fas fa-flag"></i> <span>بلاغات</span> </div>
+            <div class="nav-tab active"> <i class="fas fa-comments"></i> <span>الخاص</span> </div>
+            <div class="nav-tab"> <i class="fas fa-gem"></i> <span>الأثرياء</span> </div>
+            <div class="nav-tab"> <i class="fas fa-crown"></i> <span>الكبار</span> </div>
         </nav>
 
-        <!-- ساحة عرض المحادثات الرسائل -->
         <div class="chat-view-portal">
-            <div class="chat-cinematic-bg"></div>
-            
+            <div class="chat-bg-layer" id="roomBgLayer"></div>
             <div class="messages-list" id="chatScroller">
-                <!-- رسالة ترحيبية من النظام الأساسي -->
-                <div class="msg-block incoming">
-                    <div class="member-rank-tag" style="border-color: #888;">
-                        <span class="rank-title" style="color: #888;">النظام الملكي</span>
+                
+                <div class="msg-block">
+                    <div class="msg-header-identity">
+                        <div class="gold-avatar-frame"><img src="https://via.placeholder.com/100/000/fff?text=N" style="filter: invert(1);" alt="System"></div>
+                        <div class="user-oval-badge">النظام</div>
                     </div>
-                    <div class="text-bubble">
-                        تم فك قيود الشبكة.. أهلاً بك يا إمبراطور في النسخة المطورة v3.0 المجهزة بالكامل.
-                    </div>
-                    <div class="time-stamp">الآن</div>
+                    <div class="text-bubble">تم فك قيود الشبكة.. أهلاً بك يا إمبراطور.</div>
                 </div>
 
-                <!-- رسالة مستخدم تجريبية برتبة ذهبية -->
-                <div class="msg-block incoming">
-                    <div class="avatar-layout">
-                        <div class="gold-avatar-frame">
-                            <img src="https://via.placeholder.com/100/f1c40f/000?text=User" alt="حسوني">
-                        </div>
-                        <div>
-                            <div class="member-rank-tag">
-                                <span class="rank-title">حسوني</span>
-                                <i class="fas fa-trophy rank-icon"></i>
-                            </div>
-                            <div class="text-bubble">ولد مبرمج ومطور للشبكة</div>
-                            <div class="time-stamp">3:49 ص</div>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
 
-        <!-- لوحة التحكم السفلية لكتابة وإرسال الرسائل واختيار الصور -->
         <footer class="bottom-control-panel">
             <form id="mainChatForm" onsubmit="handleSend(event)">
                 <div class="action-bar">
+                    <button type="submit" class="submit-send-btn">إرسال</button>
                     <div class="search-input-wrapper">
                         <input type="text" id="chatInputField" placeholder="تحدث يا إمبراطور..." autocomplete="off" required>
-                        <button type="button" class="media-trigger" onclick="alert('لوحة رفع الصور والملفات جاهزة لاستقبال الملفات!')">
-                            <i class="far fa-image"></i>
-                        </button>
                     </div>
-                    <button type="submit" class="submit-send-btn">إرسال</button>
+                    <div class="image-gallery-trigger" onclick="triggerImageUpload()">
+                        <i class="fas fa-image"></i>
+                    </div>
                 </div>
             </form>
         </footer>
 
-        <!-- شريط الخيارات والأقسام السفلي المطور بالكامل -->
         <div class="footer-tabs-bar">
-            <div class="footer-item" onclick="location.reload();">
-                <i class="fas fa-sync-alt"></i>
-                <span>تحديث</span>
-            </div>
-            <div class="footer-item" onclick="alert('لوحة الأرباح والمحفظة الرقمية')">
-                <i class="fas fa-wallet"></i>
-                <span>الأرباح</span>
-            </div>
-            <div class="footer-item" onclick="alert('فتح لوحة الإعدادات والمظهر الداكن الخارق')">
-                <i class="fas fa-cogs"></i>
-                <span>الإعدادات</span>
-            </div>
-            <div class="footer-item" onclick="alert('الانتقال لمشاهدة البث المباشر واليوتيوب مدمج')">
-                <i class="fab fa-youtube" style="color: #e74c3c;"></i>
-                <span>يوتيوب</span>
-            </div>
-            <div class="footer-item active" onclick="alert('قائمة المتواجدين حالياً والغرف المفتوحة')">
-                <i class="fas fa-users"></i>
-                <span>المتواجدين</span>
-            </div>
+            <div class="footer-item" onclick="location.reload();"> <i class="fas fa-sync-alt"></i> <span>تحديث</span> </div>
+            <div class="footer-item" onclick="alert('محفظة الأرباح جاهزة ومؤمنة.')"> <i class="fas fa-wallet"></i> <span>الأرباح</span> </div>
+            <div class="footer-item" onclick="openProfileEditModal()"> <i class="fas fa-cogs"></i> <span>الإعدادات</span> </div>
+            <div class="footer-item"> <i class="fab fa-youtube"></i> <span>يوتيوب</span> </div>
+            <div class="footer-item active" onclick="openModal('adminModal')"> <i class="fas fa-users"></i> <span>الإدارة</span> </div>
         </div>
 
     </div>
 
-    <!-- العمليات الذكية وحفظ البيانات -->
     <script>
         const chatScroller = document.getElementById('chatScroller');
         const chatInputField = document.getElementById('chatInputField');
         const authOverlay = document.getElementById('authOverlay');
-        const usernameField = document.getElementById('usernameField');
-        let currentUserName = "زائر";
+        
+        let myProfile = {
+            name: "عضو جديد",
+            avatar: "https://via.placeholder.com/100/f1c40f/000",
+            cover: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=600",
+            status: "متواجد في الروم الملكي",
+            hasTrophy: false,
+            powerLevel: 1 // رتبة منخفضة تلقائياً للأعضاء الجدد
+        };
 
-        // دالة تسجيل الدخول المستعارة لمنع الزوار من الكتابة بدون اسم
-        function loginSystem() {
-            const name = usernameField.value.trim();
-            if(name === '') {
-                alert("الرجاء كتابة اسم مستعار أولاً!");
+        let selectedUserForAction = "";
+        let savedMessages = JSON.parse(localStorage.getItem('emp_v5_logs')) || [];
+
+        function switchBranch(branchId, btnElement) {
+            document.querySelectorAll('.branch-content').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.branch-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(branchId).classList.add('active');
+            btnElement.classList.add('active');
+        }
+
+        function actionRegister() {
+            const user = document.getElementById('regUser').value.trim();
+            const pass = document.getElementById('regPass').value.trim();
+            if(!user || !pass) return alert('الرجاء كتابة البيانات كاملة!');
+
+            myProfile.name = user;
+            myProfile.hasTrophy = false; 
+            myProfile.powerLevel = 1;
+
+            localStorage.setItem('emp_v5_user_' + user, JSON.stringify({pass: pass, hasTrophy: false, powerLevel: 1, avatar: myProfile.avatar, cover: myProfile.cover, status: myProfile.status}));
+            enterChat();
+        }
+
+        function actionLogin() {
+            const user = document.getElementById('loginUser').value.trim();
+            const pass = document.getElementById('loginPass').value.trim();
+            
+            // حساب الإمبراطور المطلق والتحكم الكامل
+            if(user === 'حسوني' || user.toLowerCase() === 'admin') {
+                myProfile.name = user;
+                myProfile.hasTrophy = true;
+                myProfile.powerLevel = 100; // القوة العظمى
+                myProfile.avatar = "https://i.imgur.com/v8tXg3B.png";
+                enterChat();
                 return;
             }
-            currentUserName = name;
-            authOverlay.style.opacity = '0';
-            setTimeout(() => authOverlay.style.display = 'none', 300);
+
+            const localAcc = localStorage.getItem('emp_v5_user_' + user);
+            if(localAcc) {
+                const parsed = JSON.parse(localAcc);
+                if(parsed.pass === pass) {
+                    myProfile.name = user;
+                    myProfile.hasTrophy = parsed.hasTrophy || false;
+                    myProfile.powerLevel = parsed.powerLevel || 1;
+                    myProfile.avatar = parsed.avatar || myProfile.avatar;
+                    myProfile.cover = parsed.cover || myProfile.cover;
+                    myProfile.status = parsed.status || myProfile.status;
+                    enterChat();
+                } else {
+                    alert('كلمة المرور خاطئة!');
+                }
+            } else {
+                alert('الحساب غير مسجل، تفضل بفرع تسجيل جديد!');
+            }
         }
 
-        // دالة إرسال الرسالة وبنائها ديناميكياً بهيكل الأسلوب المطور مية بالمية
+        function actionVisitor() {
+            myProfile.name = "زائر_" + Math.floor(100 + Math.random() * 900);
+            myProfile.hasTrophy = false;
+            myProfile.powerLevel = 0;
+            enterChat();
+        }
+
+        function enterChat() {
+            authOverlay.style.display = 'none';
+            loadChatLogs();
+        }
+
         function handleSend(e) {
             e.preventDefault();
-            const val = chatInputField.value.trim();
-            if(!val) return;
+            const text = chatInputField.value.trim();
+            if(!text) return;
 
-            const time = new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+            const messageData = {
+                name: myProfile.name,
+                avatar: myProfile.avatar,
+                hasTrophy: myProfile.hasTrophy,
+                powerLevel: myProfile.powerLevel,
+                text: text
+            };
 
-            const msgBlock = document.createElement('div');
-            msgBlock.classList.add('msg-block', 'outgoing');
-            msgBlock.innerHTML = `
-                <div class="text-bubble">${escapeHtml(val)}</div>
-                <div class="time-stamp">${time}</div>
-            `;
+            savedMessages.push(messageData);
+            localStorage.setItem('emp_v5_logs', JSON.stringify(savedMessages));
 
-            chatScroller.appendChild(msgBlock);
+            renderMessage(messageData);
             chatInputField.value = '';
-            chatInputField.focus();
-            
-            scrollDown();
-
-            // محاكاة رد فوري ذكي بعد ثانية لملء غرف المحادثة وتجربتها
-            setTimeout(simulateRoomResponse, 1200);
+            chatScroller.scrollTop = chatScroller.scrollHeight;
         }
 
-        function simulateRoomResponse() {
-            const time = new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
-            const msgBlock = document.createElement('div');
-            msgBlock.classList.add('msg-block', 'incoming');
-            msgBlock.innerHTML = `
-                <div class="avatar-layout">
-                    <div class="gold-avatar-frame">
-                        <img src="https://via.placeholder.com/100/f1c40f/000?text=User" alt="حسوني">
+        function renderMessage(msg) {
+            const block = document.createElement('div');
+            block.classList.add('msg-block');
+
+            const trophyHtml = msg.hasTrophy ? `<i class="fas fa-trophy rank-trophy-icon"></i>` : '';
+
+            block.innerHTML = `
+                <div class="msg-header-identity" onclick="openUserActionMenu('${msg.name}', ${msg.powerLevel})">
+                    <div class="gold-avatar-frame"><img src="${msg.avatar}" alt="Avatar"></div>
+                    ${trophyHtml}
+                    <div class="user-oval-badge">${msg.name}</div>
+                </div>
+                <div class="text-bubble">${escapeHtml(msg.text)}</div>
+            `;
+            chatScroller.appendChild(block);
+        }
+
+        function loadChatLogs() {
+            chatScroller.innerHTML = `
+                <div class="msg-block">
+                    <div class="msg-header-identity">
+                        <div class="gold-avatar-frame"><img src="https://via.placeholder.com/100/000/fff?text=N" style="filter: invert(1);" alt="System"></div>
+                        <div class="user-oval-badge">النظام</div>
                     </div>
-                    <div>
-                        <div class="member-rank-tag">
-                            <span class="rank-title">حسوني 🏆</span>
-                        </div>
-                        <div class="text-bubble">أهلاً بك يا ${currentUserName}! هذه هي الواجهة المطورة والكاملة المكونة من آلاف خطوط التنسيق المخصصة للمنصات العربية الشاملة.</div>
-                        <div class="time-stamp">${time}</div>
-                    </div>
+                    <div class="text-bubble">تم فك قيود الشبكة.. أهلاً بك يا إمبراطور.</div>
                 </div>
             `;
-            chatScroller.appendChild(msgBlock);
-            scrollDown();
+            savedMessages.forEach(msg => renderMessage(msg));
+            chatScroller.scrollTop = chatScroller.scrollHeight;
         }
 
-        function scrollDown() {
-            chatScroller.scrollTo({ top: chatScroller.scrollHeight, behavior: 'smooth' });
+        // فتح لوحة الإجراءات والتحكم بالأعضاء حسب فروقات الرتبة (الأعلى يسيطر على الأدنى)
+        function openUserActionMenu(targetUser, targetPower) {
+            if(targetUser === myProfile.name) return; // لا يمكن اتخاذ إجراء ضد بروفايلك شخصياً
+            
+            selectedUserForAction = targetUser;
+            document.getElementById('actionModalTargetTitle').innerText = `التحكم بـ ${targetUser}`;
+            
+            // إظهار تحكم الرتب الفريد وتعديل الكؤوس لحساب حسوني / الأدمن فقط
+            if(myProfile.powerLevel >= 100 || myProfile.name === 'حسوني') {
+                document.getElementById('rankManagementSection').style.display = 'block';
+            } else {
+                document.getElementById('rankManagementSection').style.display = 'none';
+            }
+
+            // السماح بالتحكم فقط إذا كانت رتبتك أعلى من رتبة المستهدف
+            if(myProfile.powerLevel > targetPower || myProfile.name === 'حسوني') {
+                openModal('userActionModal');
+            } else {
+                alert('خطأ: لا يمكنك التحكم أو طرد أو كتم هذا العضو لأن رتبته مساوية أو أعلى منك!');
+            }
         }
 
-        function escapeHtml(text) {
-            return text.replace(/[&<>'"]/g, t => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[t] || t));
+        function executePunishment(type) {
+            alert(`تم تطبيق أمر [ ${type} ] بنجاح ضد العضو المخالف ${selectedUserForAction}!`);
+            closeModal('userActionModal');
         }
 
-        window.onload = () => { chatScroller.scrollTop = chatScroller.scrollHeight; };
+        function applyRankTrophyChange() {
+            const val = document.getElementById('rankTrophyStatusSelect').value === "true";
+            
+            // تحديث الرسائل المخزنة فوراً
+            savedMessages.forEach(m => {
+                if(m.name === selectedUserForAction) {
+                    m.hasTrophy = val;
+                    m.powerLevel = val ? 50 : 1; // ترقية مستوى القوة عند منحه الكأس
+                }
+            });
+
+            // تحديث قاعدة الحسابات المحلية
+            const targetAcc = localStorage.getItem('emp_v5_user_' + selectedUserForAction);
+            if(targetAcc) {
+                let parsed = JSON.parse(targetAcc);
+                parsed.hasTrophy = val;
+                parsed.powerLevel = val ? 50 : 1;
+                localStorage.setItem('emp_v5_user_' + selectedUserForAction, JSON.stringify(parsed));
+            }
+
+            localStorage.setItem('emp_v5_logs', JSON.stringify(savedMessages));
+            loadChatLogs();
+            alert(`تم تعديل رتبة كأس العضو [ ${selectedUserForAction} ] بنجاح!`);
+            closeModal('userActionModal');
+        }
+
+        // فتح ومزامنة بيانات تعديل البروفايل لأي عضو
+        function openProfileEditModal() {
+            document.getElementById('modalProfileImg').src = myProfile.avatar;
+            if(myProfile.cover) document.getElementById('modalProfileCover').style.backgroundImage = `url('${myProfile.cover}')`;
+            
+            document.getElementById('uInputName').value = myProfile.name;
+            document.getElementById('uInputImg').value = myProfile.avatar;
+            document.getElementById('uInputCover').value = myProfile.cover;
+            document.getElementById('uInputStatus').value = myProfile.status;
+            openModal('profileModal');
+        }
+
+        function saveUserProfile() {
+            const name = document.getElementById('uInputName').value.trim();
+            const img = document.getElementById('uInputImg').value.trim();
+            const cover = document.getElementById('uInputCover').value.trim();
+            const status = document.getElementById('uInputStatus').value.trim();
+
+            if(name) myProfile.name = name;
+            if(img) myProfile.avatar = img;
+            if(cover) myProfile.cover = cover;
+            if(status) myProfile.status = status;
+
+            alert('تم حفظ تحديثات ملفك وبروفايلك بنجاح!');
+            closeModal('profileModal');
+            loadChatLogs();
+        }
+
+        // ميزة تغيير خلفية الروم ديناميكياً من لوحة الإدارة
+        function changeRoomBackground() {
+            const url = document.getElementById('bgUrlInput').value.trim();
+            if(url) {
+                document.getElementById('roomBgLayer').style.backgroundImage = `url('${url}')`;
+                alert('تم تحديث خلفية الروم بنجاح يا إمبراطور!');
+                closeModal('adminModal');
+            }
+        }
+
+        function clearRoomMessages() {
+            savedMessages = [];
+            localStorage.removeItem('emp_v5_logs');
+            loadChatLogs();
+            closeModal('adminModal');
+        }
+
+        function triggerImageUpload() {
+            const imgUrl = prompt("أدخل رابط الصورة لنشرها في الروم الملكي:");
+            if(imgUrl) {
+                chatInputField.value = imgUrl;
+                document.getElementById('mainChatForm').dispatchEvent(new Event('submit'));
+            }
+        }
+
+        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        function escapeHtml(text) { return text.replace(/[&<>'"]/g, t => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[t] || t)); }
     </script>
 </body>
 </html>
