@@ -684,3 +684,130 @@
                     };
                     reader.readAsDataURL(file);
                 }
+            };
+            fileInput.click();
+        }
+
+        function triggerCreateNewRoom() {
+            if(!myProfile || myProfile.name !== 'حسوني') return;
+            let name = prompt("اسم الغرفة الجديدة:");
+            if(name) { CURRENT_ROOMS.push({ id: "room_" + Date.now(), name: name, description: "غرفة إمبراطورية جديدة" }); localStorage.setItem('emp_rooms_list', JSON.stringify(CURRENT_ROOMS)); }
+        }
+
+        function changeRoomAccessRank() {
+            if(!myProfile || myProfile.name !== 'حسوني') return alert('للمالك فقط!');
+            currentAllowedRankId = document.getElementById('roomAccessRankSelect').value; localStorage.setItem('emp_allowed_rank', currentAllowedRankId);
+        }
+
+        function applyGiftRankChange() {
+            if(!myProfile || myProfile.name !== 'حسوني') return alert('للمالك فقط!');
+            const chosenRankId = document.getElementById('cmdRankSelect').value; const targetRankInfo = SYSTEM_RANKS.find(r => r.id === chosenRankId);
+            
+            let uData = getProfileData(selectedUserHubName); 
+            uData.rankId = chosenRankId; 
+            uData.powerLevel = targetRankInfo.power;
+            
+            localStorage.setItem('emp_v6_u_' + selectedUserHubName, JSON.stringify(uData));
+            
+            // تحديث الرتبة في المتواجدين حالياً فوراً
+            let onlineIdx = ACTIVE_ONLINE_USERS.findIndex(u => u.name === selectedUserHubName);
+            if(onlineIdx !== -1) ACTIVE_ONLINE_USERS[onlineIdx].rankId = chosenRankId;
+
+            savedMessages.forEach(m => { if(m.name === selectedUserHubName) { m.rankId = chosenRankId; } });
+            localStorage.setItem('emp_v6_logs', JSON.stringify(savedMessages)); 
+            
+            closeModal('commandsModal'); 
+            
+            // استجابة وتحديث فوري للشات بعد إهداء الرتبة مباشرة
+            loadChatLogs();
+        }
+
+        function hubViewProfile() {
+            closeModal('userHubModal'); let uData = getProfileData(selectedUserHubName); const currentRank = SYSTEM_RANKS.find(r => r.id === uData.rankId) || SYSTEM_RANKS[19];
+            document.getElementById('profileCardContent').innerHTML = `
+                <div class="profile-card-cover" style="background-image: url('${uData.cover}')"><div class="profile-card-avatar"><img src="${uData.avatar}"></div></div>
+                <h2 style="color:var(--gold); margin-bottom:5px;">${uData.name}</h2><p style="color:#aaa; font-size:12px;">الرتبة: <span style="color:${currentRank.color};">${currentRank.name}</span></p>
+                <p style="color:#aaa; font-size:12px;">العمر: ${uData.age || 19} عام</p>
+            `;
+            openModal('viewProfileModal');
+        }
+
+        function openOnlineUsersModal() {
+            const container = document.getElementById('onlineUsersContainerBox'); container.innerHTML = "";
+            ACTIVE_ONLINE_USERS.forEach(user => {
+                // سحب رتبته المحدثة فوراً من قاعدة البيانات
+                let dbUser = localStorage.getItem('emp_v6_u_' + user.name);
+                let currentRankId = user.rankId;
+                if(dbUser) currentRankId = JSON.parse(dbUser).rankId;
+
+                const uRank = SYSTEM_RANKS.find(r => r.id === currentRankId) || SYSTEM_RANKS[18];
+                const div = document.createElement('div'); div.classList.add('user-list-item');
+                div.innerHTML = `<div class="user-list-info"><img src="${user.avatar}" style="width:35px; height:35px; border-radius:50%; border:1.5px solid var(--gold); object-fit:cover;"><div><strong style="color:#fff; font-size:13px; display:block;">${user.name}</strong><span style="color:${uRank.color}; font-size:11px;"><i class="${uRank.icon}"></i> ${uRank.name}</span></div></div>`;
+                container.appendChild(div);
+            });
+            openModal('onlineUsersModal');
+        }
+
+        function processLocalFile(input, type) {
+            const file = input.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    if(type === 'avatar') tempUploadedAvatar = e.target.result;
+                    else if(type === 'cover') tempUploadedCover = e.target.result;
+                    alert('✅ تم تحميل الملف، اضغط حفظ لتثبيته فوراً!');
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function getProfileData(username) {
+            const raw = localStorage.getItem('emp_v6_u_' + username); 
+            if(raw) return JSON.parse(raw);
+            return { name: username, avatar: "https://via.placeholder.com/100/3498db/fff", cover: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=600", age: "19", rankId: (username === 'حسوني') ? "rank20" : "rank2", powerLevel: (username === 'حسوني') ? 100 : 10, points: 50, bgName: "#111111", nameStyle: "none", frameStyle: "gold-frame" };
+        }
+
+        // تحديث فوري صامت وسريع جداً بدون أي Alert
+        function triggerRefreshUI() {
+            loadChatLogs();
+            document.getElementById('onlineBadgeCount').innerText = ACTIVE_ONLINE_USERS.length;
+            closeAllActiveModals();
+        }
+
+        function actionLogoutSystem() { 
+            myProfile = null;
+            chatScroller.innerHTML = "";
+            authOverlay.style.display = 'flex';
+            document.getElementById('memberUserOrEmail').value = "";
+            document.getElementById('memberPass').value = "";
+            closeAllActiveModals();
+            alert('🚪 تم تسجيل الخروج بنجاح!');
+        }
+        
+        function closeAllActiveModals() {
+            const modals = ['settingsMenuModal', 'roomsListModal', 'onlineUsersModal', 'userHubModal', 'viewProfileModal', 'commandsModal', 'advancedEditModal'];
+            modals.forEach(id => { document.getElementById(id).style.display = 'none'; });
+        }
+        
+        function showMyPointsSystem() { if(!myProfile) return; alert(`رصيدك الحالي: ${myProfile.points || 50} نقطة.`); }
+        function hubOpenCommands() { closeModal('userHubModal'); openModal('commandsModal'); }
+        function hubOpenPrivate() { closeModal('userHubModal'); alert('تم فتح الشات الخاص بنجاح.'); }
+        function executeCommandAction(act) { alert(`تم تنفيذ الأمر الإداري: ${act}`); closeModal('commandsModal'); }
+        
+        function triggerImageUpload() { 
+            const imgUrl = prompt("أدخل رابط الصورة:"); 
+            if(imgUrl) { 
+                const inputField = document.getElementById('chatInputField');
+                if(inputField) {
+                    inputField.value = imgUrl; 
+                    executeMessageDispatch(); 
+                }
+            } 
+        }
+        
+        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        function escapeHtml(text) { return text.replace(/[&<>'"]/g, t => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[t] || t)); }
+    </script>
+</body>
+</html>
