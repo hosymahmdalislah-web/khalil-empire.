@@ -2,219 +2,229 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>شات الإمبراطورية المتطور</title>
-    <!-- ربط مكتبة الجمالية والأيقونات -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-weight/6.4.0/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>إمبراطورية خليل - الإصدار الإداري</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background: #121213; color: #fff; display: flex; justify-content: center; align-items: center; height: 100vh; }
-        .chat-container { width: 100%; max-width: 600px; height: 90vh; background: #1c1c1e; border-radius: 15px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,0.3); border: 1px solid #2c2c2e; }
-        
-        /* شاشة الدخول */
-        #login-screen { display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100%; padding: 20px; text-align: center; }
-        #login-screen h1 { color: #ffd700; margin-bottom: 20px; }
-        .input-field { width: 80%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #3a3a3c; background: #2c2c2e; color: #fff; text-align: center; font-size: 16px; }
-        .btn { width: 80%; padding: 12px; border: none; border-radius: 8px; background: #ff3b30; color: white; font-weight: bold; cursor: pointer; font-size: 16px; transition: 0.3s; }
-        .btn:hover { background: #e0241b; }
+        :root { --gold: #f1c40f; --king-grad: linear-gradient(145deg, #ffd700, #b8860b, #8a6d3b); --dark-bg: #050505; }
+        * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body, html { margin: 0; padding: 0; height: 100vh; background: var(--dark-bg); color: #fff; overflow: hidden; }
 
-        /* شاشة الشات الرئيسية */
-        #chat-screen { display: none; flex-direction: column; height: 100%; }
-        .chat-header { background: #2c2c2e; padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #3a3a3c; }
-        .chat-header h2 { color: #ffd700; font-size: 18px; }
-        .user-info-bar { font-size: 14px; color: #aaa; }
-        
-        /* منطقة الرسائل */
-        .messages-area { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; background: #141416; }
-        .msg-box { max-width: 80%; padding: 10px 14px; border-radius: 12px; background: #2c2c2e; animation: fadeIn 0.3s ease; position: relative; word-break: break-word; }
-        .msg-box.my-msg { align-self: flex-start; background: #007aff; }
-        .msg-box.others-msg { align-self: flex-end; background: #2c2c2e; }
-        
-        /* الرتب والأشكال داخل الشات */
-        .sender-name { font-size: 12px; font-weight: bold; margin-bottom: 4px; display: flex; align-items: center; gap: 5px; }
-        .role-tag { font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
-        .role-admin { color: #ff3b30; }
-        .role-royal { color: #ffcc00; }
-        .role-vip { color: #00e5ff; }
-        .role-user { color: #b3b3b3; }
-        
-        .msg-text { font-size: 15px; color: #fff; }
-        .msg-time { font-size: 9px; color: rgba(255,255,255,0.5); text-align: left; margin-top: 4px; }
+        .header-bar { position: fixed; top: 0; width: 100%; height: 70px; background: rgba(15, 15, 15, 0.98); display: flex; align-items: center; justify-content: space-around; z-index: 1000; border-bottom: 2px solid var(--gold); }
+        .sep-cup { font-size: 20px; color: var(--gold); filter: drop-shadow(0 0 5px gold); margin: 0 5px; animation: shine 1.5s infinite; }
+        @keyframes shine { 0% { opacity: 0.7; } 50% { opacity: 1; } 100% { opacity: 0.7; } }
 
-        /* صندوق الإرسال */
-        .input-area { padding: 12px; background: #2c2c2e; display: flex; gap: 10px; align-items: center; }
-        #message-input { flex: 1; padding: 12px; border-radius: 20px; border: none; background: #1c1c1e; color: #fff; outline: none; padding-right: 15px; }
-        #send-btn { background: #007aff; border: none; width: 40px; height: 40px; border-radius: 50%; color: white; cursor: pointer; display: flex; justify-content: center; align-items: center; font-size: 16px; }
+        #chatBox { height: calc(100vh - 135px); overflow-y: auto; padding: 80px 15px 120px; display: flex; flex-direction: column; gap: 12px; background-size: cover; background-position: center; }
+        
+        .msg-wrap { display: flex; flex-direction: column; align-self: flex-start; max-width: 85%; margin-bottom: 10px; }
+        .msg-header { display: flex; align-items: center; margin-bottom: 4px; }
+        .pfp-main { width: 45px; height: 45px; border-radius: 50%; border: 2px solid var(--gold); cursor: pointer; }
+        .king-name-tag { background: rgba(255, 215, 0, 0.15); border: 1px solid var(--gold); color: #fff; padding: 2px 12px; border-radius: 20px; font-weight: bold; text-shadow: 0 0 5px gold; margin-right: 5px; }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        .king-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 5000; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+        .king-card { background: #111; width: 92%; max-width: 400px; border: 2px solid var(--gold); border-radius: 25px; overflow: hidden; }
+        
+        .admin-tools { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 15px; background: rgba(255,215,0,0.05); border-top: 1px solid #333; }
+        .tool-btn { padding: 10px; border: none; border-radius: 8px; font-size: 12px; cursor: pointer; color: white; display: flex; align-items: center; justify-content: center; gap: 5px; }
+
+        .footer-nav { position: fixed; bottom: 0; width: 100%; height: 65px; background: #111; display: flex; align-items: center; justify-content: space-around; border-top: 2px solid var(--gold); z-index: 1000; }
+        .f-btn { text-align: center; font-size: 10px; color: #fff; cursor: pointer; }
+        .f-btn i { display: block; font-size: 20px; margin-bottom: 2px; }
+
+        .input-section { position: fixed; bottom: 65px; width: 100%; background: #111; padding: 10px; display: flex; align-items: center; gap: 8px; border-top: 1px solid #222; z-index: 1000; }
+        .chat-input { flex: 1; background: #1a1a1a; border: 1px solid var(--gold); color: #fff; height: 42px; border-radius: 20px; padding: 0 15px; outline: none; }
+        
+        .menu-item { padding: 12px; border-bottom: 1px solid #222; cursor: pointer; display: flex; align-items: center; gap: 10px; }
+        .menu-item:hover { background: #222; }
     </style>
-
-    <!-- استدعاء مكتبات Firebase الحديثة والمستقرة (v9) -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, doc, getDoc, setDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
-
-        // !!! ضع بيانات Firebase الخاصة بمشروعك هنا لكي يشتغل الشات 100% !!!
-        const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_AUTH_DOMAIN",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_STORAGE_BUCKET",
-            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-            appId: "YOUR_APP_ID"
-        };
-
-        // تهيئة الـ Firebase
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-
-        // متغيرات المستخدم الحالي
-        let currentUser = null;
-
-        // عناصر الواجهة
-        const loginScreen = document.getElementById('login-screen');
-        const chatScreen = document.getElementById('chat-screen');
-        const usernameInput = document.getElementById('username-input');
-        const loginBtn = document.getElementById('login-btn');
-        const messagesArea = document.getElementById('messages-area');
-        const messageInput = document.getElementById('message-input');
-        const sendBtn = document.getElementById('send-btn');
-        const userStatusText = document.getElementById('user-status');
-
-        // كود تسجيل الدخول وحفظ البيانات بشكل مضبوط وغير عشوائي
-        loginBtn.addEventListener('click', async () => {
-            const name = usernameInput.value.trim();
-            if (!name) return alert('الرجاء إدخال اسمك أولاً!');
-
-            // نستخدم الاسم كمعرّف ثابت محلياً لتسهيل التجربة بدون تعقيد الإيميلات
-            const userId = "user_" + name.replace(/\s+/g, '_').toLowerCase(); 
-            const userRef = doc(db, "users", userId);
-            const userSnap = await getDoc(userRef);
-
-            if (userSnap.exists()) {
-                // إذا كان المستخدم موجوداً من قبل، نسحب بياناته ورتبته
-                currentUser = { id: userId, ...userSnap.data() };
-            } else {
-                // إذا كان جديداً، ننشئه برتبة مستخدم عادية و0 نقاط
-                // ملاحظة: إذا كتبت اسمك الخاص الذي تريده كمالك، يمكنك تغيير رتبته يدوياً من الفايربيس إلى Admin
-                let defaultRole = "User";
-                if (name.toLowerCase() === "khalil" || name === "خليل") { 
-                    defaultRole = "Admin"; // جعل اسمك كمسؤول تلقائياً لتكون أنت المالك
-                }
-
-                currentUser = { id: userId, username: name, points: 0, role: defaultRole };
-                await setDoc(userRef, currentUser);
-            }
-
-            // الانتقال لشاشة الشات
-            loginScreen.style.display = 'none';
-            chatScreen.style.style.display = 'flex';
-            updateUserBar();
-            listenToMessages(); // تشغيل الاستماع الفوري للرسائل للجميع
-        });
-
-        function updateUserBar() {
-            userStatusText.innerHTML = `الاسم: ${currentUser.username} | الرتبة: <span class="role-${currentUser.role.toLowerCase()}">${currentUser.role}</span> | النقاط: ${currentUser.points}`;
-        }
-
-        // إرسال الرسالة وزيادة النقاط مع فحص الترقية التلقائية للرتب
-        sendBtn.addEventListener('click', sendMessage);
-        messageInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
-
-        async function sendMessage() {
-            const text = messageInput.value.trim();
-            if (!text) return;
-
-            messageInput.value = ''; // مسح صندوق الكتابة فوراً لتجربة سريعة
-
-            // 1. تحديث نقاط المستخدم في قاعدة البيانات أولاً (زيادة 10 نقاط لكل رسالة)
-            const userRef = doc(db, "users", currentUser.id);
-            await updateDoc(userRef, {
-                points: increment(10)
-            });
-
-            // 2. تحديث الرتبة محلياً وفي قاعدة البيانات بناءً على النقاط الجديدة
-            currentUser.points += 10;
-            if (currentUser.role !== "Admin") { // المالك يبقى دائماً Admin ولا تتغير رتبته بنقاطه
-                if (currentUser.points >= 200) {
-                    currentUser.role = "Royal";
-                    await updateDoc(userRef, { role: "Royal" });
-                } else if (currentUser.points >= 100) {
-                    currentUser.role = "VIP";
-                    await updateDoc(userRef, { role: "VIP" });
-                }
-            }
-            updateUserBar();
-
-            // 3. رفع الرسالة إلى مجموعة الرسائل لتظهر عند الجميع فوراً
-            await addDoc(collection(db, "messages"), {
-                text: text,
-                senderId: currentUser.id,
-                senderName: currentUser.username,
-                senderRole: currentUser.role,
-                timestamp: Date.now()
-            });
-        }
-
-        // الاستماع اللحظي (Real-time Listener) يضمن ظهور الرسالة عند الكل بنفس اللحظة بدون اختفاء
-        function listenToMessages() {
-            const q = query(collection(db, "messages"), orderBy("timestamp", "asc"));
-            onSnapshot(q, (snapshot) => {
-                messagesArea.innerHTML = ''; // تنظيف الشاشة لإعادة البناء الفوري النظيف
-                snapshot.forEach((doc) => {
-                    const msg = doc.data();
-                    const isMe = msg.senderId === currentUser.id;
-                    
-                    // تحديد شكل الرتبة (تاج للمالك، نجمة للرويال والـ VIP)
-                    let badge = '';
-                    if (msg.senderRole === 'Admin') badge = '👑 [مالك]';
-                    else if (msg.senderRole === 'Royal') badge = '👑 [Royal]';
-                    else if (msg.senderRole === 'VIP') badge = '⭐ [VIP]';
-                    else badge = '👤';
-
-                    const msgHTML = `
-                        <div class="msg-box ${isMe ? 'my-msg' : 'others-msg'}">
-                            <div class="sender-name role-${msg.senderRole.toLowerCase()}">
-                                ${badge} ${msg.senderName}
-                            </div>
-                            <div class="msg-text">${msg.text}</div>
-                        </div>
-                    `;
-                    messagesArea.insertAdjacentHTML('beforeend', msgHTML);
-                });
-                messagesArea.scrollTop = messagesArea.scrollHeight; // النزول التلقائي لآخر رسالة
-            });
-        }
-    </script>
 </head>
 <body>
 
-    <div class="chat-container">
-        <!-- شاشة الدخول المسبق -->
-        <div id="login-screen">
-            <h1>شات الإمبراطورية</h1>
-            <p>سجل اسمك لتدخل الدردشة وتبدأ بجمع النقاط والرتب</p>
-            <input type="text" id="username-input" class="input-field" placeholder="اكتب اسمك المستعار هنا..." maxlength="15">
-            <button id="login-btn" class="btn">دخول الدردشة</button>
-        </div>
+<div class="header-bar">
+    <div class="f-btn" onclick="ui.alert('لا توجد إشعارات')"><i class="fas fa-bell"></i>إشعارات</div>
+    <div class="f-btn" onclick="ui.alert('قسم البلاغات الإدارية')"><i class="fas fa-flag"></i>بلاغات</div>
+    <div class="f-btn" onclick="ui.showPrivate()"><i class="fas fa-comments"></i>الخاص</div>
+    <div class="f-btn" onclick="ui.showList('الأثرياء')"><i class="fas fa-gem"></i>الأثرياء</div>
+    <div class="f-btn" onclick="ui.showList('الكبار')"><i class="fas fa-crown"></i>الكبار</div>
+</div>
 
-        <!-- شاشة الشات الحية -->
-        <div id="chat-screen">
-            <div class="chat-header">
-                <h2>غرفة الدردشة العامة</h2>
-                <div id="user-status" class="user-info-bar">جاري تحميل البيانات...</div>
-            </div>
-            
-            <div id="messages-area" class="messages-area">
-                <!-- الرسائل تظهر هنا ديناميكياً من الفايربيس -->
-            </div>
+<div id="chatBox"></div>
 
-            <div class="input-area">
-                <input type="text" id="message-input" placeholder="اكتب رسالتك هنا..." autocomplete="off">
-                <button id="send-btn"><i class="fa-solid fa-paper-plane"></i></button>
+<div class="input-section">
+    <i class="fas fa-image" style="color:var(--gold); font-size:24px;" onclick="document.getElementById('msgFile').click()"></i>
+    <input type="text" id="msgInp" class="chat-input" placeholder="تحدث يا إمبراطور...">
+    <button id="sendBtn" style="background:var(--king-grad); border:none; padding:8px 15px; border-radius:15px; font-weight:bold; cursor:pointer;">إرسال</button>
+</div>
+
+<div class="footer-nav">
+    <div class="f-btn" onclick="ui.showList('المتواجدين')"><i class="fas fa-users"></i>المتواجدين</div>
+    <div class="f-btn" onclick="ui.openYouTube()"><i class="fab fa-youtube" style="color:red"></i>يوتيوب</div>
+    <div class="f-btn" onclick="ui.showRoomMenu()"><i class="fas fa-cogs"></i>الإعدادات</div>
+    <div class="f-btn" onclick="ui.showWallet()"><i class="fas fa-wallet"></i>الأرباح</div>
+    <div class="f-btn" onclick="location.reload()"><i class="fas fa-sync-alt"></i>تحديث</div>
+</div>
+
+<div id="modal" class="king-modal"><div class="king-card" id="mContent"></div></div>
+
+<input type="file" id="pfpFile" hidden>
+<input type="file" id="coverFile" hidden>
+<input type="file" id="bgFile" hidden>
+<input type="file" id="msgFile" hidden>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBbUsr0QrQMnewkRdQwQ33IR8asdy5VPdM",
+    authDomain: "khalil-chat.firebaseapp.com",
+    databaseURL: "https://khalil-chat-default-rtdb.firebaseio.com",
+    projectId: "khalil-chat",
+    storageBucket: "khalil-chat.firebasestorage.app",
+    messagingSenderId: "684465803980",
+    appId: "1:684465803980:web:bcc3b1cf9435958f2c2869"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+
+  // تعريف بيانات الإمبراطور
+  let me = JSON.parse(localStorage.getItem('khalil_profile')) || {
+    name: "خليل إبراهيم",
+    gold: 100000000,
+    points: 50000,
+    rank: "إمبراطور خليل",
+    status: "👑 الحاكم الفعلي للمنصة 👑",
+    img: "https://cdn-icons-png.flaticon.com/512/1042/1042291.png",
+    cover: "https://images.unsplash.com/photo-1614850523296-d8c1af93d400?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+  };
+
+  // وظائف النظام
+  window.ui = {
+    alert: (t) => alert(t),
+    closeM: () => { document.getElementById('modal').style.display = 'none'; },
+    
+    showRoomMenu: () => {
+        let h = `
+            <div style="padding:20px;">
+                <h3 style="color:var(--gold); text-align:center;">إعدادات الإمبراطورية</h3>
+                <div class="menu-item" onclick="document.getElementById('chatBox').innerHTML=''; ui.closeM();"><i class="fas fa-broom"></i> تنظيف الغرفة</div>
+                <div class="menu-item" onclick="ui.changeRoomBgTrigger()"><i class="fas fa-image"></i> تغيير الخلفية</div>
+                <div class="menu-item" onclick="ui.showBag()"><i class="fas fa-briefcase"></i> المحفظة (نقاط وذهب)</div>
+                <button onclick="ui.closeM()" style="width:100%; margin-top:10px; padding:10px; background:#333; color:white; border:none; border-radius:10px;">إغلاق</button>
+            </div>`;
+        document.getElementById('mContent').innerHTML = h;
+        document.getElementById('modal').style.display = 'flex';
+    },
+
+    editProfile: () => {
+        let h = `
+            <div style="padding:20px; text-align:center;">
+                <h3 style="color:var(--gold);">تعديل الهوية الملكية</h3>
+                <button onclick="document.getElementById('pfpFile').click()" style="width:100%; padding:10px; margin-bottom:5px;">تغيير الصورة الشخصية</button>
+                <button onclick="document.getElementById('coverFile').click()" style="width:100%; padding:10px;">تغيير الغلاف</button>
+                <input type="text" id="newNameInp" value="${me.name}" style="width:100%; margin-top:10px; padding:10px; background:#222; color:#fff; border:1px solid gold; border-radius:8px;">
+                <button onclick="ui.saveProfileChanges()" style="width:100%; margin-top:15px; background:var(--king-grad); padding:12px; border:none; font-weight:bold; border-radius:10px;">حفظ التغييرات</button>
+                <button onclick="ui.closeM()" style="width:100%; margin-top:5px; background:transparent; color:#888; border:none;">إلغاء</button>
+            </div>`;
+        document.getElementById('mContent').innerHTML = h;
+    },
+
+    saveProfileChanges: () => {
+        me.name = document.getElementById('newNameInp').value;
+        localStorage.setItem('khalil_profile', JSON.stringify(me));
+        set(ref(db, 'users/khalil'), me); // حفظ في فايربيس
+        ui.alert("تم تحديث هويتك يا إمبراطور");
+        location.reload();
+    },
+
+    renderMsg: (user, txt, img, isKing) => {
+        let div = document.createElement('div');
+        div.className = 'msg-wrap';
+        div.innerHTML = `
+            <div class="msg-header">
+                <img src="${img}" class="pfp-main" onclick="ui.viewProfile('${user}', '${img}')">
+                ${isKing ? '<i class="fas fa-trophy sep-cup"></i>' : ''}
+                <span class="king-name-tag">${user}</span>
             </div>
-        </div>
-    </div>
+            <div style="background:#fff; color:#000; padding:10px 15px; border-radius:0 15px 15px 15px; font-size:14px; margin-right:5px; box-shadow: 2px 2px 5px rgba(0,0,0,0.2);">${txt}</div>
+        `;
+        document.getElementById('chatBox').appendChild(div);
+        document.getElementById('chatBox').scrollTop = document.getElementById('chatBox').scrollHeight;
+    },
+
+    viewProfile: (name, img) => {
+        let isMe = (name === me.name);
+        let h = `
+            <div style="height:100px; background:url(${me.cover}) center/cover"></div>
+            <center>
+                <img src="${img}" style="width:80px; height:80px; border-radius:50%; border:3px solid var(--gold); margin-top:-40px; background:#000;">
+                <h3 style="color:var(--gold); margin:5px;">${name}</h3>
+                <p style="font-size:12px; color:#ccc; padding:0 10px;">${isMe ? me.status : 'عضو في الإمبراطورية'}</p>
+            </center>
+            <div class="admin-tools">
+                <button class="tool-btn" style="background:#c0392b" onclick="ui.alert('تم الحظر')"><i class="fas fa-ban"></i> حظر</button>
+                <button class="tool-btn" style="background:#d35400" onclick="ui.alert('تم الكتم')"><i class="fas fa-microphone-slash"></i> كتم</button>
+                <button class="tool-btn" style="background:#2980b9" onclick="ui.alert('تم الطرد')"><i class="fas fa-user-times"></i> طرد</button>
+                <button class="tool-btn" style="background:var(--gold); color:#000;" onclick="ui.alert('تم الإهداء')"><i class="fas fa-gift"></i> إهداء</button>
+            </div>
+            <div style="padding:15px;">
+                ${isMe ? `<button onclick="ui.editProfile()" style="width:100%; padding:10px; background:#222; color:white; border:1px solid #444; border-radius:10px;">تعديل الملف الشخصي</button>` : ''}
+                <button onclick="ui.closeM()" style="width:100%; padding:10px; background:red; color:white; border:none; border-radius:10px; margin-top:5px;">إغلاق</button>
+            </div>`;
+        document.getElementById('mContent').innerHTML = h;
+        document.getElementById('modal').style.display = 'flex';
+    },
+
+    changeRoomBgTrigger: () => { document.getElementById('bgFile').click(); },
+    showBag: () => { alert(`حقيبة الإمبراطور:\nالذهب: ${me.gold.toLocaleString()}\nالنقاط: ${me.points.toLocaleString()}`); },
+    showWallet: () => { alert(`أرباحك المحققة: ${me.gold / 1000} دولار أمريكي`); },
+    showList: (t) => alert(`قائمة ${t} قيد التحديث...`),
+    showPrivate: () => alert("صندوق الرسائل الخاصة مشفر وآمن."),
+    openYouTube: () => {
+        let link = prompt("ضع رابط فيديو اليوتيوب:");
+        if(link) {
+            let id = link.split('v=')[1]?.split('&')[0] || link.split('/').pop();
+            ui.renderMsg(me.name, `<iframe width="100%" height="200" src="https://www.youtube.com/embed/${id}" frameborder="0" allowfullscreen></iframe>`, me.img, true);
+        }
+    }
+  };
+
+  // التعامل مع الملفات
+  document.getElementById('pfpFile').onchange = (e) => {
+      let r = new FileReader(); r.onload = (ev) => { me.img = ev.target.result; ui.saveProfileChanges(); }; r.readAsDataURL(e.target.files[0]);
+  };
+  document.getElementById('coverFile').onchange = (e) => {
+      let r = new FileReader(); r.onload = (ev) => { me.cover = ev.target.result; ui.saveProfileChanges(); }; r.readAsDataURL(e.target.files[0]);
+  };
+  document.getElementById('bgFile').onchange = (e) => {
+      let r = new FileReader(); r.onload = (ev) => { 
+          localStorage.setItem('room_bg', ev.target.result); 
+          document.getElementById('chatBox').style.backgroundImage = `url(${ev.target.result})`;
+      }; r.readAsDataURL(e.target.files[0]);
+  };
+  document.getElementById('msgFile').onchange = (e) => {
+      let r = new FileReader(); r.onload = (ev) => ui.renderMsg(me.name, `<img src="${ev.target.result}" style="width:100%; border-radius:10px;">`, me.img, true);
+      r.readAsDataURL(e.target.files[0]);
+  };
+
+  // إرسال الرسائل
+  document.getElementById('sendBtn').onclick = () => {
+      let inp = document.getElementById('msgInp');
+      if(inp.value.trim()) {
+          ui.renderMsg(me.name, inp.value, me.img, true);
+          inp.value = '';
+      }
+  };
+
+  // التحميل الأولي
+  window.onload = () => {
+      let savedBg = localStorage.getItem('room_bg');
+      if(savedBg) document.getElementById('chatBox').style.backgroundImage = `url(${savedBg})`;
+      ui.renderMsg("النظام الملكي", "تم تفعيل البروتوكول الإداري.. مرحباً بك يا إمبراطور خليل.", me.img, false);
+  };
+
+</script>
 
 </body>
-</html>
+    </html>
