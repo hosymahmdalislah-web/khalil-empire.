@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>إمبراطورية خليل - الإصدار الإداري</title>
+    <title>شات حسوني - الإصدار الإداري</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --gold: #f1c40f; --king-grad: linear-gradient(145deg, #ffd700, #b8860b, #8a6d3b); --dark-bg: #050505; }
@@ -36,9 +36,23 @@
         
         .menu-item { padding: 12px; border-bottom: 1px solid #222; cursor: pointer; display: flex; align-items: center; gap: 10px; }
         .menu-item:hover { background: #222; }
+
+        /* ستايل لوحة تسجيل الدخول الجديد */
+        .login-overlay { position: fixed; inset: 0; background: #050505; z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .login-box { background: #111; border: 2px solid var(--gold); border-radius: 25px; padding: 30px 20px; width: 100%; max-width: 360px; text-align: center; box-shadow: 0 0 20px rgba(255, 215, 0, 0.2); }
+        .login-input { width: 100%; background: #1a1a1a; border: 1px solid var(--gold); color: #fff; padding: 12px; border-radius: 15px; text-align: center; font-size: 16px; outline: none; margin-bottom: 20px; }
     </style>
 </head>
 <body>
+
+<div id="loginScreen" class="login-overlay">
+    <div class="login-box">
+        <i class="fas fa-crown" style="font-size: 40px; color: var(--gold); margin-bottom: 15px; filter: drop-shadow(0 0 5px gold);"></i>
+        <h2 style="color: #fff; margin-bottom: 20px; font-size: 20px;">مرحباً بك في شات حسوني</h2>
+        <input type="text" id="loginName" class="login-input" placeholder="أدخل اسمك المستعار هنا...">
+        <button onclick="ui.handleLogin()" style="width: 100%; background: var(--king-grad); border: none; padding: 12px; border-radius: 15px; font-weight: bold; color: #fff; font-size: 16px; cursor: pointer;">دخول المنصة</button>
+    </div>
+</div>
 
 <div class="header-bar">
     <div class="f-btn" onclick="ui.alert('لا توجد إشعارات')"><i class="fas fa-bell"></i>إشعارات</div>
@@ -52,7 +66,7 @@
 
 <div class="input-section">
     <i class="fas fa-image" style="color:var(--gold); font-size:24px;" onclick="document.getElementById('msgFile').click()"></i>
-    <input type="text" id="msgInp" class="chat-input" placeholder="تحدث يا إمبراطور...">
+    <input type="text" id="msgInp" class="chat-input" placeholder="تحدث الآن...">
     <button id="sendBtn" style="background:var(--king-grad); border:none; padding:8px 15px; border-radius:15px; font-weight:bold; cursor:pointer;">إرسال</button>
 </div>
 
@@ -88,22 +102,53 @@
   const app = initializeApp(firebaseConfig);
   const db = getDatabase(app);
 
-  // تعريف بيانات الإمبراطور
-  let me = JSON.parse(localStorage.getItem('khalil_profile')) || {
-    name: "خليل إبراهيم",
-    gold: 100000000,
-    points: 50000,
-    rank: "إمبراطور خليل",
-    status: "👑 الحاكم الفعلي للمنصة 👑",
-    img: "https://cdn-icons-png.flaticon.com/512/1042/1042291.png",
-    cover: "https://images.unsplash.com/photo-1614850523296-d8c1af93d400?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
-  };
+  let me = JSON.parse(localStorage.getItem('khalil_profile')) || null;
 
-  // وظائف النظام
   window.ui = {
     alert: (t) => alert(t),
     closeM: () => { document.getElementById('modal').style.display = 'none'; },
     
+    // التعامل مع تسجيل الدخول
+    handleLogin: () => {
+        let nameInp = document.getElementById('loginName').value.trim();
+        if(!nameInp) {
+            alert("يرجى إدخال الاسم أولاً!");
+            return;
+        }
+
+        // بروتوكول الإمبراطور التلقائي
+        if(nameInp === "خليل إبراهيم" || nameInp === "حسوني") {
+            me = {
+                name: nameInp,
+                gold: 100000000,
+                points: 50000,
+                rank: "إمبراطور خليل",
+                status: "👑 الحاكم الفعلي للمنصة 👑",
+                img: "https://cdn-icons-png.flaticon.com/512/1042/1042291.png",
+                cover: "https://images.unsplash.com/photo-1614850523296-d8c1af93d400?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+            };
+        } else {
+            // عضو عادي
+            me = {
+                name: nameInp,
+                gold: 100,
+                points: 10,
+                rank: "عضو",
+                status: "عضو جديد في الإمبراطورية",
+                img: "https://cdn-icons-png.flaticon.com/512/847/847969.png",
+                cover: "https://images.unsplash.com/photo-1614850523296-d8c1af93d400?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+            };
+        }
+
+        localStorage.setItem('khalil_profile', JSON.stringify(me));
+        set(ref(db, 'users/' + me.name), me); 
+        document.getElementById('loginScreen').style.display = 'none';
+        
+        // تعديل placeholder الإدخال حسب الرتبة
+        document.getElementById('msgInp').placeholder = (me.name === "خليل إبراهيم" || me.name === "حسوني") ? "تحدث يا إمبراطور..." : "اكتب رسالتك هنا...";
+        ui.renderMsg("النظام الملكي", `مرحباً بك يا ${me.name}، تم تفعيل بروتوكول الدخول الآمن.`, me.img, (me.name === "خليل إبراهيم" || me.name === "حسوني"));
+    },
+
     showRoomMenu: () => {
         let h = `
             <div style="padding:20px;">
@@ -111,6 +156,7 @@
                 <div class="menu-item" onclick="document.getElementById('chatBox').innerHTML=''; ui.closeM();"><i class="fas fa-broom"></i> تنظيف الغرفة</div>
                 <div class="menu-item" onclick="ui.changeRoomBgTrigger()"><i class="fas fa-image"></i> تغيير الخلفية</div>
                 <div class="menu-item" onclick="ui.showBag()"><i class="fas fa-briefcase"></i> المحفظة (نقاط وذهب)</div>
+                <div class="menu-item" onclick="localStorage.removeItem('khalil_profile'); location.reload();" style="color: red;"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</div>
                 <button onclick="ui.closeM()" style="width:100%; margin-top:10px; padding:10px; background:#333; color:white; border:none; border-radius:10px;">إغلاق</button>
             </div>`;
         document.getElementById('mContent').innerHTML = h;
@@ -120,7 +166,7 @@
     editProfile: () => {
         let h = `
             <div style="padding:20px; text-align:center;">
-                <h3 style="color:var(--gold);">تعديل الهوية الملكية</h3>
+                <h3 style="color:var(--gold);">تعديل الهوية</h3>
                 <button onclick="document.getElementById('pfpFile').click()" style="width:100%; padding:10px; margin-bottom:5px;">تغيير الصورة الشخصية</button>
                 <button onclick="document.getElementById('coverFile').click()" style="width:100%; padding:10px;">تغيير الغلاف</button>
                 <input type="text" id="newNameInp" value="${me.name}" style="width:100%; margin-top:10px; padding:10px; background:#222; color:#fff; border:1px solid gold; border-radius:8px;">
@@ -133,8 +179,8 @@
     saveProfileChanges: () => {
         me.name = document.getElementById('newNameInp').value;
         localStorage.setItem('khalil_profile', JSON.stringify(me));
-        set(ref(db, 'users/khalil'), me); // حفظ في فايربيس
-        ui.alert("تم تحديث هويتك يا إمبراطور");
+        set(ref(db, 'users/' + me.name), me);
+        ui.alert("تم تحديث الهوية بنجاح");
         location.reload();
     },
 
@@ -185,7 +231,7 @@
         let link = prompt("ضع رابط فيديو اليوتيوب:");
         if(link) {
             let id = link.split('v=')[1]?.split('&')[0] || link.split('/').pop();
-            ui.renderMsg(me.name, `<iframe width="100%" height="200" src="https://www.youtube.com/embed/${id}" frameborder="0" allowfullscreen></iframe>`, me.img, true);
+            ui.renderMsg(me.name, `<iframe width="100%" height="200" src="https://www.youtube.com/embed/${id}" frameborder="0" allowfullscreen></iframe>`, me.img, (me.name === "خليل إبراهيم" || me.name === "حسوني"));
         }
     }
   };
@@ -204,7 +250,8 @@
       }; r.readAsDataURL(e.target.files[0]);
   };
   document.getElementById('msgFile').onchange = (e) => {
-      let r = new FileReader(); r.onload = (ev) => ui.renderMsg(me.name, `<img src="${ev.target.result}" style="width:100%; border-radius:10px;">`, me.img, true);
+      let isKing = (me.name === "خليل إبراهيم" || me.name === "حسوني");
+      let r = new FileReader(); r.onload = (ev) => ui.renderMsg(me.name, `<img src="${ev.target.result}" style="width:100%; border-radius:10px;">`, me.img, isKing);
       r.readAsDataURL(e.target.files[0]);
   };
 
@@ -212,19 +259,27 @@
   document.getElementById('sendBtn').onclick = () => {
       let inp = document.getElementById('msgInp');
       if(inp.value.trim()) {
-          ui.renderMsg(me.name, inp.value, me.img, true);
+          let isKing = (me.name === "خليل إبراهيم" || me.name === "حسوني");
+          ui.renderMsg(me.name, inp.value, me.img, isKing);
           inp.value = '';
       }
   };
 
-  // التحميل الأولي
+  // التحميل الأولي والتحقق من التخزين المحتفظ به
   window.onload = () => {
       let savedBg = localStorage.getItem('room_bg');
       if(savedBg) document.getElementById('chatBox').style.backgroundImage = `url(${savedBg})`;
-      ui.renderMsg("النظام الملكي", "تم تفعيل البروتوكول الإداري.. مرحباً بك يا إمبراطور خليل.", me.img, false);
+      
+      if (me) {
+          document.getElementById('loginScreen').style.display = 'none';
+          document.getElementById('msgInp').placeholder = (me.name === "خليل إبراهيم" || me.name === "حسوني") ? "تحدث يا إمبراطور..." : "اكتب رسالتك هنا...";
+          ui.renderMsg("النظام الملكي", `أهلاً بعودتك يا ${me.name}.. تم تفعيل البروتوكول الإداري بنجاح.`, me.img, (me.name === "خليل إبراهيم" || me.name === "حسوني"));
+      } else {
+          document.getElementById('loginScreen').style.display = 'flex';
+      }
   };
 
 </script>
 
 </body>
-    </html>
+</html>
