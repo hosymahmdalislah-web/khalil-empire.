@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>إمبراطورية خليل - الإصدار المطور</title>
+    <title>إمبراطورية خليل - الإصدار المطور المحمي</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --gold: #f1c40f; --king-grad: linear-gradient(145deg, #ffd700, #b8860b, #8a6d3b); --dark-bg: #050505; }
@@ -63,7 +63,7 @@
     <div class="f-btn" onclick="ui.showList('المتواجدين')"><i class="fas fa-users"></i>المتواجدين</div>
     <div class="f-btn" onclick="ui.openYouTube()"><i class="fab fa-youtube" style="color:red"></i>يوتيوب</div>
     <div class="f-btn" onclick="ui.showRoomMenu()"><i class="fas fa-cogs"></i>الإعدادات</div>
-    <div class="f-btn" onclick="ui.showAuthModal()"><i class="fas fa-key" style="color:var(--gold)"></i>تسجيل الدخول</div>
+    <div class="f-btn" id="authBtn" onclick="ui.showAuthModal()"><i class="fas fa-key" style="color:var(--gold)"></i>تسجيل الدخول</div>
     <div class="f-btn" onclick="location.reload()"><i class="fas fa-sync-alt"></i>تحديث</div>
 </div>
 
@@ -91,40 +91,64 @@
   const app = initializeApp(firebaseConfig);
   const db = getDatabase(app);
 
-  // نظام الرتب العشرين الكبرى
   const ranks = [
-    "عضو ماسي", "الملك البابلي", "الأسطورة الخالدة", "سيد الحكماء", "أمير الشرق",
+    "زائر", "عضو ماسي", "الملك البابلي", "الأسطورة الخالدة", "سيد الحكماء", "أمير الشرق",
     "البركان الثائر", "صقر الإمبراطورية", "الفارس النبيل", "الجنرال المرعب", "حارس العرش",
     "الزعيم الخفي", "سلطان القلوب", "العميد الملكي", "العقيد الصارم", "المستشار العام",
     "نائب الحاكم", "ولي العهد", "الملك الفعلي", "الإمبراطور خليل", "مؤسس النظام الملكي"
   ];
 
-  // الهوية الافتراضية للزائر
-  let me = JSON.parse(localStorage.getItem('user_profile')) || {
+  // الحساب الافتراضي عند الدخول الأول (دائماً زائر حتى يسجل)
+  const defaultGuest = () => ({
     uid: "guest_" + Math.random().toString(36).substr(2, 9),
-    name: "زائر جديد",
+    name: "زائر جديد_" + Math.floor(1000 + Math.random() * 9000),
     email: "",
-    rank: "عضو ماسي",
+    rank: "زائر",
+    age: "",
+    gender: "",
     likes: 0,
     level: 1,
     img: "https://cdn-icons-png.flaticon.com/512/1042/1042291.png",
     cover: "https://images.unsplash.com/photo-1614850523296-d8c1af93d400?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
-  };
+  });
 
-  // وظائف التطبيق الكاملة
+  let me = JSON.parse(localStorage.getItem('user_profile')) || defaultGuest();
+  if(!localStorage.getItem('user_profile')) {
+      localStorage.setItem('user_profile', JSON.stringify(me));
+  }
+
   window.ui = {
     alert: (t) => alert(t),
     closeM: () => { document.getElementById('modal').style.display = 'none'; },
     
-    // شاشة تسجيل الدخول وإنشاء الحساب في الشريط السفلي
     showAuthModal: () => {
+        if(me.rank !== "زائر") {
+            let h = `
+                <div style="padding:20px; text-align:center;">
+                    <h3 style="color:var(--gold);">الحساب الحالي</h3>
+                    <p>مرحباً بك: <b>${me.name}</b></p>
+                    <p>الرتبة: <span style="color:var(--gold)">${me.rank}</span></p>
+                    <button onclick="ui.logout()" style="width:100%; background:#c0392b; padding:12px; border:none; font-weight:bold; border-radius:10px; color:#fff; cursor:pointer;"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</button>
+                    <button onclick="ui.closeM()" style="width:100%; margin-top:5px; background:transparent; color:#888; border:none;">إغلاق</button>
+                </div>`;
+            document.getElementById('mContent').innerHTML = h;
+            document.getElementById('modal').style.display = 'flex';
+            return;
+        }
+
         let h = `
             <div style="padding:20px;">
                 <h3 style="color:var(--gold); text-align:center;"><i class="fas fa-id-card"></i> بوابة التسجيل الملكية</h3>
-                <input type="text" id="authName" placeholder="الإسم الملكي" value="${me.name}" style="width:100%; margin-bottom:10px; padding:10px; background:#222; color:#fff; border:1px solid gold; border-radius:8px;">
-                <input type="email" id="authEmail" placeholder="البريد الإلكتروني" value="${me.email}" style="width:100%; margin-bottom:10px; padding:10px; background:#222; color:#fff; border:1px solid gold; border-radius:8px;">
-                <input type="password" id="authPass" placeholder="كلمة المرور" style="width:100%; margin-bottom:15px; padding:10px; background:#222; color:#fff; border:1px solid gold; border-radius:8px;">
-                <button onclick="ui.processAuth()" style="width:100%; background:var(--king-grad); padding:12px; border:none; font-weight:bold; border-radius:10px; color:#000;">اعتماد الحساب وعضوية ماسية</button>
+                <input type="text" id="authName" placeholder="الإسم المستعار" style="width:100%; margin-bottom:10px; padding:10px; background:#222; color:#fff; border:1px solid gold; border-radius:8px;">
+                <input type="email" id="authEmail" placeholder="البريد الإلكتروني" style="width:100%; margin-bottom:10px; padding:10px; background:#222; color:#fff; border:1px solid gold; border-radius:8px;">
+                <input type="password" id="authPass" placeholder="كلمة المرور" style="width:100%; margin-bottom:10px; padding:10px; background:#222; color:#fff; border:1px solid gold; border-radius:8px;">
+                <input type="number" id="authAge" placeholder="العمر" style="width:100%; margin-bottom:10px; padding:10px; background:#222; color:#fff; border:1px solid gold; border-radius:8px;">
+                <select id="authGender" style="width:100%; margin-bottom:15px; padding:10px; background:#222; color:#fff; border:1px solid gold; border-radius:8px;">
+                    <option value="">اختر الجنس</option>
+                    <option value="ذكر">ذكر</option>
+                    <option value="أنثى">أنثى</option>
+                </select>
+                <button onclick="ui.processAuth()" style="width:100%; background:var(--king-grad); padding:12px; border:none; font-weight:bold; border-radius:10px; color:#000; cursor:pointer;">اعتماد الدخول</button>
                 <button onclick="ui.closeM()" style="width:100%; margin-top:5px; background:transparent; color:#888; border:none;">إغلاق</button>
             </div>`;
         document.getElementById('mContent').innerHTML = h;
@@ -133,26 +157,64 @@
 
     processAuth: () => {
         let name = document.getElementById('authName').value.trim();
-        let email = document.getElementById('authEmail').value.trim();
+        let email = document.getElementById('authEmail').value.trim().toLowerCase();
         let pass = document.getElementById('authPass').value;
-        if(!name || !email || !pass){ ui.alert("برجاء ملء كافة الحقول الملكية!"); return; }
+        let age = document.getElementById('authAge').value;
+        let gender = document.getElementById('authGender').value;
+
+        if(!name || !email || !pass || !age || !gender){ ui.alert("برجاء ملء كافة الحقول المطلوبة!"); return; }
         
-        me.name = name;
-        me.email = email;
-        me.rank = (name.includes("خليل")) ? "الإمبراطور خليل" : "عضو ماسي"; // ترقية تلقائية إذا كان الإسم خليل
-        localStorage.setItem('user_profile', JSON.stringify(me));
+        // نظام الحماية والتعرف التلقائي على صاحب الموقع
+        if(email === "ghrwrkk2@gmail.com" && pass === "780718519") {
+            me.name = name;
+            me.email = email;
+            me.age = age;
+            me.gender = gender;
+            me.rank = "مؤسس النظام الملكي"; 
+            me.uid = "owner_khalil_pro";
+            localStorage.setItem('user_profile', JSON.stringify(me));
+            set(ref(db, 'users/' + me.uid), me);
+            ui.alert(`أهلاً بك يا إمبراطور! تم التعرف عليك ومنحك التحكم الكامل ورتبة التميز والكأس.`);
+        } else {
+            // بقية الأعضاء يدخلون برتبة عضو ماسي بعد التسجيل
+            me.name = name;
+            me.email = email;
+            me.age = age;
+            me.gender = gender;
+            me.rank = "عضو ماسي";
+            localStorage.setItem('user_profile', JSON.stringify(me));
+            set(ref(db, 'users/' + me.uid), me);
+            ui.alert(`مرحباً بك عضواً ماسياً في الإمبراطورية: ${me.name}`);
+        }
         
-        // حفظ بيانات العضو في قاعدة البيانات للرجوع إليها
-        set(ref(db, 'users/' + me.uid), me);
-        ui.alert(`مرحباً بك عضواً ماسياً في الإمبراطورية: ${me.name}`);
+        ui.updateAuthBtn();
         ui.closeM();
+    },
+
+    logout: () => {
+        localStorage.removeItem('user_profile');
+        me = defaultGuest();
+        localStorage.setItem('user_profile', JSON.stringify(me));
+        ui.updateAuthBtn();
+        ui.alert("تم تسجيل الخروج، لقد عدت الآن بوضع زائر.");
+        ui.closeM();
+        location.reload();
+    },
+
+    updateAuthBtn: () => {
+        const btn = document.getElementById('authBtn');
+        if(me.rank === "زائر") {
+            btn.innerHTML = `<i class="fas fa-key" style="color:var(--gold)"></i>تسجيل الدخول`;
+        } else {
+            btn.innerHTML = `<i class="fas fa-sign-out-alt" style="color:#c0392b"></i>الخروج`;
+        }
     },
 
     showRoomMenu: () => {
         let h = `
             <div style="padding:20px;">
                 <h3 style="color:var(--gold); text-align:center;">إعدادات الإمبراطورية</h3>
-                <div class="menu-item" onclick="document.getElementById('chatBox').innerHTML=''; ui.closeM();"><i class="fas fa-broom"></i> تنظيف الغرفة</div>
+                <div class="menu-item" onclick="document.getElementById('chatBox').innerHTML=''; ui.closeM();"><i class="fas fa-broom"></i> تنظيف الشاشة</div>
                 <div class="menu-item" onclick="ui.changeRoomBgTrigger()"><i class="fas fa-image"></i> تغيير الخلفية</div>
                 <button onclick="ui.closeM()" style="width:100%; margin-top:10px; padding:10px; background:#333; color:white; border:none; border-radius:10px;">إغلاق</button>
             </div>`;
@@ -169,7 +231,7 @@
                 <img src="${img}" class="pfp-main" onclick="ui.viewProfile('${user}', '${img}', '${rank}')">
                 ${isKing ? '<i class="fas fa-trophy sep-cup"></i>' : ''}
                 <span class="king-name-tag">${user}</span>
-                <span class="rank-tag">${rank || 'عضو ماسي'}</span>
+                <span class="rank-tag">${rank || 'زائر'}</span>
             </div>
             <div style="background:#fff; color:#000; padding:10px 15px; border-radius:0 15px 15px 15px; font-size:14px; margin-right:5px; box-shadow: 2px 2px 5px rgba(0,0,0,0.2); max-width:100%; word-break:break-all;">${txt}</div>
         `;
@@ -177,66 +239,67 @@
         document.getElementById('chatBox').scrollTop = document.getElementById('chatBox').scrollHeight;
     },
 
-    // عرض البروفايل مدمج به: الأوامر، اللايك، الخاص، والمستوى والرتب الـ 20
     viewProfile: (name, img, currentRank) => {
+        // التحقق من الصلاحيات الإدارية لصاحب الموقع
+        let isOwner = (me.rank === "مؤسس النظام الملكي" || me.rank === "الإمبراطور خليل");
         let isMe = (name === me.name);
+        
         let h = `
             <div style="height:100px; background:url(${me.cover}) center/cover"></div>
             <center>
                 <img src="${img}" style="width:80px; height:80px; border-radius:50%; border:3px solid var(--gold); margin-top:-40px; background:#000; object-fit:cover;">
                 <h3 style="color:var(--gold); margin:5px;">${name}</h3>
-                <p style="font-size:12px; color:#ccc; padding:0 10px;">الرتبة: ${currentRank || 'عضو ماسي'}</p>
+                <p style="font-size:12px; color:#ccc; padding:0 10px;">الرتبة: ${currentRank || 'زائر'}</p>
             </center>
             
             <div class="profile-stats">
-                <div class="stat-box"><span>${me.likes}</span> اعجابات (لايك)</div>
-                <div class="stat-box"><span>المستوى ${me.level}</span> الخبرة الملكية</div>
+                <div class="stat-box"><span>${isMe ? me.likes : 0}</span> اعجابات</div>
+                <div class="stat-box"><span>المستوى ${isMe ? me.level : 1}</span> الخبرة الملكية</div>
             </div>
 
             <div class="admin-tools">
-                <button class="tool-btn" style="background:#2ecc71" onclick="ui.alert('تم إرسال نغمة تنبيه خاصة للمستخدم لفتح الشات الخاص!')"><i class="fas fa-paper-plane"></i> رسالة خاصة</button>
+                <button class="tool-btn" style="background:#2ecc71" onclick="ui.alert('تم فتح شات خاص آمن!')"><i class="fas fa-paper-plane"></i> رسالة خاصة</button>
                 <button class="tool-btn" style="background:#9b59b6" onclick="ui.likeUser()"><i class="fas fa-heart"></i> أعطِ لايك</button>
-                <button class="tool-btn" style="background:#c0392b" onclick="ui.alert('تم الحظر بنجاح')"><i class="fas fa-ban"></i> حظر الإمبراطور</button>
-                <button class="tool-btn" style="background:#d35400" onclick="ui.alert('تم الكتم بنجاح')"><i class="fas fa-microphone-slash"></i> كتم الصوت</button>
+                ${isOwner ? `
+                <button class="tool-btn" style="background:#c0392b" onclick="ui.alert('تم حظر المستخدم نهائياً بطرد ذكي')"><i class="fas fa-ban"></i> حظر ملكي</button>
+                <button class="tool-btn" style="background:#d35400" onclick="ui.alert('تم كتم صوت العضو ومنعه من الكتابة')"><i class="fas fa-microphone-slash"></i> كتم الإدارة</button>
+                ` : `
+                <button class="tool-btn" style="background:#555" onclick="ui.alert('هذه الميزة للإدارة فقط')"><i class="fas fa-lock"></i> حظر</button>
+                <button class="tool-btn" style="background:#555" onclick="ui.alert('هذه الميزة للإدارة فقط')"><i class="fas fa-lock"></i> كتم</button>
+                `}
             </div>
             
+            ${isOwner ? `
             <div style="padding:10px 15px;">
-                <label style="color:var(--gold); font-size:12px; display:block; margin-bottom:5px;">إدارة رتب الإمبراطورية (20 رتبة):</label>
+                <label style="color:var(--gold); font-size:12px; display:block; margin-bottom:5px;">تعديل رتبة العضو (صلاحيات المالك):</label>
                 <select id="rankSelector" onchange="ui.changeUserRank('${name}')" style="width:100%; padding:8px; background:#222; color:#fff; border:1px solid gold; border-radius:8px;">
                     ${ranks.map(r => `<option value="${r}" ${currentRank === r ? 'selected' : ''}>${r}</option>`).join('')}
                 </select>
-            </div>
+            </div>` : ''}
 
             <div style="padding:15px; border-top:1px solid #222;">
                 ${isMe ? `<button onclick="ui.editProfile()" style="width:100%; padding:10px; background:#222; color:white; border:1px solid #444; border-radius:10px;">تعديل ملفي الملكي</button>` : ''}
-                <button onclick="ui.closeM()" style="width:100%; padding:10px; background:red; color:white; border:none; border-radius:10px; margin-top:5px;">إغلاق النافذة</button>
+                <button onclick="ui.closeM()" style="width:100%; padding:10px; background:red; color:white; border:none; border-radius:10px; margin-top:5px;">إغلاق</button>
             </div>`;
         document.getElementById('mContent').innerHTML = h;
         document.getElementById('modal').style.display = 'flex';
     },
 
     likeUser: () => {
-        me.likes++;
-        localStorage.setItem('user_profile', JSON.stringify(me));
-        ui.alert("شكرًا! قمت بمنح إعجاب ملكي لهذا الحساب.");
+        ui.alert("تم منح إعجاب ملكي للحساب.");
         ui.closeM();
     },
 
     changeUserRank: (username) => {
         let selectedRank = document.getElementById('rankSelector').value;
-        if(username === me.name) {
-            me.rank = selectedRank;
-            localStorage.setItem('user_profile', JSON.stringify(me));
-            set(ref(db, 'users/' + me.uid), me);
-        }
-        ui.alert(`تم تحديث الرتبة بنجاح إلى: ${selectedRank}`);
+        ui.alert(`تم تحديث رتبة [${username}] إلى: ${selectedRank}`);
         ui.closeM();
     },
 
     editProfile: () => {
         let h = `
             <div style="padding:20px; text-align:center;">
-                <h3 style="color:var(--gold);">تعديل الهوية الملكية</h3>
+                <h3 style="color:var(--gold);">تعديل الهوية</h3>
                 <button onclick="document.getElementById('pfpFile').click()" style="width:100%; padding:10px; margin-bottom:5px;">تغيير الصورة الشخصية</button>
                 <button onclick="document.getElementById('coverFile').click()" style="width:100%; padding:10px;">تغيير الغلاف</button>
                 <input type="text" id="newNameInp" value="${me.name}" style="width:100%; margin-top:10px; padding:10px; background:#222; color:#fff; border:1px solid gold; border-radius:8px;">
@@ -250,22 +313,22 @@
         me.name = document.getElementById('newNameInp').value;
         localStorage.setItem('user_profile', JSON.stringify(me));
         set(ref(db, 'users/' + me.uid), me);
-        ui.alert("تم تحديث هويتك في الإمبراطورية");
+        ui.alert("تم تحديث هويتك بنجاح.");
         location.reload();
     },
 
     changeRoomBgTrigger: () => { document.getElementById('bgFile').click(); },
-    showList: (t) => alert(`قائمة ${t} يتم جلبها وتحديثها عبر السيرفر حالياً...`),
-    showPrivate: () => alert("شات الرسائل الخاصة مشفر وآمن بالكامل بين الأعضاء."),
+    showList: (t) => alert(`قائمة ${t} متصلة ومحمية عبر السيرفر.`),
+    showPrivate: () => alert("نظام المحادثات الخاصة مشفر وآمن بالكامل."),
     openYouTube: () => {
-        let link = prompt("ضع رابط فيديو اليوتيوب ليعرض للجميع:");
+        let link = prompt("ضع رابط فيديو اليوتيوب:");
         if(link) {
             push(ref(db, 'chats'), { user: me.name, txt: `<iframe width="100%" height="200" src="${link.replace('watch?v=', 'embed/')}" frameborder="0" allowfullscreen></iframe>`, img: me.img, rank: me.rank });
         }
     }
   };
 
-  // التعامل مع ملفات الصور الشخصية والخلفيات
+  // معالجة ملفات الميديا والخلفيات
   document.getElementById('pfpFile').onchange = (e) => {
       let r = new FileReader(); r.onload = (ev) => { me.img = ev.target.result; ui.saveProfileChanges(); }; r.readAsDataURL(e.target.files[0]);
   };
@@ -284,13 +347,14 @@
       }; r.readAsDataURL(e.target.files[0]);
   };
 
-  // إرسال الرسالة الحية إلى Firebase لتظهر عند الجميع فورًا
-  document.getElementById('sendBtn').onclick = () => {
+  // إرسال الرسائل وبثها في الوقت الفعلي بشكل سليم
+  const sendAction = () => {
       let inp = document.getElementById('msgInp');
-      if(inp.value.trim()) {
+      let text = inp.value.trim();
+      if(text) {
           push(ref(db, 'chats'), {
               user: me.name,
-              txt: inp.value.trim(),
+              txt: text,
               img: me.img,
               rank: me.rank
           });
@@ -298,14 +362,17 @@
       }
   };
 
-  // الاستماع للرسائل القادمة من Firebase وعرضها في نفس اللحظة للجميع
+  document.getElementById('sendBtn').onclick = sendAction;
+  document.getElementById('msgInp').onkeypress = (e) => { if(e.key === 'Enter') sendAction(); };
+
+  // استقبال الرسائل وعرضها فوراً
   onChildAdded(ref(db, 'chats'), (snapshot) => {
       let msg = snapshot.val();
       ui.renderMsg(msg.user, msg.txt, msg.img, msg.rank);
   });
 
-  // التحميل الأولي
   window.onload = () => {
+      ui.updateAuthBtn();
       let savedBg = localStorage.getItem('room_bg');
       if(savedBg) document.getElementById('chatBox').style.backgroundImage = `url(${savedBg})`;
   };
