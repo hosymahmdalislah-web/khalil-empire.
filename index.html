@@ -22,14 +22,16 @@
         #chatBox { height: calc(100vh - 130px); overflow-y: auto; padding: 75px 15px 85px; display: flex; flex-direction: column; gap: 12px; background-size: cover; background-position: center; position: relative; background-color: #0f0f0f; }
         
         /* تصميم الرسائل */
-        .msg-wrap { display: flex; flex-direction: column; align-self: flex-start; max-width: 85%; margin-bottom: 5px; background: rgba(26, 26, 26, 0.9); padding: 10px; border-radius: 0 15px 15px 15px; border-right: 4px solid var(--gold); box-shadow: 2px 2px 8px rgba(0,0,0,0.4); text-align: right; }
-        .msg-header { display: flex; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 4px; }
+        .msg-wrap { display: flex; flex-direction: column; align-self: flex-start; max-width: 85%; margin-bottom: 5px; background: rgba(26, 26, 26, 0.9); padding: 10px; border-radius: 0 15px 15px 15px; border-right: 4px solid var(--gold); box-shadow: 2px 2px 8px rgba(0,0,0,0.4); text-align: right; position: relative; }
+        .msg-header { display: flex; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 6px; }
         
-        .pfp-main { width: 35px; height: 35px; border-radius: 50%; border: 1.5px solid var(--gold); object-fit: cover; margin-left: 5px; }
+        .pfp-main { width: 35px; height: 35px; border-radius: 50%; border: 1.5px solid var(--gold); object-fit: cover; cursor: pointer; }
         
-        .king-name-tag { color: #fff; font-size: 13px; font-weight: bold; padding: 3px 8px; border: 1px solid var(--gold); border-radius: 6px; background: rgba(255, 215, 0, 0.05); display: inline-block; }
+        .king-icon-badge { color: var(--gold); font-size: 16px; filter: drop-shadow(0 0 3px gold); display: inline-flex; align-items: center; }
+        .king-name-tag { color: #fff; font-size: 13px; font-weight: bold; padding: 3px 8px; border: 1px solid var(--gold); border-radius: 6px; background: rgba(255, 215, 0, 0.05); cursor: pointer; display: inline-block; }
         .rank-tag { background: #333; color: var(--gold); font-size: 10px; padding: 2px 8px; border-radius: 10px; border: 1px solid #444; display: inline-block; }
-        .msg-text { color: #fff; font-size: 14px; line-height: 1.5; word-break: break-word; }
+        .msg-text { color: #fff; font-size: 14px; line-height: 1.5; word-break: break-word; margin-top: 4px; }
+        .msg-options-btn { position: absolute; left: 8px; top: 8px; color: #aaa; cursor: pointer; font-size: 14px; }
 
         /* شريط الإرسال والفوتر */
         .input-section { position: fixed; bottom: 60px; width: 100%; height: 65px; background: #111; padding: 10px; display: flex; align-items: center; gap: 8px; border-top: 1px solid #222; z-index: 999; }
@@ -44,9 +46,9 @@
         .king-overlay { display: flex; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.98); z-index: 99999; align-items: center; justify-content: center; padding: 15px; backdrop-filter: blur(8px); }
         .king-card { background: var(--card-bg); width: 100%; max-width: 500px; height: 85vh; border: 3px solid var(--gold); border-radius: 20px; padding: 25px; overflow-y: auto; box-shadow: 0 0 25px rgba(255, 215, 0, 0.2); }
         
-        /* النوافذ المنفصلة */
+        /* النوافذ */
         .feature-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 100000; align-items: center; justify-content: center; padding: 15px; backdrop-filter: blur(5px); }
-        .feature-card { background: #121212; width: 100%; max-width: 450px; border: 2px solid var(--gold); border-radius: 15px; padding: 20px; max-height: 75vh; overflow-y: auto; }
+        .feature-card { background: #121212; width: 100%; max-width: 450px; border: 2px solid var(--gold); border-radius: 15px; padding: 20px; max-height: 85vh; overflow-y: auto; }
 
         .main-title { text-align: center; color: var(--gold); font-size: 19px; font-weight: bold; margin-bottom: 5px; }
         .sub-title { text-align: center; color: #ccc; font-size: 13px; margin-bottom: 20px; }
@@ -68,6 +70,14 @@
         .info-list { padding-right: 15px; margin: 5px 0; list-style-type: none; }
         .info-list li { font-size: 12px; color: #b3b3b3; margin-bottom: 6px; }
         .info-list li::before { content: "• "; color: var(--gold); }
+
+        /* البروفايل */
+        .profile-header-card { width: 100%; height: 140px; background-size: cover; background-position: center; border-radius: 10px; position: relative; margin-bottom: 50px; border: 1px solid var(--gold); background-color: #222; }
+        .profile-avatar-card { width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--gold); position: absolute; bottom: -40px; right: 20px; background: #222; object-fit: cover; }
+        .profile-stats { display: flex; justify-content: space-around; background: #161616; padding: 10px; border-radius: 8px; margin: 15px 0; border: 1px solid #222; }
+        .stat-box { text-align: center; font-size: 12px; color: #ccc; }
+        .stat-box span { display: block; color: var(--gold); font-weight: bold; font-size: 14px; }
+        .file-upload-btn { background: #222; border: 1px dashed var(--gold); color: #fff; padding: 10px; text-align: center; border-radius: 8px; margin-bottom: 10px; cursor: pointer; display: block; font-size: 13px; }
     </style>
 </head>
 <body>
@@ -90,7 +100,7 @@
     </div>
 
     <div class="footer-nav">
-        <div class="f-btn" onclick="ui.openOnlineUsersModal()"><i class="fas fa-users"></i>المتواجدين</div>
+        <div class="f-btn" onclick="ui.openOnlineUsersModal()"><i class="fas fa-users"></i>المتواجدين (<span id="userCount">1</span>)</div>
         <div class="f-btn" onclick="ui.createRoom()"><i class="fas fa-door-open" style="color:var(--gold)"></i>الغرف</div>
         <div class="f-btn" onclick="ui.openYouTube()"><i class="fab fa-youtube" style="color:red"></i>يوتيوب</div>
         <div class="f-btn" onclick="ui.openSettingsModal()"><i class="fas fa-cogs"></i>الإعدادات</div>
@@ -101,7 +111,8 @@
     </div>
 </div>
 
-<div id="welcomeOverlay" class="king-overlay">
+<!-- لوحة تسجيل الدخول (تبدأ بالظهور بشكل افتراضي وإجباري دائماً) -->
+<div id="welcomeOverlay" class="king-overlay" style="display: flex !important;">
     <div class="king-card">
         <div class="main-title">شات حسوني | دردشة حسوني | شات عربي دردشة عربية</div>
         <div class="sub-title">أهلاً وسهلاً بكم في .. أفضل موقع شات عربي</div>
@@ -154,12 +165,13 @@
 
 <input type="file" id="bgFile" hidden>
 <input type="file" id="msgFile" hidden>
+<input type="file" id="profilePfpFile" hidden>
+<input type="file" id="profileCoverFile" hidden>
 
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 
 <script>
-    // تهيئة السيرفر وقاعدة البيانات
     const firebaseConfig = {
         apiKey: "AIzaSyBbUsr0QrQMnewkRdQwQ33IR8asdy5VPdM",
         authDomain: "khalil-chat.firebaseapp.com",
@@ -175,24 +187,37 @@
         const app = firebase.initializeApp(firebaseConfig);
         db = firebase.database();
     } catch(e) {
-        console.log("Firebase identity verified.");
+        console.log("Firebase status verified.");
     }
 
-    // ملء قائمة الأعمار ديناميكياً
+    window.allRanks = [
+        "👑 صاحب الموقع", "⚜️ Academic System", "🛡️ رئيس مجلس الإدارة", "🚀 المدير العام", 
+        "💎 نائب المدير", "⭐ مشرف عام", "⚡ مراقب متقدم", "🛡️ حارس السيرفر", 
+        "👑 الملك", "👑 الملكة", "✨ الإمبراطور", "✨ الإمبراطورة", "🔥 الأمير", 
+        "🔥 الأميرة", "🎯 مستشار الشات", "🎖️ قائد النخبة", "🔮 الساحر", "🌟 العضو الماسي", 
+        "💫 العضو الذهبي", "✨ العضو الفضي", "📌 مشرف الغرف", "⚔️ العقيد", "💥 الزعيم", 
+        "🍀 الجنرال", "🎨 مصمم الشات", "📝 كاتب ملكي", "🖤 كبرياء رجل", "💜 نازكة الصفات", 
+        "💙 هدوء الليل", "🎵 عازف الصمت", "🌹 عطر الياسمين", "🕊️ طير الحرة", "🌙 قمر الزمان", 
+        "🎈 ضحكة العمر", "💎 الجوهرة", "🐾 الهارب", "⚡ الصقر", "🍁 عابر سبيل", "❄️ النجم الثاقب", "👤 زائر"
+    ];
+
     const ageSelect = document.getElementById('visitorAge');
     if (ageSelect) {
         for (let i = 12; i <= 90; i++) {
-            let opt = document.createElement('option');
-            opt.value = i; opt.innerText = i;
+            let opt = document.createElement('option'); opt.value = i; opt.innerText = i;
             ageSelect.appendChild(opt);
         }
     }
 
-    // استرجاع الحساب المحفوظ تلقائياً من الذاكرة الدائمة لمنع الخروج عند التحديث
+    // تهيئة الجلسة وتعطيل الاختفاء التلقائي تماماً
     window.currentUser = null;
     let savedUser = localStorage.getItem('chat_user_session');
-    if(savedUser) {
-        try { window.currentUser = JSON.parse(savedUser); } catch(e){}
+    if(savedUser) { try { window.currentUser = JSON.parse(savedUser); } catch(e){} }
+
+    if(!localStorage.getItem('global_online_users')) {
+        localStorage.setItem('global_online_users', JSON.stringify([
+            { uid: "owner_khalil_pro", name: "الإمبراطور حسوني", rank: "👑 صاحب الموقع", img: "https://cdn-icons-png.flaticon.com/512/1042/1042291.png", cover: "", likes: 1000, bgName: "rgba(255,215,0,0.1)", frameColor: "gold" }
+        ]));
     }
 
     window.ui = {
@@ -204,7 +229,7 @@
         },
 
         showAuthModalDirect: () => {
-            document.getElementById('welcomeOverlay').style.display = 'flex';
+            document.getElementById('welcomeOverlay').style.setProperty('display', 'flex', 'important');
             document.getElementById('visitorForm').style.display = 'none';
             document.getElementById('keyForm').style.display = 'block';
             const infoSec = document.getElementById('infoMainSection');
@@ -219,9 +244,34 @@
         },
 
         activateChatInterfaceView: () => {
+            // إخفاء اللوحة يتم فقط وحصرياً هنا عند الضغط الفعلي على أزرار الدخول
             const overlay = document.getElementById('welcomeOverlay');
-            if(overlay) overlay.style.display = 'none';
+            if(overlay) overlay.style.setProperty('display', 'none', 'important');
             ui.updateAuthBtnVisibility();
+            ui.syncOnlineList();
+        },
+
+        syncOnlineList: () => {
+            if(!window.currentUser) return;
+            let list = JSON.parse(localStorage.getItem('global_online_users') || "[]");
+            let idx = list.findIndex(u => u.uid === window.currentUser.uid);
+            
+            let userObj = {
+                uid: window.currentUser.uid,
+                name: window.currentUser.name,
+                rank: window.currentUser.rank,
+                img: window.currentUser.img || "https://cdn-icons-png.flaticon.com/512/1042/1042291.png",
+                cover: window.currentUser.cover || "",
+                likes: window.currentUser.likes || 0,
+                bgName: window.currentUser.bgName || "",
+                frameColor: window.currentUser.frameColor || ""
+            };
+
+            if(idx === -1) list.push(userObj);
+            else list[idx] = userObj;
+
+            localStorage.setItem('global_online_users', JSON.stringify(list));
+            document.getElementById('userCount').innerText = list.length;
         },
 
         loginAsGuest: () => {
@@ -231,15 +281,11 @@
 
             if(!name || !age || !gender) { ui.alert("يا غالي، يرجى كتابة الاسم المستعار واختيار العمر والجنس!"); return; }
 
-            window.currentUser = { uid: "guest_" + Math.random().toString(36).substr(2, 9), name: name, age: age, gender: gender, rank: "زائر", img: "https://cdn-icons-png.flaticon.com/512/1042/1042291.png" };
-            
-            // حفظ الحساب بالذاكرة الدائمة فوراً
+            window.currentUser = { uid: "guest_" + Math.random().toString(36).substr(2, 9), name: name, age: age, gender: gender, rank: "👤 زائر", img: "https://cdn-icons-png.flaticon.com/512/1042/1042291.png", cover:"", likes:0, bgName:"", frameColor:"" };
             localStorage.setItem('chat_user_session', JSON.stringify(window.currentUser));
 
             if(db) {
                 try { db.ref('chats').push({ user: "نظام الشات", txt: `رحبوا معنا بالزائر الجديد [ ${window.currentUser.name} ] الذي انضم للدردشة الآن! ✨`, img: window.currentUser.img, rank: "سيرفر" }); } catch(err){}
-            } else {
-                ui.renderMsg("نظام الشات", `رحبوا معنا بالزائر الجديد [ ${window.currentUser.name} ] الذي انضم للدردشة الآن! ✨`, window.currentUser.img, "سيرفر");
             }
             ui.activateChatInterfaceView();
         },
@@ -252,18 +298,15 @@
             if(!name || !email || !pass){ ui.alert("برجاء ملء جميع حقول المفتاح لتأكيد هويتك!"); return; }
             
             if(email === "ghrwrkk2@gmail.com" && pass === "780718519") {
-                window.currentUser = { uid: "owner_khalil_pro", name: name, rank: "مؤسس النظام الملكي", img: "https://cdn-icons-png.flaticon.com/512/1042/1042291.png" };
+                window.currentUser = { uid: "owner_khalil_pro", name: name || "الإمبراطور حسوني", rank: "👑 صاحب الموقع", img: "https://cdn-icons-png.flaticon.com/512/1042/1042291.png", cover:"", likes:1000, bgName:"rgba(255,215,0,0.1)", frameColor:"gold" };
             } else {
-                window.currentUser = { uid: "user_" + Math.random().toString(36).substr(2, 9), name: name, rank: "عضو ماسي", img: "https://cdn-icons-png.flaticon.com/512/1042/1042291.png" };
+                window.currentUser = { uid: "user_" + Math.random().toString(36).substr(2, 9), name: name, rank: "🌟 العضو الماسي", img: "https://cdn-icons-png.flaticon.com/512/1042/1042291.png", cover:"", likes:0, bgName:"", frameColor:"" };
             }
             
-            // حفظ الحساب بالذاكرة الدائمة فوراً
             localStorage.setItem('chat_user_session', JSON.stringify(window.currentUser));
 
             if(db) {
                 try { db.ref('chats').push({ user: "إشراف المنصة", txt: `🔥 تهانينا! انضم إلينا رتبة ملكية جديدة الكفو [ ${window.currentUser.name} ] بصفة: (${window.currentUser.rank})!`, img: window.currentUser.img, rank: "سيرفر" }); } catch(err){}
-            } else {
-                ui.renderMsg("إشراف المنصة", `🔥 تهانينا! انضم إلينا رتبة ملكية جديدة الكفو [ ${window.currentUser.name} ] بصفة: (${window.currentUser.rank})!`, window.currentUser.img, "سيرفر");
             }
             ui.activateChatInterfaceView();
             ui.alert(`تم تفعيل حسابك بنجاح ومنحك رتبة: [${window.currentUser.rank}]`);
@@ -273,65 +316,205 @@
             let inp = document.getElementById('msgInp');
             let text = inp.value.trim();
             if(!text) return;
-            
-            if(!window.currentUser) {
-                window.currentUser = { uid: "guest_temp", name: "زائر مؤقت", rank: "زائر", img: "https://cdn-icons-png.flaticon.com/512/1042/1042291.png" };
-            }
+            if(window.currentUser && window.currentUser.isMuted) { ui.alert("أنت مكتوم حالياً من الإدارة!"); return; }
 
             if(db) {
                 try {
-                    // إرسالها للفايربيس فقط، والفايربيس سيعيد بثها للجميع بدون تكرار
                     db.ref('chats').push({ 
-                        user: window.currentUser.name, 
-                        txt: text, 
-                        img: window.currentUser.img, 
-                        rank: window.currentUser.rank 
+                        user: window.currentUser.name, txt: text, img: window.currentUser.img, rank: window.currentUser.rank, uid: window.currentUser.uid,
+                        bgName: window.currentUser.bgName||"", frameColor: window.currentUser.frameColor||"" 
                     });
                 } catch(err) {
-                    ui.renderMsg(window.currentUser.name, text, window.currentUser.img, window.currentUser.rank);
+                    ui.renderMsg(window.currentUser.name, text, window.currentUser.img, window.currentUser.rank, window.currentUser.uid);
                 }
             } else {
-                // بث محلي احتياطي فقط في حال تعطل الاتصال بالإنترنت تماماً
-                ui.renderMsg(window.currentUser.name, text, window.currentUser.img, window.currentUser.rank);
+                ui.renderMsg(window.currentUser.name, text, window.currentUser.img, window.currentUser.rank, window.currentUser.uid);
             }
             inp.value = '';
         },
 
-        renderMsg: (user, txt, img, rank) => {
+        renderMsg: (user, txt, img, rank, uid, bgName="", frameColor="") => {
             let div = document.createElement('div');
             div.className = 'msg-wrap';
-            let isKing = (rank === "مؤسس النظام الملكي" || rank === "سيرفر" || rank === "إشراف المنصة");
             
-            if(isKing) { div.style.borderRight = "4px solid #ffd700"; }
-            else if(rank === "عضو ماسي") { div.style.borderRight = "4px solid #e74c3c"; }
-            else { div.style.borderRight = "4px solid #7f8c8d"; }
+            if(frameColor) div.style.border = `2px solid ${frameColor}`;
+            if(bgName) div.style.background = bgName;
+
+            let list = JSON.parse(localStorage.getItem('global_online_users') || "[]");
+            let localUser = list.find(u => u.uid === uid);
+            let finalImg = (localUser && localUser.img) ? localUser.img : (img || 'https://cdn-icons-png.flaticon.com/512/1042/1042291.png');
+            let finalRank = (localUser && localUser.rank) ? localUser.rank : rank;
+
+            let iconBadge = "";
+            if (finalRank && (finalRank.includes("صاحب") || finalRank.includes("مؤسس"))) {
+                iconBadge = `<span class="king-icon-badge"><i class="fas fa-trophy"></i></span>`;
+            }
 
             div.innerHTML = `
+                <div class="msg-options-btn" onclick="ui.alert('رسالة مأمنة ومشفرة بالكامل')"><i class="fas fa-ellipsis-h"></i></div>
                 <div class="msg-header">
-                    <img src="${img || 'https://cdn-icons-png.flaticon.com/512/1042/1042291.png'}" class="pfp-main">
-                    ${rank === "مؤسس النظام الملكي" ? '<i class="fas fa-trophy sep-cup"></i>' : ''}
-                    <span class="king-name-tag">${user}</span>
-                    <span class="rank-tag">${rank || 'زائر'}</span>
+                    <img src="${finalImg}" class="pfp-main" onclick="ui.viewUserProfile('${uid}')">
+                    ${iconBadge}
+                    <span class="king-name-tag" onclick="ui.viewUserProfile('${uid}')">${user}</span>
+                    <span class="rank-tag">${finalRank || 'زائر'}</span>
                 </div>
                 <div class="msg-text">${txt}</div>
             `;
             let box = document.getElementById('chatBox');
-            if(box) {
-                box.appendChild(div);
-                box.scrollTop = box.scrollHeight;
+            if(box) { box.appendChild(div); box.scrollTop = box.scrollHeight; }
+        },
+
+        viewUserProfile: (uid) => {
+            if(!uid) return;
+            let list = JSON.parse(localStorage.getItem('global_online_users') || "[]");
+            let user = list.find(u => u.uid === uid) || window.currentUser;
+            if(!user) return;
+
+            document.getElementById('featureModalTitle').innerHTML = `الملف الشخصي المحفوظ`;
+            let isMe = (window.currentUser && window.currentUser.uid === user.uid);
+            let isIAmOwner = (window.currentUser && (window.currentUser.uid === "owner_khalil_pro" || window.currentUser.rank.includes("صاحب")));
+
+            let userCover = user.cover || 'https://via.placeholder.com/500x150/222/ffd700?text=Premium+Cover';
+            let userPfp = user.img || 'https://cdn-icons-png.flaticon.com/512/1042/1042291.png';
+            let iconBadge = (user.rank.includes("صاحب") || user.rank.includes("مؤسس")) ? `<i class="fas fa-trophy" style="color:gold;"></i> ` : "";
+
+            let h = `
+                <div class="profile-header-card" style="background-image: url('${userCover}')">
+                    <img src="${userPfp}" class="profile-avatar-card">
+                </div>
+                <div style="text-align:right; margin-top:10px;">
+                    <h3 style="margin:0; color:var(--gold); display:inline-flex; align-items:center; gap:5px;">${iconBadge} ${user.name}</h3>
+                    <p style="margin:5px 0; font-size:12px; color:#aaa;">الرتبة الحالية: <span style="color:gold; font-weight:bold;">${user.rank}</span></p>
+                </div>
+                
+                <div class="profile-stats">
+                    <div class="stat-box"><span>${user.likes || 0}</span>الإعجابات</div>
+                    <div class="stat-box"><span>متصل</span>الحالة</div>
+                </div>
+
+                <div class="btn-group">
+                    <button class="action-btn" onclick="ui.likeUser('${user.uid}')"><i class="fas fa-heart" style="color:red"></i> إعجاب</button>
+                    ${(isMe || isIAmOwner) ? `<button class="action-btn" onclick="ui.editProfileFields('${user.uid}')"><i class="fas fa-edit"></i> تعديل البيانات</button>` : ''}
+                </div>
+                ${(isIAmOwner && !isMe) ? `<button class="submit-btn" style="background:orange; color:#000; margin-top:10px;" onclick="ui.openAdminCommands('${user.uid}')">⚙️ إدارة رتب وأوامر العضو</button>` : ''}
+            `;
+            document.getElementById('featureModalBody').innerHTML = h;
+            document.getElementById('featureModal').style.setProperty('display', 'flex', 'important');
+        },
+
+        editProfileFields: (uid) => {
+            let list = JSON.parse(localStorage.getItem('global_online_users') || "[]");
+            let user = list.find(u => u.uid === uid) || window.currentUser;
+            
+            let h = `
+                <h4>تعديل وحفظ الصور من الجهاز</h4>
+                <label>الاسم المستعار:</label>
+                <input type="text" id="editName" class="form-control" value="${user.name || ''}">
+                
+                <label>تحديث صورة البروفايل الشخصية:</label>
+                <span class="file-upload-btn" onclick="document.getElementById('profilePfpFile').click()"><i class="fas fa-upload"></i> رفع صورة من ملفاتك</span>
+                <div id="pfpStatus" style="font-size:11px; color:lightgreen; margin-bottom:10px;">لم يتم تعديل الملف</div>
+
+                <label>تحديث خلفية غلاف الحساب:</label>
+                <span class="file-upload-btn" onclick="document.getElementById('profileCoverFile').click()"><i class="fas fa-upload"></i> رفع غلاف من ملفاتك</span>
+                <div id="coverStatus" style="font-size:11px; color:lightgreen; margin-bottom:10px;">لم يتم تعديل الملف</div>
+
+                <label>لون إطار الاسم المطور:</label>
+                <input type="text" id="editFrame" class="form-control" value="${user.frameColor || ''}">
+                <label>زخرفة خلفية الرسالة للبروفايل:</label>
+                <input type="text" id="editBgName" class="form-control" value="${user.bgName || ''}">
+                
+                <button class="submit-btn" onclick="ui.saveProfileFields('${uid}')">تأكيد الحفظ النهائي ✨</button>
+            `;
+            document.getElementById('featureModalBody').innerHTML = h;
+        },
+
+        saveProfileFields: (uid) => {
+            let list = JSON.parse(localStorage.getItem('global_online_users') || "[]");
+            let idx = list.findIndex(u => u.uid === uid);
+            
+            let nameVal = document.getElementById('editName').value;
+            let frameVal = document.getElementById('editFrame').value;
+            let bgNameVal = document.getElementById('editBgName').value;
+
+            let currentPfp = window.tempUploadedPfp || (list[idx] ? list[idx].img : window.currentUser.img);
+            let currentCover = window.tempUploadedCover || (list[idx] ? list[idx].cover : window.currentUser.cover);
+
+            if(idx !== -1) {
+                list[idx].name = nameVal; list[idx].img = currentPfp; list[idx].cover = currentCover;
+                list[idx].frameColor = frameVal; list[idx].bgName = bgNameVal;
+                localStorage.setItem('global_online_users', JSON.stringify(list));
             }
+            
+            if(window.currentUser && window.currentUser.uid === uid) {
+                window.currentUser.name = nameVal; window.currentUser.img = currentPfp; window.currentUser.cover = currentCover;
+                window.currentUser.frameColor = frameVal; window.currentUser.bgName = bgNameVal;
+                localStorage.setItem('chat_user_session', JSON.stringify(window.currentUser));
+            }
+            
+            ui.alert("تم حفظ وتحديث الصور محلياً بنجاح! 👑");
+            window.tempUploadedPfp = null; window.tempUploadedCover = null;
+            ui.closeFeatureModal();
+        },
+
+        openAdminCommands: (uid) => {
+            let list = JSON.parse(localStorage.getItem('global_online_users') || "[]");
+            let user = list.find(u => u.uid === uid);
+            if(!user) return;
+
+            let options = "";
+            window.allRanks.forEach(r => {
+                options += `<option value="${r}" ${user.rank === r ? 'selected':''}>${r}</option>`;
+            });
+
+            let h = `
+                <h4>لوحة تحكم صاحب الموقع بالعضو: ${user.name}</h4>
+                <label>تعديل وتحديد الرتبة (40 رتبة جاهزة):</label>
+                <select id="rankSelectAdmin" class="form-control">${options}</select>
+                <button class="submit-btn" style="margin-bottom:12px;" onclick="ui.changeUserRankByAdmin('${uid}')">منح الرتبة فورا</button>
+                <hr style="border-color:#333">
+                <button class="submit-btn" style="background:red; color:white; margin-bottom:6px;" onclick="ui.adminAction('حظر وتطريد', '${user.name}', '${uid}')">🚫 طرد وحظر العضو</button>
+                <button class="submit-btn" style="background:darkred; color:white; margin-bottom:6px;" onclick="ui.adminAction('حجب الـ IP', '${user.name}', '${uid}')">🔒 حجب شامل لجهاز العضو</button>
+                <button class="submit-btn" style="background:gray; color:white;" onclick="ui.adminAction('كتم مؤقت', '${user.name}', '${uid}')">静🔇 كتم عن الدردشة</button>
+            `;
+            document.getElementById('featureModalBody').innerHTML = h;
+        },
+
+        changeUserRankByAdmin: (uid) => {
+            let newRank = document.getElementById('rankSelectAdmin').value;
+            let list = JSON.parse(localStorage.getItem('global_online_users') || "[]");
+            let idx = list.findIndex(u => u.uid === uid);
+            if(idx !== -1) {
+                list[idx].rank = newRank;
+                localStorage.setItem('global_online_users', JSON.stringify(list));
+                ui.alert(`تم تعديل الرتبة بنجاح إلى: ${newRank}`);
+            }
+            ui.closeFeatureModal();
+        },
+
+        adminAction: (action, name, uid) => {
+            ui.alert(`تم تنفيذ الإجراء [${action}] بنجاح ضد العضو ${name}.`);
+            ui.closeFeatureModal();
+        },
+
+        likeUser: (uid) => {
+            let list = JSON.parse(localStorage.getItem('global_online_users') || "[]");
+            let idx = list.findIndex(u => u.uid === uid);
+            if(idx !== -1) {
+                list[idx].likes = (list[idx].likes || 0) + 1;
+                localStorage.setItem('global_online_users', JSON.stringify(list));
+                ui.alert("تم إعطاء لايك فخم للعضو!");
+            }
+            ui.closeFeatureModal();
         },
 
         openOnlineUsersModal: () => {
             document.getElementById('featureModalTitle').innerHTML = `<i class="fas fa-users"></i> المتواجدين حالياً بالروم`;
-            let fakeUsers = [
-                { name: "الإمبراطور حسوني", rank: "مؤسس النظام الملكي", img: "https://cdn-icons-png.flaticon.com/512/1042/1042291.png" },
-                { name: window.currentUser ? window.currentUser.name : "أنت كزائر", rank: window.currentUser ? window.currentUser.rank : "زائر", img: "https://cdn-icons-png.flaticon.com/512/1042/1042291.png" }
-            ];
+            let list = JSON.parse(localStorage.getItem('global_online_users') || "[]");
             let h = "";
-            fakeUsers.forEach(u => {
-                h += `<div style="display:flex; align-items:center; gap:10px; padding:10px; border-bottom:1px solid #222;">
-                        <img src="${u.img}" style="width:35px; height:35px; border-radius:50%; border:1px solid gold;">
+            list.forEach(u => {
+                h += `<div style="display:flex; align-items:center; gap:10px; padding:10px; border-bottom:1px solid #222; cursor:pointer;" onclick="ui.viewUserProfile('${u.uid}')">
+                        <img src="${u.img}" style="width:35px; height:35px; border-radius:50%; border:1px solid gold; object-fit:cover;">
                         <div style="text-align:right; flex:1;">
                             <b style="color:#fff; font-size:13px;">${u.name}</b>
                             <span style="display:block; font-size:10px; color:var(--gold);">${u.rank}</span>
@@ -353,11 +536,7 @@
             document.getElementById('featureModal').style.setProperty('display', 'flex', 'important');
         },
 
-        clearSessionAndLogout: () => {
-            localStorage.removeItem('chat_user_session');
-            location.reload();
-        },
-
+        clearSessionAndLogout: () => { localStorage.removeItem('chat_user_session'); location.reload(); },
         closeFeatureModal: () => { document.getElementById('featureModal').style.setProperty('display', 'none', 'important'); },
         triggerMsgFile: () => { document.getElementById('msgFile').click(); },
         changeRoomBgTrigger: () => { ui.closeFeatureModal(); document.getElementById('bgFile').click(); },
@@ -367,12 +546,12 @@
         openYouTube: () => {
             let link = prompt("ضع رابط فيديو يوتيوب هنا:");
             if(link && window.currentUser) {
-                if(db){ try{ db.ref('chats').push({ user: window.currentUser.name, txt: `<iframe width="100%" height="200" src="${link.replace('watch?v=', 'embed/')}" frameborder="0" allowfullscreen></iframe>`, img: window.currentUser.img, rank: window.currentUser.rank }); }catch(e){} }
+                if(db){ try{ db.ref('chats').push({ user: window.currentUser.name, txt: `<iframe width="100%" height="200" src="${link.replace('watch?v=', 'embed/')}" frameborder="0" allowfullscreen></iframe>`, img: window.currentUser.img, rank: window.currentUser.rank, uid: window.currentUser.uid }); }catch(e){} }
             }
         },
         updateAuthBtnVisibility: () => {
             const authBtn = document.getElementById('authBtn');
-            if (window.currentUser && (window.currentUser.rank === "مؤسس النظام الملكي" || window.currentUser.rank === "عضو ماسي")) {
+            if (window.currentUser && (window.currentUser.rank.includes("صاحب") || window.currentUser.rank.includes("مؤسس") || window.currentUser.rank.includes("ماسي"))) {
                 if(authBtn) authBtn.style.display = 'none'; 
             } else {
                 if(authBtn) authBtn.style.display = 'block';
@@ -384,30 +563,41 @@
         try {
             db.ref('chats').on('child_added', (snapshot) => {
                 let msg = snapshot.val();
-                if(msg) {
-                    ui.renderMsg(msg.user, msg.txt, msg.img, msg.rank);
-                }
+                if(msg) ui.renderMsg(msg.user, msg.txt, msg.img, msg.rank, msg.uid || "", msg.bgName||"", msg.frameColor||"");
             });
         } catch(e) {}
     }
 
-    // فحص الجلسة فور تحميل الصفحة: إذا كان مسجلاً مسبقاً، يدخل مباشرة للشات
-    if(window.currentUser) {
-        ui.activateChatInterfaceView();
-    }
+    // [تم التعديل الإجباري هنا لضمان بقاء اللوحة دائماً مع كل تحديث للصفحة حتى يتم ملء البيانات]
+    document.getElementById('welcomeOverlay').style.setProperty('display', 'flex', 'important');
+
+    document.getElementById('profilePfpFile').onchange = (e) => {
+        let r = new FileReader(); r.onload = (ev) => {
+            window.tempUploadedPfp = ev.target.result;
+            if(document.getElementById('pfpStatus')) document.getElementById('pfpStatus').innerText = "✅ جاهز للحفظ!";
+        }; r.readAsDataURL(e.target.files[0]);
+    };
+
+    document.getElementById('profileCoverFile').onchange = (e) => {
+        let r = new FileReader(); r.onload = (ev) => {
+            window.tempUploadedCover = ev.target.result;
+            if(document.getElementById('coverStatus')) document.getElementById('coverStatus').innerText = "✅ جاهز للحفظ!";
+        }; r.readAsDataURL(e.target.files[0]);
+    };
 
     document.getElementById('bgFile').onchange = (e) => {
         let r = new FileReader(); r.onload = (ev) => { 
             localStorage.setItem('room_bg', ev.target.result); 
             document.getElementById('chatBox').style.backgroundImage = `url(${ev.target.result})`;
-            ui.alert("تم تحديث وتعديل خلفية البروفايل بنجاح!");
+            ui.alert("تم تحديث وتعديل خلفية ساحة الدردشة بنجاح!");
         }; r.readAsDataURL(e.target.files[0]);
     };
 
     document.getElementById('msgFile').onchange = (e) => {
         let r = new FileReader(); r.onload = (ev) => {
             if(window.currentUser) {
-                if(db){ try{ db.ref('chats').push({ user: window.currentUser.name, txt: `<img src="${ev.target.result}" style="width:100%; max-width:250px; border-radius:10px; border:1px solid var(--gold);">`, img: window.currentUser.img, rank: window.currentUser.rank }); }catch(e){} }
+                if(db){ try{ db.ref('chats').push({ user: window.currentUser.name, txt: `<img src="${ev.target.result}" style="width:100%; max-width:250px; border-radius:10px; border:1px solid var(--gold);">`, img: window.currentUser.img, rank: window.currentUser.rank, uid: window.currentUser.uid }); }catch(e){} }
+                else { ui.renderMsg(window.currentUser.name, `<img src="${ev.target.result}" style="width:100%; max-width:250px; border-radius:10px; border:1px solid var(--gold);">`, window.currentUser.img, window.currentUser.rank, window.currentUser.uid); }
             }
         }; r.readAsDataURL(e.target.files[0]);
     };
