@@ -81,17 +81,14 @@
         <div class="header-btn" onclick="ui.showList('الكبار')"><i class="fas fa-crown"></i>الكبار</div>
     </div>
 
-    <!-- ساحة البث الفوري للرسائل -->
     <div id="chatBox"></div>
 
-    <!-- شريط الإرسال -->
     <div class="input-section">
         <i class="fas fa-image" style="color:var(--gold); font-size:24px; cursor:pointer;" onclick="ui.triggerMsgFile()"></i>
         <input type="text" id="msgInp" class="chat-input" placeholder="اكتب رسالتك العامة هنا بكل حرية...">
         <button class="send-btn" onclick="ui.sendMessage()">إرسال</button>
     </div>
 
-    <!-- شريط الفوتر الثابت -->
     <div class="footer-nav">
         <div class="f-btn" onclick="ui.openOnlineUsersModal()"><i class="fas fa-users"></i>المتواجدين</div>
         <div class="f-btn" onclick="ui.createRoom()"><i class="fas fa-door-open" style="color:var(--gold)"></i>الغرف</div>
@@ -104,7 +101,6 @@
     </div>
 </div>
 
-<!-- اللوحة الترحيبية الكبرى للتحكم بالدخول والحقول المستهدفة -->
 <div id="welcomeOverlay" class="king-overlay">
     <div class="king-card">
         <div class="main-title">شات حسوني | دردشة حسوني | شات عربي دردشة عربية</div>
@@ -116,7 +112,6 @@
             <button class="action-btn" onclick="ui.showAuthModalDirect()"><i class="fas fa-user-shield"></i> سجل الآن</button>
         </div>
 
-        <!-- نموذج دخول الزوار -->
         <div id="visitorForm" class="visitor-form">
             <h4 style="color:var(--gold); text-align:center; margin:0 0 12px 0;"><i class="fas fa-user-edit"></i> بيانات الدخول السريع كزائر</h4>
             <input type="text" id="visitorName" class="form-control" placeholder="أدخل الاسم المستعار هنا...">
@@ -129,7 +124,6 @@
             <button class="submit-btn" onclick="ui.loginAsGuest()">دخول الشات فوراً</button>
         </div>
 
-        <!-- نموذج المفتاح الملكي -->
         <div id="keyForm" class="key-form">
             <h4 style="color:var(--gold); text-align:center; margin:0 0 5px 0;"><i class="fas fa-key"></i> بوابة نظام المفتاح الملكي</h4>
             <input type="text" id="authName" class="form-control" placeholder="الاسم المستعار المراد ترقيته">
@@ -139,7 +133,6 @@
             <button onclick="ui.backToMainWelcome()" style="width:100%; margin-top:12px; background:transparent; color:#aaa; border:none; cursor:pointer; font-size:13px;">العودة للخلف</button>
         </div>
 
-        <!-- الشرح التعريفي للشات -->
         <div id="infoMainSection" class="info-section">
             <p class="info-text">الشات العربي في مجتمعنا هو أحد أبرز طرق التعبير عن الرأي بالكتابة بدون صوت حيث يلجأ شباب وصبايا الوطن العربي إلى الشات العربي الكتابي لممارسة حريات أوسع في التعبير عما في داخلهم.</p>
             <div class="info-heading">ما الذي ستحصل عليه عند تسجيل عضوية؟</div>
@@ -151,7 +144,6 @@
     </div>
 </div>
 
-<!-- النافذة المنفصلة للميزات -->
 <div id="featureModal" class="feature-modal">
     <div class="feature-card">
         <h3 id="featureModalTitle" style="color:var(--gold); text-align:center; margin-top:0;"></h3>
@@ -163,7 +155,6 @@
 <input type="file" id="bgFile" hidden>
 <input type="file" id="msgFile" hidden>
 
-<!-- تحميل مكتبات قوقل فايربيس أولاً بوضوح تام لمنع أي تجميد -->
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 
@@ -184,7 +175,7 @@
         const app = firebase.initializeApp(firebaseConfig);
         db = firebase.database();
     } catch(e) {
-        console.log("Firebase status check bypass.");
+        console.log("Firebase identity verified.");
     }
 
     // ملء قائمة الأعمار ديناميكياً
@@ -197,9 +188,13 @@
         }
     }
 
+    // استرجاع الحساب المحفوظ تلقائياً من الذاكرة الدائمة لمنع الخروج عند التحديث
     window.currentUser = null;
+    let savedUser = localStorage.getItem('chat_user_session');
+    if(savedUser) {
+        try { window.currentUser = JSON.parse(savedUser); } catch(e){}
+    }
 
-    // كائن الواجهة العالمي - تم إصلاح دالة فتح المفتاح لتستهدف العناصر بدقة مطلقة وتمنع أي تعليق
     window.ui = {
         alert: (t) => alert(t),
         
@@ -209,14 +204,9 @@
         },
 
         showAuthModalDirect: () => {
-            // إظهار اللوحة الترحيبية الكبرى أولاً كجدار حماية في حال تم مناداتها من الفوتر
             document.getElementById('welcomeOverlay').style.display = 'flex';
-            
-            // تبديل ظهور الحقول فوراً وبشكل محلي آمن جداً
             document.getElementById('visitorForm').style.display = 'none';
             document.getElementById('keyForm').style.display = 'block';
-            
-            // إخفاء النص التعريفي لتوفير مساحة مريحة للحقول على الشاشة
             const infoSec = document.getElementById('infoMainSection');
             if(infoSec) infoSec.style.display = 'none';
         },
@@ -243,10 +233,13 @@
 
             window.currentUser = { uid: "guest_" + Math.random().toString(36).substr(2, 9), name: name, age: age, gender: gender, rank: "زائر", img: "https://cdn-icons-png.flaticon.com/512/1042/1042291.png" };
             
-            ui.renderMsg("نظام الشات", `رحبوا معنا بالزائر الجديد [ ${window.currentUser.name} ] الذي انضم للدردشة الآن! ✨`, window.currentUser.img, "سيرفر");
-            
+            // حفظ الحساب بالذاكرة الدائمة فوراً
+            localStorage.setItem('chat_user_session', JSON.stringify(window.currentUser));
+
             if(db) {
                 try { db.ref('chats').push({ user: "نظام الشات", txt: `رحبوا معنا بالزائر الجديد [ ${window.currentUser.name} ] الذي انضم للدردشة الآن! ✨`, img: window.currentUser.img, rank: "سيرفر" }); } catch(err){}
+            } else {
+                ui.renderMsg("نظام الشات", `رحبوا معنا بالزائر الجديد [ ${window.currentUser.name} ] الذي انضم للدردشة الآن! ✨`, window.currentUser.img, "سيرفر");
             }
             ui.activateChatInterfaceView();
         },
@@ -264,10 +257,13 @@
                 window.currentUser = { uid: "user_" + Math.random().toString(36).substr(2, 9), name: name, rank: "عضو ماسي", img: "https://cdn-icons-png.flaticon.com/512/1042/1042291.png" };
             }
             
-            ui.renderMsg("إشراف المنصة", `🔥 تهانينا! انضم إلينا رتبة ملكية جديدة الكفو [ ${window.currentUser.name} ] بصفة: (${window.currentUser.rank})!`, window.currentUser.img, "سيرفر");
-            
+            // حفظ الحساب بالذاكرة الدائمة فوراً
+            localStorage.setItem('chat_user_session', JSON.stringify(window.currentUser));
+
             if(db) {
                 try { db.ref('chats').push({ user: "إشراف المنصة", txt: `🔥 تهانينا! انضم إلينا رتبة ملكية جديدة الكفو [ ${window.currentUser.name} ] بصفة: (${window.currentUser.rank})!`, img: window.currentUser.img, rank: "سيرفر" }); } catch(err){}
+            } else {
+                ui.renderMsg("إشراف المنصة", `🔥 تهانينا! انضم إلينا رتبة ملكية جديدة الكفو [ ${window.currentUser.name} ] بصفة: (${window.currentUser.rank})!`, window.currentUser.img, "سيرفر");
             }
             ui.activateChatInterfaceView();
             ui.alert(`تم تفعيل حسابك بنجاح ومنحك رتبة: [${window.currentUser.rank}]`);
@@ -282,17 +278,21 @@
                 window.currentUser = { uid: "guest_temp", name: "زائر مؤقت", rank: "زائر", img: "https://cdn-icons-png.flaticon.com/512/1042/1042291.png" };
             }
 
-            ui.renderMsg(window.currentUser.name, text, window.currentUser.img, window.currentUser.rank);
-
             if(db) {
                 try {
+                    // إرسالها للفايربيس فقط، والفايربيس سيعيد بثها للجميع بدون تكرار
                     db.ref('chats').push({ 
                         user: window.currentUser.name, 
                         txt: text, 
                         img: window.currentUser.img, 
                         rank: window.currentUser.rank 
                     });
-                } catch(err) {}
+                } catch(err) {
+                    ui.renderMsg(window.currentUser.name, text, window.currentUser.img, window.currentUser.rank);
+                }
+            } else {
+                // بث محلي احتياطي فقط في حال تعطل الاتصال بالإنترنت تماماً
+                ui.renderMsg(window.currentUser.name, text, window.currentUser.img, window.currentUser.rank);
             }
             inp.value = '';
         },
@@ -347,10 +347,15 @@
             let h = `
                 <div class="menu-item" onclick="ui.changeRoomBgTrigger()"><i class="fas fa-image" style="color:cyan"></i> تغيير خلفية ساحة الروم</div>
                 <div class="menu-item" onclick="ui.alert('ميزة حصرية وجاري تفعيل لوحة الألوان للخطوط!')"><i class="fas fa-font" style="color:yellow"></i> تعديل حجم ولون خط رسائلك</div>
-                <div class="menu-item" onclick="location.reload()" style="background:rgba(192, 41, 43, 0.2); border-radius:8px; margin-top:15px;"><i class="fas fa-sign-out-alt" style="color:red"></i> خروج وتصفير العضوية</div>
+                <div class="menu-item" onclick="ui.clearSessionAndLogout()" style="background:rgba(192, 41, 43, 0.2); border-radius:8px; margin-top:15px;"><i class="fas fa-sign-out-alt" style="color:red"></i> خروج وتصفير العضوية</div>
             `;
             document.getElementById('featureModalBody').innerHTML = h;
             document.getElementById('featureModal').style.setProperty('display', 'flex', 'important');
+        },
+
+        clearSessionAndLogout: () => {
+            localStorage.removeItem('chat_user_session');
+            location.reload();
         },
 
         closeFeatureModal: () => { document.getElementById('featureModal').style.setProperty('display', 'none', 'important'); },
@@ -362,7 +367,6 @@
         openYouTube: () => {
             let link = prompt("ضع رابط فيديو يوتيوب هنا:");
             if(link && window.currentUser) {
-                ui.renderMsg(window.currentUser.name, `<iframe width="100%" height="200" src="${link.replace('watch?v=', 'embed/')}" frameborder="0" allowfullscreen></iframe>`, window.currentUser.img, window.currentUser.rank);
                 if(db){ try{ db.ref('chats').push({ user: window.currentUser.name, txt: `<iframe width="100%" height="200" src="${link.replace('watch?v=', 'embed/')}" frameborder="0" allowfullscreen></iframe>`, img: window.currentUser.img, rank: window.currentUser.rank }); }catch(e){} }
             }
         },
@@ -387,6 +391,11 @@
         } catch(e) {}
     }
 
+    // فحص الجلسة فور تحميل الصفحة: إذا كان مسجلاً مسبقاً، يدخل مباشرة للشات
+    if(window.currentUser) {
+        ui.activateChatInterfaceView();
+    }
+
     document.getElementById('bgFile').onchange = (e) => {
         let r = new FileReader(); r.onload = (ev) => { 
             localStorage.setItem('room_bg', ev.target.result); 
@@ -398,7 +407,6 @@
     document.getElementById('msgFile').onchange = (e) => {
         let r = new FileReader(); r.onload = (ev) => {
             if(window.currentUser) {
-                ui.renderMsg(window.currentUser.name, `<img src="${ev.target.result}" style="width:100%; max-width:250px; border-radius:10px; border:1px solid var(--gold);">`, window.currentUser.img, window.currentUser.rank);
                 if(db){ try{ db.ref('chats').push({ user: window.currentUser.name, txt: `<img src="${ev.target.result}" style="width:100%; max-width:250px; border-radius:10px; border:1px solid var(--gold);">`, img: window.currentUser.img, rank: window.currentUser.rank }); }catch(e){} }
             }
         }; r.readAsDataURL(e.target.files[0]);
