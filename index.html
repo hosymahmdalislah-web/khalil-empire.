@@ -22,7 +22,7 @@
         #chatBox { height: calc(100vh - 130px); overflow-y: auto; padding: 75px 15px 85px; display: flex; flex-direction: column; gap: 12px; background-size: cover; background-position: center; position: relative; background-color: #0f0f0f; }
         
         /* تصميم الرسائل */
-        .msg-wrap { display: flex; flex-direction: column; align-self: flex-start; max-width: 85%; margin-bottom: 5px; background: rgba(26, 26, 26, 0.9); padding: 10px; border-radius: 0 15px 15px 15px; border-right: 4px solid var(--gold); box-shadow: 2px 2px 8px rgba(0,0,0,0.4); text-align: right; position: relative; }
+        .msg-wrap { display:  flex; flex-direction: column; align-self: flex-start; max-width: 85%; margin-bottom: 5px; background: rgba(26, 26, 26, 0.9); padding: 10px; border-radius: 0 15px 15px 15px; border-right: 4px solid var(--gold); box-shadow: 2px 2px 8px rgba(0,0,0,0.4); text-align: right; position: relative; }
         .msg-header { display: flex; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 6px; }
         
         .pfp-main { width: 35px; height: 35px; border-radius: 50%; border: 1.5px solid var(--gold); object-fit: cover; cursor: pointer; }
@@ -107,7 +107,8 @@
         <div class="f-btn" id="authBtn" onclick="ui.showAuthModalDirect()" style="background: rgba(255,215,0,0.1); border-radius: 8px;">
             <i class="fas fa-key" style="color:var(--gold)"></i><span>المفتاح الملكي</span>
         </div>
-        <div class="f-btn" onclick="location.reload()"><i class="fas fa-sync-alt"></i>تحديث</div>
+        <!-- تم تعديل هذا الزر فقط -->
+        <div class="f-btn" onclick="ui.refreshChat()"><i class="fas fa-sync-alt"></i>تحديث</div>
     </div>
 </div>
 
@@ -223,6 +224,19 @@
     window.ui = {
         alert: (t) => alert(t),
         
+        // تم إضافة وظيفة التحديث هنا فقط
+        refreshChat: () => {
+            document.getElementById('chatBox').innerHTML = '';
+            if(db) {
+                db.ref('chats').off();
+                db.ref('chats').on('child_added', (snapshot) => {
+                    let msg = snapshot.val();
+                    if(msg) ui.renderMsg(msg.user, msg.txt, msg.img, msg.rank, msg.uid || "", msg.bgName||"", msg.frameColor||"");
+                });
+            }
+            ui.alert("تم تحديث الدردشة بنجاح دون الخروج من حسابك!");
+        },
+
         openQuickFields: () => { 
             document.getElementById('keyForm').style.display = 'none';
             document.getElementById('visitorForm').style.display = 'block'; 
