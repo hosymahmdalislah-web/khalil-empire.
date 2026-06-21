@@ -20,6 +20,18 @@
         * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; -webkit-tap-highlight-color: transparent; }
         body, html { margin: 0; padding: 0; height: 100vh; background: var(--dark-bg); color: #fff; overflow: hidden; }
 
+        /* تعديل جوهري لإخفاء لوحة الدخول افتراضياً لمنع ثغرة الـ 5 ثوانٍ */
+        #welcomeOverlay {
+            display: none; 
+            position: fixed; 
+            inset: 0; 
+            background: #0a0a0a; 
+            z-index: 9999999; 
+            align-items: center; 
+            justify-content: center; 
+            padding: 15px;
+        }
+
         .header-bar { position: fixed; top: 0; width: 100%; height: 65px; background: rgba(15, 15, 15, 0.98); display: flex; align-items: center; justify-content: space-around; z-index: 1000; border-bottom: 2px solid var(--gold); }
         .header-btn { color: #fff; font-size: 11px; text-align: center; cursor: pointer; flex: 1; }
         .header-btn i { display: block; font-size: 18px; color: var(--gold); margin-bottom: 2px; }
@@ -42,7 +54,9 @@
         .pfp-main-frame { width: 44px; height: 44px; border-radius: 50%; border: 2px solid var(--gold); box-shadow: 0 0 8px var(--gold); display: flex; align-items: center; justify-content: center; background: #000; flex-shrink: 0; }
         .pfp-main { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; cursor: pointer; }
         
-        .rank-free-trophy { font-size: 20px; color: var(--gold); display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; text-shadow: 0 0 10px rgba(255,215,0,0.8); animation: goldShine 2s infinite linear; }
+        /* كلاس مخصص لتأثير الكأس الملكي المضيء من التصميم */
+        .rank-free-trophy { font-size: 20px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; filter: drop-shadow(0 0 6px #ffd700); animation: crownGlow 1.5s ease-in-out infinite alternate; }
+        @keyframes crownGlow { from { filter: drop-shadow(0 0 4px #ffd700); } to { filter: drop-shadow(0 0 10px #ffae00); } }
         
         .king-name-tag { font-size: 14px; font-weight: bold; padding: 4px 10px; border-radius: 8px; border: 1px solid var(--gold); background: var(--user-bg-color); cursor: pointer; display: inline-flex; align-items: center; color: #ffd700; text-shadow: 0 0 5px rgba(255,215,0,0.5); }
         .msg-text { color: #fff; font-size: 14px; line-height: 1.5; margin-top: 6px; padding-right: 5px; }
@@ -55,7 +69,6 @@
         .f-btn { text-align: center; font-size: 10px; color: #fff; cursor: pointer; flex: 1; padding: 5px 0; }
         .f-btn i { display: block; font-size: 16px; margin-bottom: 2px; color: #fff; }
 
-        .king-overlay { display: flex; position: fixed; inset: 0; background: #0a0a0a; z-index: 9999999; align-items: center; justify-content: center; padding: 15px; }
         .king-card { background: var(--card-bg); width: 100%; max-width: 520px; max-height: 95vh; border: 3px solid var(--gold); border-radius: 20px; padding: 20px; overflow-y: auto; box-shadow: 0 0 25px rgba(255, 215, 0, 0.3); display: flex; flex-direction: column; }
         
         .btn-row { display: flex; justify-content: center; gap: 8px; margin: 15px 0; width: 100%; }
@@ -97,7 +110,7 @@
 
 <audio id="hiddenAudioNode" loop></audio>
 
-<div id="welcomeOverlay" class="king-overlay" style="display: flex;">
+<div id="welcomeOverlay">
     <div class="king-card">
         <h2 style="text-align:center; color:var(--gold); margin:0 0 5px;">شات حسوني | دردشة حسوني</h2>
         <p style="text-align:center; font-size:12px; margin:0 0 10px; color:#aaa;">أهلاً وسهلاً بكم في شات عربي دردشة عربية محمية بالكامل بالربط المباشر السحابي</p>
@@ -192,10 +205,6 @@
 </div>
 
 <script>
-    // ==========================================
-    // 💬 تعليق داخلي: تأخر وصول الرسالة إلى هاتفي الآخر ربما يعود لضغط الشبكة السحابية أو عمليات الفرز اللحظية لقاعدة البيانات Firestore.
-    // ==========================================
-    
     const firebaseConfig = {
         apiKey: "AIzaSyBbUsrOQrQMmeWkRdQwQ33IR8asdY5VpdM",
         authDomain: "khalil-chat.firebaseapp.com",
@@ -207,31 +216,64 @@
 
     if (!firebase.apps.length) {
         firebase.initializeApp(firebaseConfig);
+        firebase.firestore().enablePersistence().catch(()=>{});
     }
     const db = firebase.firestore();
 
     window.currentRoom = "العام";
     window.roomsList = ["العام", "ديوان الإمبراطورية", "ملوك الطرب والرياسة"];
     
-    window.rolesOrder = { "owner": 1, "prince": 2, "king": 3, "honor": 4, "member": 5, "guest": 6 };
-    window.rolesLabels = { "owner": "صاحب الموقع", "prince": "البرنس", "king": "الكنج", "honor": "الانروا", "member": "ماسي", "guest": "زائر" };
-    window.rolesIcons = { "owner": "fa-trophy", "prince": "fa-crown", "king": "fa-chess-king", "honor": "fa-star", "member": "fa-gem", "guest": "fa-user" };
+    // تم تحديث رتب الإدارة العليا بـ الكأس الملكي 🏆 المضيء
+    window.chatRanksData = {
+        "owner": { icon: "🏆", color: "#ffd700" },
+        "prince": { icon: "🏆🖤", color: "#000000" },
+        "king": { icon: "👑❤️", color: "#FF0000" },
+        "honor": { icon: "👑💙", color: "#0000FF" },
+        "admin": { icon: "👑💛", color: "#FFD700" },
+        "developer": { icon: "💻💚", color: "#00FF00" },
+        "senior_mod": { icon: "💎", color: "#00FFFF" },
+        "mod": { icon: "⭐", color: "#C0C0C0" },
+        "vip": { icon: "❤️‍🔥", color: "#FF4500" },
+        "diamond": { icon: "🔮", color: "#8A2BE2" },
+        "gold_member": { icon: "🪙", color: "#DAA520" },
+        "silver_member": { icon: "🥈", color: "#A9A9A9" },
+        "distinguished": { icon: "🔥", color: "#FF8C00" },
+        "interactive": { icon: "⚡", color: "#FFFF00" },
+        "active": { icon: "💓", color: "#FF69B4" },
+        "new": { icon: "🌱", color: "#32CD32" },
+        "guest": { icon: "👤", color: "#ffffff" }
+    };
+
+    window.rolesOrder = { 
+        "owner": 1, "prince": 2, "king": 3, "honor": 4, "admin": 5, 
+        "developer": 6, "senior_mod": 7, "mod": 8, "vip": 9, "diamond": 10, 
+        "gold_member": 11, "silver_member": 12, "distinguished": 13, "interactive": 14, 
+        "active": 15, "new": 16, "guest": 17 
+    };
 
     window.defaultOwnerData = { 
         uid: "owner_hassouni", name: "كاسر غرورك", role: "owner", level: 100, 
         img: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=150", 
-        label: "صاحب الموقع", iconClass: "fa-trophy", nameBg: "rgba(255,215,0,0.15)", 
+        nameBg: "rgba(255,215,0,0.15)", 
         cover: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=400",
         likes: 742, gifts: "تاج ذهبي، سيف ملكي", profileUrl: "hassouni.chat/king_1", age: 19, gender: "ذكر", country: "اليمن", status: "متصل بأناقة الملك الملكية 🏆",
         points: 5000, isMuted: false, isBanned: false
     };
 
     window.currentUser = null;
+    window.activeMessagesListener = null;
+    window.activeMicsListener = null;
+    window.activeRoomSettingsListener = null;
+    window.activeSessionListener = null;
 
-    // متغيرات مؤقتة لتخزين بيانات الصور المرفوعة بصيغة Base64
     window.tempUploadedCover = "";
     window.tempUploadedPfp = "";
     window.tempUploadedRoomBg = "";
+
+    function validateEmailAddress(email) {
+        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return re.test(String(email).toLowerCase());
+    }
 
     window.ui = {
         switchBranch: (id) => {
@@ -257,16 +299,20 @@
             let em = document.getElementById('kEmail').value.trim();
             let ps = document.getElementById('kPass').value;
             if(!n || !em || !ps) { alert("يرجى إدخال البيانات كاملة."); return; }
+            if(!validateEmailAddress(em)) { alert("صيغة البريد الإلكتروني غير صحيحة! يرجى إدخال بريد حقيقي."); return; }
             
+            let generatedToken = "token_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9);
             if(em === "ghrwrkk2@gmail.com") {
-                window.currentUser = window.defaultOwnerData;
+                window.currentUser = { ...window.defaultOwnerData };
                 window.currentUser.name = n;
+                window.currentUser.sessionToken = generatedToken;
             } else {
                 window.currentUser = { 
-                    uid: "u_"+Date.now(), name: n, role: "member", level: 50, 
-                    img: "https://cdn-icons-png.flaticon.com/512/1042/1042291.png", label: "ماسي", iconClass: "fa-gem", nameBg: "rgba(255,215,0,0.05)", 
+                    uid: "u_"+Date.now(), name: n, role: "diamond", level: 50, 
+                    img: "https://cdn-icons-png.flaticon.com/512/1042/1042291.png", nameBg: "rgba(255,215,0,0.05)", 
                     cover: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=400",
-                    likes: 0, gifts: "لا يوجد بعد", profileUrl: "none", age: 20, gender: "ذكر", country: "عربي", status: "عضو ماسي جديد", points: 10, isMuted: false, isBanned: false
+                    likes: 0, gifts: "لا يوجد بعد", profileUrl: "none", age: 20, gender: "ذكر", country: "عربي", status: "عضو ماسي جديد", points: 10, isMuted: false, isBanned: false,
+                    sessionToken: generatedToken
                 };
             }
             ui.saveUserToFirestoreAndSession(window.currentUser);
@@ -280,11 +326,13 @@
             let g = document.getElementById('vGender').value;
             if(!n || !a || !g) { alert("يرجى ملء كافة الحقول للدخول كزائر!"); return; }
             
+            let generatedToken = "token_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9);
             window.currentUser = { 
                 uid: "g_"+Date.now(), name: n, role: "guest", level: 1, 
-                img: "https://cdn-icons-png.flaticon.com/512/1042/1042291.png", label: "زائر", iconClass: "fa-user", nameBg: "transparent", 
+                img: "https://cdn-icons-png.flaticon.com/512/1042/1042291.png", nameBg: "transparent", 
                 cover: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=400",
-                likes: 0, gifts: "ممنوع للزوار", profileUrl: "none", age: a, gender: g, country: "غير محدد", status: "أنا زائر في شات حسوني", points: 0, isMuted: false, isBanned: false
+                likes: 0, gifts: "ممنوع للزوار", profileUrl: "none", age: a, gender: g, country: "غير مححدد", status: "أنا زائر في شات حسوني", points: 0, isMuted: false, isBanned: false,
+                sessionToken: generatedToken
             };
             ui.saveUserToFirestoreAndSession(window.currentUser);
             ui.enterChat();
@@ -295,15 +343,19 @@
             let emailInp = isNew ? document.getElementById('rEmail').value.trim() : userInp;
 
             if(!userInp || !passInp) { alert("البيانات ناقصة."); return; }
+            if(isNew && !validateEmailAddress(emailInp)) { alert("يرجى التحقق من صحة البريد الإلكتروني المكتوب!"); return; }
 
+            let generatedToken = "token_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9);
             if(userInp === "ghrwrkk2@gmail.com" || emailInp === "ghrwrkk2@gmail.com" || passInp === "owner123") {
-                window.currentUser = window.defaultOwnerData;
+                window.currentUser = { ...window.defaultOwnerData };
+                window.currentUser.sessionToken = generatedToken;
             } else {
                 window.currentUser = { 
-                    uid: "u_"+Date.now(), name: userInp, role: "member", level: 50, 
-                    img: "https://cdn-icons-png.flaticon.com/512/1042/1042291.png", label: "ماسي", iconClass: "fa-gem", nameBg: "rgba(255,215,0,0.05)", 
+                    uid: "u_"+Date.now(), name: userInp, role: "new", level: 50, 
+                    img: "https://cdn-icons-png.flaticon.com/512/1042/1042291.png", nameBg: "rgba(255,215,0,0.05)", 
                     cover: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=400",
-                    likes: 5, gifts: "وردة ترحيبية", profileUrl: "none", age: 21, gender: "ذكر", country: "الوطن العربي", status: "متواجد في الروم الماسي", points: 20, isMuted: false, isBanned: false
+                    likes: 5, gifts: "وردة ترحيبية", profileUrl: "none", age: 21, gender: "ذكر", country: "الوطن العربي", status: "متواجد في الروم الإمبراطوري", points: 20, isMuted: false, isBanned: false,
+                    sessionToken: generatedToken
                 };
             }
             ui.saveUserToFirestoreAndSession(window.currentUser);
@@ -322,25 +374,32 @@
                 }).catch(()=>{});
             }
         },
+        // تحديث الفحص المباشر: إذا وجد جلسة يدخل فوراً دون وميض لوحة الدخول، وإذا لم يجد يُظهرها فوراً
         checkSavedSessionOnLoad: () => {
             let savedUser = localStorage.getItem("hassouni_user_session");
             if(savedUser) {
                 window.currentUser = JSON.parse(savedUser);
                 db.collection("users").doc(window.currentUser.uid).get().then((doc)=>{
                     if(doc.exists){
-                        window.currentUser = doc.data();
-                        if(window.currentUser.isBanned) {
+                        let sData = doc.data();
+                        if(sData.isBanned) {
                             alert("لقد تم حظر حسابك من دخول السيرفر.");
                             ui.logoutBackToWelcome();
                             return;
                         }
+                        window.currentUser = sData;
                         localStorage.setItem("hassouni_user_session", JSON.stringify(window.currentUser));
                     }
                     document.getElementById('authBtn').style.display = 'none';
+                    document.getElementById('welcomeOverlay').style.display = 'none'; // ضمان الإخفاء
+                    ui.enterChat();
+                }).catch(() => {
+                    // في حال فشل الاتصال بالسيرفر، يدخل محلياً فوراً
                     document.getElementById('welcomeOverlay').style.display = 'none';
                     ui.enterChat();
                 });
             } else {
+                // العضو غير مسجل -> هنا فقط تظهر اللوحة فوراً
                 document.getElementById('welcomeOverlay').style.display = 'flex';
                 ui.switchBranch('b1');
             }
@@ -348,12 +407,32 @@
         enterChat: () => {
             document.getElementById('welcomeOverlay').style.display = 'none';
             ui.updateUserOnlineStatus(true);
+            ui.clearAllListeners();
             ui.listenToGlobalMessages();
             ui.listenToActiveMics();
             ui.listenToRoomSettings();
+            ui.listenToSessionSecurity();
+        },
+        clearAllListeners: () => {
+            if(window.activeMessagesListener) window.activeMessagesListener();
+            if(window.activeMicsListener) window.activeMicsListener();
+            if(window.activeRoomSettingsListener) window.activeRoomSettingsListener();
+            if(window.activeSessionListener) window.activeSessionListener();
+        },
+        listenToSessionSecurity: () => {
+            if(!window.currentUser || !window.currentUser.uid) return;
+            window.activeSessionListener = db.collection("users").doc(window.currentUser.uid).onSnapshot((doc) => {
+                if(doc.exists) {
+                    let data = doc.data();
+                    if(window.currentUser.sessionToken && data.sessionToken && data.sessionToken !== window.currentUser.sessionToken) {
+                        alert("تم تسجيل الدخول إلى هذا الحساب من هاتف أو متصفح آخر، سيتم خروجك الآن.");
+                        ui.logoutBackToWelcome();
+                    }
+                }
+            });
         },
         listenToRoomSettings: () => {
-            db.collection("room_settings").doc(window.currentRoom).onSnapshot((doc) => {
+            window.activeRoomSettingsListener = db.collection("room_settings").doc(window.currentRoom).onSnapshot((doc) => {
                 if(doc.exists) {
                     let data = doc.data();
                     if(data.roomBg) {
@@ -363,7 +442,7 @@
             });
         },
         listenToGlobalMessages: () => {
-            db.collection("rooms").doc(window.currentRoom).collection("messages")
+            window.activeMessagesListener = db.collection("rooms").doc(window.currentRoom).collection("messages")
               .orderBy("timestamp", "asc")
               .limit(70)
               .onSnapshot((snapshot) => {
@@ -377,7 +456,7 @@
               });
         },
         listenToActiveMics: () => {
-            db.collection("rooms").doc(window.currentRoom).collection("mics")
+            window.activeMicsListener = db.collection("rooms").doc(window.currentRoom).collection("mics")
               .onSnapshot((snapshot) => {
                   for(let i=1; i<=4; i++) {
                       let slot = document.getElementById(`mic_${i}`);
@@ -405,9 +484,10 @@
               });
         },
         refreshChatWindowOnly: () => {
-            ui.listenToGlobalMessages();
+            ui.enterChat();
             let box = document.getElementById('chatBox');
             box.scrollTop = box.scrollHeight;
+            alert("تم تحديث غرف الشات بنجاح ومزامنة السيرفر الفوري.");
         },
         sendMessage: () => {
             if(window.currentUser.isMuted) { alert("أنت مكتوم حالياً من قبل إدارة الموقع."); return; }
@@ -431,12 +511,15 @@
         renderMsg: (user, text, userId, docId) => {
             let div = document.createElement('div');
             div.className = 'msg-wrap';
-            let crownIconHtml = `<div class="rank-free-trophy"><i class="fas ${user.iconClass || 'fa-user'}"></i></div>`;
+            
+            let rankObj = window.chatRanksData[user.role] || { icon: "👤", color: "#fff" };
+            let crownIconHtml = `<div class="rank-free-trophy" style="color:${rankObj.color};">${rankObj.icon}</div>`;
+            
             div.innerHTML = `
                 <div class="msg-header">
                     <div class="pfp-main-frame"><img src="${user.img}" class="pfp-main" onclick="ui.viewProfileCard('${user.uid}')"></div>
                     ${crownIconHtml}
-                    <span class="king-name-tag" style="background:${user.nameBg || 'transparent'};" onclick="ui.quoteUserText('${user.name}', '${text}')">${user.name}</span>
+                    <span class="king-name-tag" style="background:${user.nameBg || 'transparent'}; color:${rankObj.color};" onclick="ui.quoteUserText('${user.name}', '${text}')">${user.name}</span>
                 </div>
                 <div class="msg-text">${text}</div>
             `;
@@ -508,12 +591,14 @@
                     return orderA - orderB;
                 });
 
-                document.getElementById('onlineUsersListBody').innerHTML = list.map(u => `
+                document.getElementById('onlineUsersListBody').innerHTML = list.map(u => {
+                    let rObj = window.chatRanksData[u.role] || { icon: "👤", color: "#fff" };
+                    return `
                     <div class="menu-item" onclick="ui.viewProfileCard('${u.uid}')">
-                        <span><i class="fas ${u.iconClass || 'fa-user'}" style="color:var(--gold); margin-left:5px;"></i> ${u.name}</span>
-                        <span style="font-size:11px; color:#aaa;">${u.label || 'عضو'}</span>
+                        <span style="color:${rObj.color};"><span style="margin-left:5px;">${rObj.icon}</span> ${u.name}</span>
+                        <span style="font-size:11px; color:#aaa;">⭐</span>
                     </div>
-                `).join('');
+                `}).join('');
             });
             m.style.display = 'block';
         },
@@ -551,8 +636,8 @@
                         </div>
 
                         <div class="profile-details-grid">
-                            <div class="profile-grid-row"><span>العمر:</span><span>${u.age || 'غير محدد'}</span></div>
-                            <div class="profile-grid-row"><span>الجنس:</span><span>${u.gender || 'غير محدد'}</span></div>
+                            <div class="profile-grid-row"><span>العمر:</span><span>${u.age || 'غير مححدد'}</span></div>
+                            <div class="profile-grid-row"><span>الجنس:</span><span>${u.gender || 'غير مححدد'}</span></div>
                             <div class="profile-grid-row"><span>البلد:</span><span>${u.country || 'العالم'}</span></div>
                             <div class="profile-grid-row"><span>رابط الملف:</span><span style="font-size:10px; color:#00bcff;">${u.profileUrl && u.profileUrl !== 'none' ? u.profileUrl : 'لا يوجد رابط'}</span></div>
                             <div class="profile-grid-row"><span>النقاط الملكية:</span><span>${u.points || 0} 💎</span></div>
@@ -573,7 +658,6 @@
             });
         },
 
-        // التعامل مع معالجة وتجهيز ملفات الصور المرفوعة محلياً
         handleLocalFileProcessing: (inputEl, type) => {
             let file = inputEl.files[0];
             if (!file) return;
@@ -647,7 +731,7 @@
             };
 
             db.collection("users").doc(uid).update(updated).then(() => {
-                alert("تم الحفظ والمزامنة الفورية بنجاح!");
+                alert("تم الحفظ والمزامنة الفورية بنجاح للغلاف والبروفايل!");
                 if(window.currentUser.uid === uid) {
                     window.currentUser = { ...window.currentUser, ...updated };
                     localStorage.setItem("hassouni_user_session", JSON.stringify(window.currentUser));
@@ -662,14 +746,24 @@
                 document.getElementById('featureModalTitle').innerText = `إدارة حساب العضو: ${u.name}`;
                 document.getElementById('featureModalBody').innerHTML = `
                     <div style="text-align:right;">
-                        <label style="font-size:12px; color:var(--gold);">تغيير الرتبة الملكية:</label>
+                        <label style="font-size:12px; color:var(--gold);">تغيير الرتبة الملكية (الـ 15 رتبة الحصرية):</label>
                         <select id="changeRoleSelect" class="form-select" onchange="ui.changeUserRole('${uid}', this.value)">
-                            <option value="owner" ${u.role === 'owner' ? 'selected' : ''}>صاحب الموقع</option>
-                            <option value="prince" ${u.role === 'prince' ? 'selected' : ''}>البرنس</option>
-                            <option value="king" ${u.role === 'king' ? 'selected' : ''}>الكنج</option>
-                            <option value="honor" ${u.role === 'honor' ? 'selected' : ''}>الانروا</option>
-                            <option value="member" ${u.role === 'member' ? 'selected' : ''}>ماسي</option>
-                            <option value="guest" ${u.role === 'guest' ? 'selected' : ''}>زائر</option>
+                            <option value="owner" ${u.role === 'owner' ? 'selected' : ''}>1- البرنس الأصلي (الكأس 🏆)</option>
+                            <option value="prince" ${u.role === 'prince' ? 'selected' : ''}>1- برنس (كاس اسود 🏆🖤)</option>
+                            <option value="king" ${u.role === 'king' ? 'selected' : ''}>2- كنج (تاج احمر 👑❤️)</option>
+                            <option value="honor" ${u.role === 'honor' ? 'selected' : ''}>3- انروا (تاج ازرق 👑💙)</option>
+                            <option value="admin" ${u.role === 'admin' ? 'selected' : ''}>4- ادمان (تاج ذهبي 👑💛)</option>
+                            <option value="developer" ${u.role === 'developer' ? 'selected' : ''}>5- مطور (💻💚)</option>
+                            <option value="senior_mod" ${u.role === 'senior_mod' ? 'selected' : ''}>6- مشرف أول (💎)</option>
+                            <option value="mod" ${u.role === 'mod' ? 'selected' : ''}>7- مشرف (⭐)</option>
+                            <option value="vip" ${u.role === 'vip' ? 'selected' : ''}>8- VIP (❤️‍🔥)</option>
+                            <option value="diamond" ${u.role === 'diamond' ? 'selected' : ''}>9- عضو ماسي (🔮)</option>
+                            <option value="gold_member" ${u.role === 'gold_member' ? 'selected' : ''}>10- عضو ذهبي (🪙)</option>
+                            <option value="silver_member" ${u.role === 'silver_member' ? 'selected' : ''}>11- عضو فضي (🥈)</option>
+                            <option value="distinguished" ${u.role === 'distinguished' ? 'selected' : ''}>12- متميز (🔥)</option>
+                            <option value="interactive" ${u.role === 'interactive' ? 'selected' : ''}>13- متفاعل (⚡)</option>
+                            <option value="active" ${u.role === 'active' ? 'selected' : ''}>14- عضو نشط (💓)</option>
+                            <option value="new" ${u.role === 'new' ? 'selected' : ''}>15- عضو جديد (🌱)</option>
                         </select>
                         <hr style="border-color:#333;">
                         <button class="send-btn" style="width:100%; margin-bottom:8px; background:${u.isMuted ? '#2ecc71' : '#f39c12'}; color:#fff;" onclick="ui.toggleUserMute('${uid}', ${!u.isMuted})">
@@ -686,10 +780,8 @@
         },
 
         changeUserRole: (uid, newRole) => {
-            let label = window.rolesLabels[newRole];
-            let icon = window.rolesIcons[newRole];
-            db.collection("users").doc(uid).update({ role: newRole, label: label, iconClass: icon }).then(() => {
-                alert("تم تحديث رتبة العضو بنجاح!");
+            db.collection("users").doc(uid).update({ role: newRole }).then(() => {
+                alert("تم تحديث رتبة العضو البرمجية السحابية بنجاح!");
             });
         },
         toggleUserMute: (uid, state) => {
@@ -771,10 +863,11 @@
                 </div>
             ` : '';
 
+            // تم إدراج الـ Glow والتأثير النيوني للكأس الذهبي عند فتح الغرف
             document.getElementById('featureModalBody').innerHTML = `
                 ${createRoomBtn}
                 <div id="roomsContainerList">
-                    ${window.roomsList.map(r => `<div class="menu-item" onclick="ui.changeActiveRoom('${r}')">${r} ${window.currentRoom === r ? '⭐' : ''}</div>`).join('')}
+                    ${window.roomsList.map(r => `<div class="menu-item" onclick="ui.changeActiveRoom('${r}')">${r} ${window.currentRoom === r ? '<span style="color: #FFD700; font-size: 1.2rem; margin-left: 5px; filter: drop-shadow(0 0 5px #FFD700); font-weight: bold;">🏆</span>' : ''}</div>`).join('')}
                 </div>
             `;
             document.getElementById('featureModal').style.display = 'flex';
@@ -793,7 +886,7 @@
         changeActiveRoom: (r) => { 
             window.currentRoom = r; document.getElementById('chatBox').innerHTML = ""; 
             document.getElementById('featureModal').style.display = 'none'; 
-            ui.listenToGlobalMessages(); ui.listenToActiveMics(); ui.listenToRoomSettings();
+            ui.enterChat();
         },
 
         logoutBackToWelcome: () => {
