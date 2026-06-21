@@ -65,6 +65,8 @@
         .branch-content { display: none; background: #161616; padding: 15px; border-radius: 8px; border: 1px solid #333; margin-bottom: 15px; }
         .form-control { width: 100%; padding: 11px; margin-bottom: 11px; background: #222; border: 1px solid #444; color: #fff; border-radius: 8px; outline: none; text-align: right; }
         .form-select { width: 100%; padding: 11px; margin-bottom: 11px; background: #222; border: 1px solid #444; color: #fff; border-radius: 8px; text-align: right; }
+        .file-input-label { display: block; width: 100%; padding: 11px; margin-bottom: 11px; background: #2a2a2a; border: 1px dashed var(--gold); color: var(--gold); border-radius: 8px; text-align: center; cursor: pointer; font-size: 13px; font-weight: bold; }
+        .file-input-hidden { display: none; }
         
         .info-scroll-box { background: rgba(255,255,255,0.02); border: 1px solid #333; padding: 12px; border-radius: 10px; font-size: 12px; line-height: 1.6; color: #ccc; margin-top: 5px; text-align: right; }
 
@@ -75,7 +77,6 @@
         .menu-item { padding: 12px; border-bottom: 1px solid #222; cursor: pointer; display: flex; align-items: center; gap: 10px; font-size: 14px; color: #fff; justify-content: space-between; }
         .menu-item:hover { background: rgba(255,255,255,0.03); }
 
-        /* تصفيف كرت البروفايل الإمبراطوري المتكامل */
         .profile-card-wrapper { text-align: center; color: #fff; position: relative; }
         .profile-card-cover { width: 100%; height: 140px; border-radius: 10px; object-fit: cover; border: 1px solid #333; }
         .profile-card-pfp { width: 90px; height: 90px; border-radius: 50%; border: 3px solid var(--gold); margin-top: -45px; object-fit: cover; background: #111; position: relative; z-index: 2; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
@@ -192,8 +193,9 @@
 
 <script>
     // ==========================================
-    // ✅ إعدادات FIREBASE
+    // 💬 تعليق داخلي: تأخر وصول الرسالة إلى هاتفي الآخر ربما يعود لضغط الشبكة السحابية أو عمليات الفرز اللحظية لقاعدة البيانات Firestore.
     // ==========================================
+    
     const firebaseConfig = {
         apiKey: "AIzaSyBbUsrOQrQMmeWkRdQwQ33IR8asdY5VpdM",
         authDomain: "khalil-chat.firebaseapp.com",
@@ -211,7 +213,6 @@
     window.currentRoom = "العام";
     window.roomsList = ["العام", "ديوان الإمبراطورية", "ملوك الطرب والرياسة"];
     
-    // مصفوفة ترتيب الرتب حسب الأولوية المطلوبة
     window.rolesOrder = { "owner": 1, "prince": 2, "king": 3, "honor": 4, "member": 5, "guest": 6 };
     window.rolesLabels = { "owner": "صاحب الموقع", "prince": "البرنس", "king": "الكنج", "honor": "الانروا", "member": "ماسي", "guest": "زائر" };
     window.rolesIcons = { "owner": "fa-trophy", "prince": "fa-crown", "king": "fa-chess-king", "honor": "fa-star", "member": "fa-gem", "guest": "fa-user" };
@@ -226,6 +227,11 @@
     };
 
     window.currentUser = null;
+
+    // متغيرات مؤقتة لتخزين بيانات الصور المرفوعة بصيغة Base64
+    window.tempUploadedCover = "";
+    window.tempUploadedPfp = "";
+    window.tempUploadedRoomBg = "";
 
     window.ui = {
         switchBranch: (id) => {
@@ -320,7 +326,6 @@
             let savedUser = localStorage.getItem("hassouni_user_session");
             if(savedUser) {
                 window.currentUser = JSON.parse(savedUser);
-                // تحديث البيانات لحظياً من السيرفر للتأكد من الرتبة المحدثة أو الحظر
                 db.collection("users").doc(window.currentUser.uid).get().then((doc)=>{
                     if(doc.exists){
                         window.currentUser = doc.data();
@@ -445,7 +450,7 @@
             if(!slot.classList.contains('occupied')) {
                 document.getElementById('featureModalTitle').innerText = "🎙️ طلب الصعود للمصطبة السحابية";
                 document.getElementById('featureModalBody').innerHTML = `
-                    <p style="text-align:center; font-size:15px;">هل تريد الصعود والحديث على مايك رقم [ ${num} ] ليسمعك الجميع؟</p>
+                    <p style="text-align:center; font-size:15px;">هل تريد الصعود والحديث على مايك رقم [ ${num} ] ليسمعك الجميع?</p>
                     <div style="display:flex; gap:10px; margin-top:15px;">
                         <button class="send-btn" style="flex:1; border-radius:8px;" onclick="ui.confirmMicGoingUp(true)">نعم</button>
                         <button class="send-btn" style="flex:1; background:#7f8c8d; color:#fff; border-radius:8px;" onclick="ui.confirmMicGoingUp(false)">إلغاء</button>
@@ -491,14 +496,12 @@
             audioNode.pause(); audioNode.src = ""; document.getElementById('featureModal').style.display = 'none';
         },
         
-        // المتواجدين مع الترتيب الملكي الدقيق حسب الرتبة
         toggleOnlineUsers: () => {
             let m = document.getElementById('onlineUsersHalfModal');
             if(m.style.display === 'block') { m.style.display = 'none'; return; }
             db.collection("users").get().then((snap) => {
                 let list = []; snap.forEach(doc => list.push(doc.data()));
                 
-                // عملية الفرز والترتيب
                 list.sort((a, b) => {
                     let orderA = window.rolesOrder[a.role] || 99;
                     let orderB = window.rolesOrder[b.role] || 99;
@@ -515,7 +518,6 @@
             m.style.display = 'block';
         },
 
-        // عرض كرت البروفايل الإمبراطوري المتكامل
         viewProfileCard: (uid) => {
             db.collection("users").doc(uid).get().then((doc) => {
                 if(!doc.exists) return;
@@ -571,19 +573,43 @@
             });
         },
 
-        // فتح نافذة التعديل
+        // التعامل مع معالجة وتجهيز ملفات الصور المرفوعة محلياً
+        handleLocalFileProcessing: (inputEl, type) => {
+            let file = inputEl.files[0];
+            if (!file) return;
+            let reader = new FileReader();
+            reader.onload = (e) => {
+                if (type === 'cover') {
+                    window.tempUploadedCover = e.target.result;
+                    alert("تم تحميل صورة الغلاف من جهازك بنجاح وجاهزة للحفظ!");
+                } else if (type === 'pfp') {
+                    window.tempUploadedPfp = e.target.result;
+                    alert("تم تحميل الصورة الشخصية من جهازك بنجاح وجاهزة للحفظ!");
+                } else if (type === 'roomBg') {
+                    window.tempUploadedRoomBg = e.target.result;
+                    alert("تم تحميل خلفية الغرفة من جهازك بنجاح وجاهزة للمزامنة!");
+                }
+            };
+            reader.readAsDataURL(file);
+        },
+
         openEditProfileModal: (uid) => {
             if(window.currentUser.role === 'guest') { alert("لا يمكن للزوار تعديل الملف الشخصي، يرجى التسجيل أولاً!"); return; }
             db.collection("users").doc(uid).get().then((doc) => {
                 let u = doc.data();
+                window.tempUploadedCover = u.cover || "";
+                window.tempUploadedPfp = u.img || "";
+                
                 document.getElementById('featureModalTitle').innerText = "تعديل بيانات الملف الشخصي";
                 document.getElementById('featureModalBody').innerHTML = `
                     <div style="text-align:right;">
-                        <label style="font-size:12px; color:var(--gold);">صورة الغلاف (رابط مباشر):</label>
-                        <input type="text" id="editCover" class="form-control" value="${u.cover || ''}">
+                        <label style="font-size:12px; color:var(--gold); font-weight:bold;">صورة الغلاف (تحميل ملف):</label>
+                        <label for="fileCover" class="file-input-label"><i class="fas fa-upload"></i> اختر صورة غلاف من ملفاتك</label>
+                        <input type="file" id="fileCover" class="file-input-hidden" accept="image/*" onchange="ui.handleLocalFileProcessing(this, 'cover')">
                         
-                        <label style="font-size:12px; color:var(--gold);">الصورة الشخصية (رابط مباشر):</label>
-                        <input type="text" id="editImg" class="form-control" value="${u.img || ''}">
+                        <label style="font-size:12px; color:var(--gold); font-weight:bold;">الصورة الشخصية (تحميل ملف):</label>
+                        <label for="filePfp" class="file-input-label"><i class="fas fa-image"></i> اختر صورة بروفايل من ملفاتك</label>
+                        <input type="file" id="filePfp" class="file-input-hidden" accept="image/*" onchange="ui.handleLocalFileProcessing(this, 'pfp')">
                         
                         <label style="font-size:12px; color:var(--gold);">الاسم المستعار:</label>
                         <input type="text" id="editName" class="form-control" value="${u.name || ''}">
@@ -611,8 +637,8 @@
 
         saveProfileEdits: (uid) => {
             let updated = {
-                cover: document.getElementById('editCover').value.trim(),
-                img: document.getElementById('editImg').value.trim(),
+                cover: window.tempUploadedCover,
+                img: window.tempUploadedPfp,
                 name: document.getElementById('editName').value.trim(),
                 age: document.getElementById('editAge').value.trim(),
                 gender: document.getElementById('editGender').value,
@@ -630,7 +656,6 @@
             });
         },
 
-        // لوحة الإجراءات الخاصة بصاحب الموقع فقط
         openAdminControls: (uid) => {
             db.collection("users").doc(uid).get().then((doc) => {
                 let u = doc.data();
@@ -688,15 +713,16 @@
             }
         },
 
-        // إدارة الإعدادات الذكية مع حماية العادية
         openGlobalSettings: () => {
             document.getElementById('featureModalTitle').innerText = "الإعدادات العامة للروم";
             let isOwner = (window.currentUser.role === 'owner');
+            window.tempUploadedRoomBg = "";
             
             let adminFields = isOwner ? `
                 <div style="border-top:1px solid var(--gold); padding-top:10px; margin-top:10px; text-align:right;">
-                    <label style="font-size:12px; color:var(--gold);">تغيير خلفية الروم (رابط صورة):</label>
-                    <input type="text" id="settingRoomBg" class="form-control" placeholder="ضع رابط الصورة هنا...">
+                    <label style="font-size:12px; color:var(--gold); font-weight:bold;">تغيير خلفية الروم (تحميل ملف من جهازك):</label>
+                    <label for="fileRoomBg" class="file-input-label"><i class="fas fa-images"></i> اختيار صورة خلفية للغرفة</label>
+                    <input type="file" id="fileRoomBg" class="file-input-hidden" accept="image/*" onchange="ui.handleLocalFileProcessing(this, 'roomBg')">
                     <button class="send-btn" style="width:100%; margin-bottom:8px;" onclick="ui.saveRoomBgSetting()">تحديث خلفية الروم سحابياً</button>
                     
                     <label style="font-size:12px; color:var(--gold);">تعيين ملك أو مسؤول للروم الحالية:</label>
@@ -718,10 +744,10 @@
         },
 
         saveRoomBgSetting: () => {
-            let url = document.getElementById('settingRoomBg').value.trim();
-            if(!url) return;
-            db.collection("room_settings").doc(window.currentRoom).set({ roomBg: url }, { merge: true }).then(() => {
+            if(!window.tempUploadedRoomBg) { alert("الرجاء اختيار ملف صورة أولاً"); return; }
+            db.collection("room_settings").doc(window.currentRoom).set({ roomBg: window.tempUploadedRoomBg }, { merge: true }).then(() => {
                 alert("تم تغيير وتثبيت خلفية الروم بنجاح لجميع المتواجدين!");
+                document.getElementById('featureModal').style.display = 'none';
             });
         },
 
@@ -735,7 +761,6 @@
             }
         },
 
-        // إدارة الغرف مع زر مخفي لإنشاء روم
         openRoomsManager: () => {
             document.getElementById('featureModalTitle').innerText = "الغرف الإمبراطورية المتوفرة";
             
