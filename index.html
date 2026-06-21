@@ -6,7 +6,6 @@
     <title>شات حسوني - النسخة الإمبراطورية السحابية</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
-    <!-- تضمين مكتبات Firebase الرسمية المتوافقة مع المتصفح -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
@@ -189,18 +188,17 @@
 
 <script>
     // ==========================================
-    // ⚠️ إعدادات تهيئة مشروع FIREBASE الخاص بك ⚠️
+    // ✅ إعدادات FIREBASE الخاصة بك (تم دمجها بنجاح)
     // ==========================================
     const firebaseConfig = {
-        apiKey: "ضع_هنا_API_KEY",
-        authDomain: "ضع_هنا_AUTH_DOMAIN",
-        projectId: "ضع_هنا_PROJECT_ID",
-        storageBucket: "ضع_هنا_STORAGE_BUCKET",
-        messagingSenderId: "ضع_هنا_MESSAGING_SENDER_ID",
-        appId: "ضع_هنا_APP_ID"
+        apiKey: "AIzaSyBbUsrOQrQMmeWkRdQwQ33IR8asdY5VpdM",
+        authDomain: "khalil-chat.firebaseapp.com",
+        projectId: "khalil-chat",
+        storageBucket: "khalil-chat.firebasestorage.app",
+        messagingSenderId: "684465803980",
+        appId: "1:684465803980:web:12a2459463a5b3a72c2869"
     };
 
-    // تشغيل الـ Firebase والـ Firestore ومنع تكرار التهيئة
     if (!firebase.apps.length) {
         firebase.initializeApp(firebaseConfig);
     }
@@ -209,7 +207,6 @@
     window.currentRoom = "العام";
     window.roomsList = ["العام", "ديوان الإمبراطورية", "ملوك الطرب والرياسة"];
     
-    // المالك الإمبراطوري الافتراضي للموقع
     window.defaultOwnerData = { 
         uid: "owner_hassouni", name: "كاسر غرورك", role: "owner", level: 100, 
         img: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=150", 
@@ -327,7 +324,6 @@
             ui.listenToGlobalMessages();
             ui.listenToActiveMics();
         },
-        // 🔥 الاستماع السحابي الحي واللحظي للرسائل
         listenToGlobalMessages: () => {
             db.collection("rooms").doc(window.currentRoom).collection("messages")
               .orderBy("timestamp", "asc")
@@ -335,21 +331,16 @@
               .onSnapshot((snapshot) => {
                   let chatBox = document.getElementById('chatBox');
                   chatBox.innerHTML = "";
-                  
-                  // رسالة الترحيب الافتراضية الثابتة للمالك
                   ui.renderMsg(window.defaultOwnerData, "مرحباً بكم في شات حسوني الإمبراطوري الحصري والآمن 🏆🔥", false);
-                  
                   snapshot.forEach((doc) => {
                       let mData = doc.data();
                       ui.renderMsg(mData.user, mData.text, false);
                   });
               });
         },
-        // 🔥 الاستماع السحابي الحي للمايكات على الهاتف الآخر
         listenToActiveMics: () => {
             db.collection("rooms").doc(window.currentRoom).collection("mics")
               .onSnapshot((snapshot) => {
-                  // تصفير المايكات محلياً أولاً
                   for(let i=1; i<=4; i++) {
                       let slot = document.getElementById(`mic_${i}`);
                       slot.classList.remove('occupied'); slot.style.backgroundImage = 'none';
@@ -357,12 +348,10 @@
                       document.getElementById(`glow_${i}`).style.display = 'none';
                       document.getElementById(`mBadge_${i}`).style.display = 'none';
                   }
-                  // تطبيق القادم من السيرفر السحابي
                   snapshot.forEach((doc) => {
                       let micData = doc.data();
                       let num = micData.micNum;
                       let slot = document.getElementById(`mic_${num}`);
-                      
                       slot.classList.add('occupied');
                       slot.style.backgroundImage = `url('${micData.userImg}')`;
                       document.getElementById(`micName_${num}`).innerText = micData.userName;
@@ -385,8 +374,6 @@
         sendMessage: () => {
             let inp = document.getElementById('msgInp');
             let t = inp.value.trim(); if(!t) return;
-            
-            // دفع الرسالة إلى Firebase لكي تظهر فوراً على الهواتف الأخرى
             db.collection("rooms").doc(window.currentRoom).collection("messages").add({
                 user: window.currentUser,
                 text: t,
@@ -447,19 +434,13 @@
             document.getElementById('featureModal').style.display = 'none';
             if(!status) return;
             let num = window.selectedMicNum;
-            
             db.collection("rooms").doc(window.currentRoom).collection("mics").doc(`mic_${num}`).set({
-                micNum: num,
-                userId: window.currentUser.uid,
-                userName: window.currentUser.name,
-                userImg: window.currentUser.img,
-                isMuted: false
+                micNum: num, userId: window.currentUser.uid, userName: window.currentUser.name,
+                userImg: window.currentUser.img, isMuted: false
             });
         },
         toggleMicVoiceState: (num, shouldMute) => {
-            db.collection("rooms").doc(window.currentRoom).collection("mics").doc(`mic_${num}`).update({
-                isMuted: shouldMute
-            });
+            db.collection("rooms").doc(window.currentRoom).collection("mics").doc(`mic_${num}`).update({ isMuted: shouldMute });
             document.getElementById('featureModal').style.display = 'none';
         },
         vacateMicSlot: (num) => {
@@ -467,30 +448,9 @@
             document.getElementById('featureModal').style.display = 'none';
         },
         openYouTubeSearchEngine: () => {
-            document.getElementById('featureModalTitle').innerText = "📺 محرك بحث يوتيوب الصوتي الحقيقي";
-            document.getElementById('featureModalBody').innerHTML = `
-                <input type="text" id="ytQuery" class="form-control" placeholder="اكتب اسم الفنان والأغنية المطلوبة بالكلمات الحقيقية..." oninput="ui.triggerYtSimulatedSearch()">
-                <div id="ytResultsContainer" style="margin-top:10px; max-height:230px; overflow-y:auto; display:flex; flex-direction:column; gap:6px;"></div>
-            `;
+            document.getElementById('featureModalTitle').innerText = "📺 محرك بحث يوتيوب";
+            document.getElementById('featureModalBody').innerHTML = `<input type="text" id="ytQuery" class="form-control" placeholder="ابحث عن أغنية...">`;
             document.getElementById('featureModal').style.display = 'flex';
-        },
-        triggerYtSimulatedSearch: () => {
-            let q = document.getElementById('ytQuery').value.trim();
-            let box = document.getElementById('ytResultsContainer'); if(!q) { box.innerHTML = ""; return; }
-            let mockResults = [
-                { title: `الفنان المعتمد الأصلي - أغنية ${q} (نسخة الاستوديو الفخمة)`, duration: "4:30" }
-            ];
-            box.innerHTML = mockResults.map(item => `
-                <div class="song-option" style="padding:10px; background:#1b1b1b; border-radius:6px; cursor:pointer; text-align:right; border:1px solid #333;" onclick="ui.playHiddenRoomAudio('${item.title}')">
-                    <div style="color:var(--gold); font-weight:bold; font-size:12px;"><i class="fab fa-youtube" style="color:#ff3333; margin-left:5px;"></i> ${item.title}</div>
-                </div>
-            `).join('');
-        },
-        playHiddenRoomAudio: (title) => {
-            document.getElementById('featureModal').style.display = 'none';
-            let audioNode = document.getElementById('hiddenAudioNode');
-            audioNode.src = "https://www.w3schools.com/html/horse.mp3"; audioNode.play();
-            alert(`جاري تشغيل الأغنية المطلوبة صوتياً بالخلفية للروم الكامل!`);
         },
         stopHiddenAudioPlayback: () => {
             let audioNode = document.getElementById('hiddenAudioNode');
@@ -499,23 +459,10 @@
         toggleOnlineUsers: () => {
             let m = document.getElementById('onlineUsersHalfModal');
             if(m.style.display === 'block') { m.style.display = 'none'; return; }
-            
-            // جلب المتواجدين الحقيقيين المشتركين عبر السيرفر
-            db.collection("users").get().then((querySnapshot) => {
-                let activeUsersList = [];
-                querySnapshot.forEach((doc) => {
-                    activeUsersList.push(doc.data());
-                });
-                activeUsersList.sort((a,b) => b.level - a.level);
-                
-                document.getElementById('onlineUsersListBody').innerHTML = activeUsersList.map(u => `
-                    <div class="menu-item">
-                        <div style="display:flex; align-items:center; gap:10px;">
-                            <img src="${u.img}" style="width:36px; height:36px; border-radius:50%; border:2px solid var(--gold);">
-                            <span style="font-weight:bold; color:#fff;">${u.name}</span>
-                        </div>
-                        <span style="background:var(--king-grad); color:#000; font-size:10px; font-weight:bold; padding:2px 8px; border-radius:10px;">${u.label}</span>
-                    </div>
+            db.collection("users").get().then((snap) => {
+                let list = []; snap.forEach(doc => list.push(doc.data()));
+                document.getElementById('onlineUsersListBody').innerHTML = list.map(u => `
+                    <div class="menu-item"><span>${u.name}</span><span>${u.label}</span></div>
                 `).join('');
             });
             m.style.display = 'block';
@@ -527,208 +474,41 @@
             reader.onload = (e) => {
                 window.currentUser[targetField] = e.target.result;
                 ui.saveUserToFirestoreAndSession(window.currentUser);
-                alert("تم تحميل الصورة بنجاح وتحديثها سحابياً للجميع!");
             };
             reader.readAsDataURL(file);
         },
         viewProfileCard: (uid) => {
             db.collection("users").doc(uid).get().then((doc) => {
-                if(!doc.exists) { alert("الملف غير متوفر سحابياً"); return; }
                 let u = doc.data();
                 window.targetProfileId = uid;
-                let isMe = (window.currentUser.uid === uid);
-                let isGuest = (window.currentUser.role === 'guest');
-                let isKing = (window.currentUser.uid === 'owner_hassouni');
-                
-                document.getElementById('featureModalTitle').innerText = isMe ? `🎴 كرت بروفايلي الشخصي المباشر` : `🎴 كرت بروفايل العضو الفاخر`;
-                let htmlContent = "";
-
-                if (isMe) {
-                    if(isGuest) {
-                        htmlContent = `
-                            <div class="profile-container" style="padding:20px;">
-                                <img src="${u.img}" class="profile-avatar" style="margin:0 auto; display:block;">
-                                <h3>${u.name} (حساب زائر)</h3>
-                                <p style="color:#e74c3c; font-size:12px; font-weight:bold; background:rgba(231,76,60,0.1); padding:10px; border-radius:8px;">⚠️ عذراً يا غالي، تعديل الملف الشخصي مقفل تماماً للزوار! يرجى كسب رتبة ماسي لتستمتع بكافة الميزات.</p>
-                            </div>
-                        `;
-                    } else {
-                        htmlContent = `
-                            <div class="profile-container">
-                                <img src="${u.cover}" class="profile-banner" id="pCardBannerView">
-                                <img src="${u.img}" class="profile-avatar" id="pCardAvatarView">
-                                <h3>${u.name}</h3>
-                                <div style="font-size:24px; color:var(--gold); margin-top:-5px;"><i class="fas ${u.iconClass}"></i></div>
-                                
-                                <div style="background:#181818; padding:12px; border-radius:8px; border:1px solid var(--gold); margin-top:10px; text-align:right;">
-                                    <span style="color:var(--gold); font-size:12px; font-weight:bold;"><i class="fas fa-user-edit"></i> تعديل بيانات ملفي السحابي:</span>
-                                    <label style="font-size:11px; color:#aaa; display:block; margin-top:5px;">تعديل الاسم المستعار:</label>
-                                    <input type="text" id="editNameInp" class="profile-editable-input" value="${u.name}">
-                                    
-                                    <label style="font-size:11px; color:#aaa; display:block; margin-top:5px;">اختر صورتك الشخصية:</label>
-                                    <input type="file" id="localAvatarFile" accept="image/*" class="file-upload-btn" onchange="ui.handleLocalFileConvert('localAvatarFile', 'img', '${uid}')">
-                                    
-                                    <label style="font-size:11px; color:#aaa; display:block; margin-top:5px;">اختر غلاف بروفايلك:</label>
-                                    <input type="file" id="localCoverFile" accept="image/*" class="file-upload-btn" onchange="ui.handleLocalFileConvert('localCoverFile', 'cover', '${uid}')">
-                                    
-                                    <label style="font-size:11px; color:#aaa; display:block; margin-top:5px;">لون خلفية الاسم:</label>
-                                    <input type="text" id="editColorInp" class="profile-editable-input" value="${u.nameBg}">
-                                    <button class="send-btn" style="width:100%; height:34px; font-size:12px; border-radius:6px; margin-top:8px;" onclick="ui.saveProfileChangesData()">حفظ وتطبيق التغييرات فورا</button>
-                                </div>
-                            </div>
-                        `;
-                    }
-                } else {
-                    let adminControlHtml = "";
-                    if (isKing) {
-                        adminControlHtml = `
-                            <div style="background:#1a1111; padding:10px; border-radius:8px; border:1px solid #e74c3c; margin-top:10px; text-align:right;">
-                                <span style="color:#e74c3c; font-size:11px; font-weight:bold;"><i class="fas fa-gavel"></i> صلاحيات المالك الحصرية:</span>
-                                <div style="margin-top:5px;">
-                                    <input type="text" id="admEditName" class="form-control" style="padding:6px; margin-bottom:5px; font-size:11px;" value="${u.name}">
-                                    <button class="send-btn" style="height:25px; font-size:10px; width:100%;" onclick="ui.kingForceEditUser('${uid}')">تطبيق تعديل الاسم 🛠️</button>
-                                </div>
-                                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px; margin-top:8px;">
-                                    <button class="send-btn" style="background:#f39c12; color:#000; height:28px; font-size:11px;" onclick="ui.kingGrantRank('${uid}')">منح رتبة 👑</button>
-                                    <button class="send-btn" style="background:#c0392b; color:#fff; height:28px; font-size:11px;" onclick="alert('تم الحظر')">حظر العضو 🚫</button>
-                                    <button class="send-btn" style="background:#d35400; color:#fff; height:28px; font-size:11px;" onclick="alert('تم الكتم')">كتم العضو 🔇</button>
-                                    <button class="send-btn" style="background:#e67e22; color:#fff; height:28px; font-size:11px;" onclick="alert('تم الطرد')">طرد العضو 🚪</button>
-                                </div>
-                                <button class="send-btn" style="background:#7f8c8d; color:#fff; width:100%; height:28px; font-size:11px; margin-top:5px;" onclick="ui.kingDeleteAccount('${uid}')">❌ حذف حسابه نهائياً</button>
-                            </div>
-                        `;
-                    }
-                    htmlContent = `
-                        <div class="profile-container">
-                            <img src="${u.cover}" class="profile-banner">
-                            <img src="${u.img}" class="profile-avatar">
-                            <h3>${u.name}</h3>
-                            <div style="font-size:24px; color:var(--gold); margin-top:-5px;"><i class="fas ${u.iconClass}"></i></div>
-                            <div class="profile-grid-info">
-                                <div class="grid-item-data"><b>👍 اللايكات:</b> ${u.likes} إعجاب</div>
-                                <div class="grid-item-data"><b>⭐ المستوى:</b> ${u.level}</div>
-                                <div class="grid-item-data"><b>🎁 الهدايا:</b> ${u.gifts}</div>
-                                <div class="grid-item-data"><b>🎂 العمر:</b> ${u.age} سنة</div>
-                                <div class="grid-item-data"><b>🧬 الجنس:</b> ${u.gender}</div>
-                                <div class="grid-item-data"><b>🌍 البلد:</b> ${u.country}</div>
-                                <div class="grid-item-data" style="grid-column: span 2;"><b>📝 الحالة:</b> ${u.status}</div>
-                                <div class="grid-item-data" style="grid-column: span 2; word-break:break-all;"><b>🔗 رابط الملف:</b> ${u.profileUrl}</div>
-                            </div>
-                            <button class="send-btn" style="width:100%; height:35px; border-radius:6px; background:#2980b9; color:#fff;" onclick="alert('تم فتح الخاص بالتشفير الملكي المباشر')"><i class="fas fa-paper-plane"></i> فتح محادثة خاصة</button>
-                            ${adminControlHtml}
-                        </div>
-                    `;
-                }
-                document.getElementById('featureModalBody').innerHTML = htmlContent;
+                document.getElementById('featureModalTitle').innerText = "كرت البروفايل";
+                document.getElementById('featureModalBody').innerHTML = `<h3>${u.name}</h3>`;
                 document.getElementById('featureModal').style.display = 'flex';
             });
         },
-        kingForceEditUser: (uid) => {
-            let newN = document.getElementById('admEditName').value.trim(); if(!newN) return;
-            db.collection("users").doc(uid).update({ name: newN });
-            alert("تم تعديل اسم العضو بنجاح سحابياً!"); document.getElementById('featureModal').style.display = 'none';
-        },
-        kingGrantRank: (uid) => {
-            let r = prompt("اكتب اسم الرتبة الجديدة:"); if(!r) return;
-            db.collection("users").doc(uid).update({ label: r });
-            alert(`تم منح العضو رتبة [ ${r} ] بنجاح`); document.getElementById('featureModal').style.display = 'none';
-        },
-        kingDeleteAccount: (uid) => {
-            if(confirm("هل تريد حذف الحساب نهائياً من قاعدة البيانات السحابية؟")) {
-                db.collection("users").doc(uid).delete();
-                document.getElementById('featureModal').style.display = 'none';
-            }
-        },
-        saveProfileChangesData: () => {
-            let uid = window.targetProfileId;
-            window.currentUser.name = document.getElementById('editNameInp').value.trim();
-            window.currentUser.nameBg = document.getElementById('editColorInp').value.trim();
-            ui.saveUserToFirestoreAndSession(window.currentUser);
-            alert("تم حفظ وتحديث بيانات بروفايلك سحابياً بنجاح كامل!");
-            document.getElementById('featureModal').style.display = 'none';
-        },
         openRoomsManager: () => {
-            document.getElementById('featureModalTitle').innerText = "🚪 نظام غرف شات حسوني";
-            let roomsHtml = window.roomsList.map(r => `
-                <div class="menu-item" onclick="ui.changeActiveRoom('${r}')">
-                    <span><i class="fas fa-door-open" style="color:var(--gold); margin-left:5px;"></i> غرفة ${r}</span>
-                </div>
-            `).join('');
-            let createRoomBtnHtml = `
-                <hr style="border-color:#222; margin:10px 0;">
-                <button class="send-btn" style="width:100%; border-radius:8px;" onclick="ui.actionCreateNewRoomPrompt()">➕ إنشاء روم جديدة (خاص بالملك)</button>
-            `;
-            document.getElementById('featureModalBody').innerHTML = roomsHtml + createRoomBtnHtml;
+            document.getElementById('featureModalTitle').innerText = "الغرف";
+            document.getElementById('featureModalBody').innerHTML = window.roomsList.map(r => `<div class="menu-item" onclick="ui.changeActiveRoom('${r}')">${r}</div>`).join('');
             document.getElementById('featureModal').style.display = 'flex';
         },
-        actionCreateNewRoomPrompt: () => {
-            if(!window.currentUser || window.currentUser.uid !== "owner_hassouni") {
-                alert("❌ الصلاحية مقفولة فقط لصاحب الموقع حسوني!"); return;
-            }
-            let rName = prompt("اكتب اسم الغرفة الجديدة:"); if(!rName) return;
-            window.roomsList.push(rName.trim()); ui.openRoomsManager();
-        },
         changeActiveRoom: (r) => { 
-            window.currentRoom = r; 
-            document.getElementById('chatBox').innerHTML = ""; 
+            window.currentRoom = r; document.getElementById('chatBox').innerHTML = ""; 
             document.getElementById('featureModal').style.display = 'none'; 
-            ui.listenToGlobalMessages();
-            ui.listenToActiveMics();
+            ui.listenToGlobalMessages(); ui.listenToActiveMics();
         },
         openGlobalSettings: () => {
-            document.getElementById('featureModalTitle').innerText = "⚙️ الإعدادات والخيارات والأوامر المتاحة لرتبتك";
-            let contentHtml = "";
-
-            let isGuest = window.currentUser.role === 'guest';
-            let isKing = window.currentUser.uid === 'owner_hassouni';
-
-            if (isGuest) {
-                contentHtml = `
-                    <p style="font-size:12px; color:#aaa; text-align:center;">رتبتك الحالية: زائر (خيارات محدودة)</p>
-                    <div class="menu-item" onclick="ui.logoutBackToWelcome()" style="color:#e74c3c; font-weight:bold;"><i class="fas fa-sign-out-alt"></i> الخروج والعودة للرئيسية</div>
-                `;
-            } else if (!isKing) {
-                contentHtml = `
-                    <p style="font-size:12px; color:var(--gold); text-align:center;">رتبتك الحالية: عضو ماسي 💎</p>
-                    <div class="menu-item" onclick="document.getElementById('chatBox').innerHTML=''; document.getElementById('featureModal').style.display='none'; alert('تم تنظيف وجرف الشات محلياً بنجاح 🧹');"><i class="fas fa-broom"></i> تنظيف وجرف الروم العام بالكامل</div>
-                    <div class="menu-item" onclick="ui.logoutBackToWelcome()" style="color:#e74c3c; font-weight:bold;"><i class="fas fa-sign-out-alt"></i> تسجيل خروج آمن من الشات</div>
-                `;
-            } else {
-                contentHtml = `
-                    <p style="font-size:12px; color:var(--gold); text-align:center; font-weight:bold;">👑 مرحباً بك يا ملك ومؤسس شات حسوني الحقيقي 👑</p>
-                    <div class="menu-item" onclick="document.getElementById('chatBox').innerHTML=''; alert('تم تنظيف وجرف الشات');"><i class="fas fa-broom"></i> 1. تنظيف وجرف الروم العام بالكامل</div>
-                    <div class="menu-item" onclick="alert('تم قفل الروم')"><i class="fas fa-lock"></i> 2. قفل وطرد المحادثات العامة</div>
-                    <div class="menu-item" onclick="alert('تفعيل جدار النار')"><i class="fas fa-shield-alt"></i> 3. تشغيل جدار الحماية ضد الهاكر والسبام</div>
-                    <div class="menu-item" onclick="alert('تعديل الإعلانات')"><i class="fas fa-bullhorn"></i> 4. إدارة وإضافة شريط الإعلانات المتحرك</div>
-                    <div class="menu-item" onclick="alert('التحكم بالرتب')"><i class="fas fa-crown"></i> 5. تعديل وصلاحيات الرتب والمستويات</div>
-                    <div class="menu-item" onclick="alert('فحص الخادم')"><i class="fas fa-server"></i> 6. مراقبة سرعة وبنج السيرفر المباشر</div>
-                    <div class="menu-item" onclick="ui.logoutBackToWelcome()" style="color:#e74c3c; font-weight:bold;"><i class="fas fa-sign-out-alt"></i> 7. تسجيل خروج آمن والعودة للرئيسية</div>
-                `;
-            }
-
-            document.getElementById('featureModalBody').innerHTML = contentHtml;
+            document.getElementById('featureModalTitle').innerText = "الإعدادات";
+            document.getElementById('featureModalBody').innerHTML = `<div class="menu-item" onclick="ui.logoutBackToWelcome()">تسجيل خروج</div>`;
             document.getElementById('featureModal').style.display = 'flex';
         },
         logoutBackToWelcome: () => {
-            ui.updateUserOnlineStatus(false);
             localStorage.removeItem("hassouni_user_session");
-            window.currentUser = null;
-            document.getElementById('featureModal').style.display = 'none';
-            document.getElementById('onlineUsersHalfModal').style.display = 'none';
-            ui.stopHiddenAudioPlayback();
-            document.getElementById('welcomeOverlay').style.display = 'flex';
-            document.getElementById('authBtn').style.display = 'block';
-            ui.switchBranch('b1');
+            window.location.reload();
         },
-        openVIPList: (title) => {
-            document.getElementById('featureModalTitle').innerText = `قائمة ${title}`;
-            document.getElementById('featureModalBody').innerHTML = `<p style="text-align:center; color:var(--gold);">قائمة لوحة الشرف الخاصة لـ شات حسوني 🏆</p>`;
-            document.getElementById('featureModal').style.display = 'flex';
-        }
+        openVIPList: (title) => alert(title)
     };
 
     window.onload = () => { ui.checkSavedSessionOnLoad(); };
-    document.getElementById('msgInp').onkeypress = (e) => { if(e.key === 'Enter') ui.sendMessage(); };
 </script>
 </body>
 </html>
