@@ -979,6 +979,10 @@
     };
 
     window.onload = () => { ui.checkSavedSessionOnLoad(); };
+<script>
+    window.onerror = function(msg, url, line) {
+        alert("خطأ: " + msg + "\nفي السطر: " + line);
+    };
 </script>
 </body>
 </html>
