@@ -53,7 +53,6 @@
         .pfp-main-frame { width: 44px; height: 44px; border-radius: 50%; border: 2px solid var(--gold); box-shadow: 0 0 8px var(--gold); display: flex; align-items: center; justify-content: center; background: #000; flex-shrink: 0; }
         .pfp-main { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; cursor: pointer; }
         
-        /* أيقونة الرتبة المنفصلة بين الصورة والاسم */
         .rank-standalone-icon {
             font-size: 16px;
             display: flex;
@@ -67,7 +66,6 @@
             flex-shrink: 0;
         }
 
-        /* إطار الاسم الفخم المنفصل */
         .king-name-container {
             display: inline-flex;
             align-items: center;
@@ -487,11 +485,13 @@
             });
         },
         listenToGlobalMessages: () => {
-            window.activeMessagesListener = db.collection("rooms").doc(window.currentRoom).collection("messages")
+            window.activeMessagesListener = db.collection("global_messages")
+              .where("room", "==", window.currentRoom)
               .orderBy("timestamp", "asc")
-              .limit(70)
+              .limit(100)
               .onSnapshot((snapshot) => {
                   let chatBox = document.getElementById('chatBox');
+                  if (!chatBox) return;
                   chatBox.innerHTML = "";
                   ui.renderMsg(window.defaultOwnerData, "مرحباً بكم في شات حسوني الإمبراطوري الحصري والآمن 🏆🔥");
                   snapshot.forEach((doc) => {
@@ -500,6 +500,8 @@
                           ui.renderMsg(mData.user, mData.text);
                       }
                   });
+              }, (error) => {
+                  console.error("خطأ في المزامنة: ", error);
               });
         },
         listenToActiveMics: () => {
@@ -533,7 +535,7 @@
         refreshChatWindowOnly: () => {
             ui.enterChat();
             let box = document.getElementById('chatBox');
-            box.scrollTop = box.scrollHeight;
+            if (box) box.scrollTop = box.scrollHeight;
             alert("تم تحديث غرف الشات بنجاح.");
         },
         sendMessage: () => {
@@ -551,9 +553,10 @@
                 nameBg: window.currentUser.nameBg || "transparent"
             };
 
-            db.collection("rooms").doc(window.currentRoom).collection("messages").add({
+            db.collection("global_messages").add({
                 user: cleanUserObj,
                 text: t,
+                room: window.currentRoom,
                 timestamp: firebase.firestore.FieldValue.serverTimestamp()
             }).catch((err) => {
                 alert("خطأ: " + err.message);
@@ -565,7 +568,6 @@
             document.getElementById('msgInp').focus();
         },
         
-        // التعديل السحري هنا: فصل الأيقونة تماماً لتصبح مستقلة وتظهر بين الصورة والاسم
         renderMsg: (user, text) => {
             if (!user) return;
             let div = document.createElement('div');
@@ -925,7 +927,7 @@
 
         cleanCurrentRoomMessages: () => {
             if(confirm("هل تريد مسح كافة رسائل هذه الغرفة فوراً؟")) {
-                db.collection("rooms").doc(window.currentRoom).collection("messages").get().then((snap) => {
+                db.collection("global_messages").where("room", "==", window.currentRoom).get().then((snap) => {
                     snap.forEach(doc => doc.ref.delete());
                     alert("تم تنظيف الروم بالكامل.");
                     document.getElementById('featureModal').style.display = 'none';
