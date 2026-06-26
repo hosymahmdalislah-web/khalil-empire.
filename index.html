@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>شات حسوني المطور - النسخة الماسية المتكاملة</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- استدعاء مكتبة Socket.io للربط الحي والمباشر مع السيرفر -->
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background-color: #f0f2f5; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
@@ -371,6 +373,9 @@
 <script src="https://www.youtube.com/iframe_api"></script>
 
 <script>
+    // إنشاء الاتصال المباشر بالسيرفر (قم بتغيير الرابط إلى رابط سيرفرك الفعلي عند الرفع أونلاين)
+    const socket = io('http://localhost:3000');
+
     // إعداد الـ 20 رتبة المتكاملة
     const sysRanksConfig = {
         'owner': { label: 'صاحب الموقع', color: '#ffd700', icon: '<i class="fa-solid fa-trophy" style="color:#ffd700;"></i>', isStaff: true },
@@ -439,7 +444,6 @@
         if (localSave) { 
             accountData = JSON.parse(localSave); 
             document.getElementById('welcomeWelcomePanel').style.display = 'none';
-            if(accountData.name !== siteOwnerObj.name) { dynamicRoomUsers.push(accountData); }
             applyUserSessionUI(); 
         }
 
@@ -467,7 +471,6 @@
         accountData.rank = "visitor";
         
         localStorage.setItem('hasoni_secure_session', JSON.stringify(accountData));
-        dynamicRoomUsers.push(accountData);
         document.getElementById('welcomeWelcomePanel').style.display = 'none';
         applyUserSessionUI();
     }
@@ -487,9 +490,6 @@
             accountData.avatar = "https://via.placeholder.com/40/00b4db/ffffff?text=💎";
             accountData.cover = "linear-gradient(135deg, #00b4db, #2c3e50)";
             accountData.status = "عضو ماسي مسجل للأبد بنجاح 💎";
-            
-            dynamicRoomUsers = dynamicRoomUsers.filter(u => u.name !== accountData.name);
-            dynamicRoomUsers.push(accountData);
         }
 
         localStorage.setItem('hasoni_secure_session', JSON.stringify(accountData));
@@ -513,6 +513,9 @@
         document.getElementById('roomCleanOpt').style.display = hasStaffPower ? 'flex' : 'none';
         document.getElementById('roomBgOpt').style.display = hasStaffPower ? 'flex' : 'none';
         document.getElementById('roomMsgOpt').style.display = hasStaffPower ? 'flex' : 'none';
+
+        // إعلام السيرفر بانضمام مستخدم جديد ليتم تحديث القائمة لدى الجميع فوراً
+        socket.emit('user_join', accountData);
     }
 
     function openLoginModal() { document.getElementById('loginPopupModal').style.display = 'flex'; }
@@ -621,9 +624,6 @@
 
     function executeAdminAction(actionType) {
         alert(`تم تطبيق أمر الإدارة [ ${actionType} ] بنجاح ضد العضو ${currentProfileUserTarget.name}.`);
-        if(actionType === 'طرد' || actionType === 'حذف الحساب') {
-            dynamicRoomUsers = dynamicRoomUsers.filter(u => u.name !== currentProfileUserTarget.name);
-        }
         closeAllModals();
     }
 
@@ -712,7 +712,7 @@
         `;
         container.appendChild(ownerRow);
 
-        // 2. ظهور بقية الحسابات والزوار بالأسفل تحت صاحب الموقع
+        // 2. ظهور بقية الحسابات والزوار بالأسفل تحت صاحب الموقع (القادمة من السيرفر)
         dynamicRoomUsers.forEach(u => {
             if(u.name !== siteOwnerObj.name) {
                 let row = document.createElement('div');
@@ -751,18 +751,16 @@
     const chatInput = document.getElementById('chatInput');
     const chatMessages = document.getElementById('chatMessages');
 
+    // تعديل الدالة لتقوم بإرسال الرسالة إلى خادم الـ Socket بدلاً من التخزين المحلي الفردي
     function sendMessage() {
         const text = chatInput.value.trim();
         if (text !== "") {
             const packedMsg = {
                 name: accountData.name, avatar: accountData.avatar, rank: accountData.rank, nameBg: accountData.nameBg, text: text
             };
-            archivedChatMessages.push(packedMsg);
-            if(archivedChatMessages.length > 50) { archivedChatMessages.shift(); }
-            localStorage.setItem('hasoni_chat_history', JSON.stringify(archivedChatMessages));
-            renderHistoricalMessage(packedMsg);
+            // بث الرسالة عبر السيرفر لتصل للجميع فورا
+            socket.emit('send_message', packedMsg);
             chatInput.value = "";
-            chatMessages.scrollTop = chatMessages.scrollHeight;
         }
     }
 
@@ -784,6 +782,22 @@
         chatMessages.appendChild(messageRow);
         chatMessages.scrollTop = chatMessages.scrollHeight;
     }
+
+    // --- استقبال البيانات الحية من السيرفر وعرضها لجميع المتصلين ---
+
+    // 1. استقبال الرسائل الحية من السيرفر
+    socket.on('receive_message', function(packedMsg) {
+        archivedChatMessages.push(packedMsg);
+        if(archivedChatMessages.length > 50) { archivedChatMessages.shift(); }
+        localStorage.setItem('hasoni_chat_history', JSON.stringify(archivedChatMessages));
+        renderHistoricalMessage(packedMsg);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    });
+
+    // 2. استقبال قائمة المستخدمين النشطين فور دخول أو خروج أي عضو
+    socket.on('update_users', function(usersList) {
+        dynamicRoomUsers = usersList;
+    });
 
     sendBtn.addEventListener('click', sendMessage);
     chatInput.addEventListener('keypress', function(e) { if (e.key === 'Enter') { sendMessage(); } });
