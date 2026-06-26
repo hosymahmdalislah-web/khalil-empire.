@@ -65,7 +65,7 @@
         .message-text { background-color: #ffffff; color: #212529; padding: 8px 12px; border-radius: 8px; font-size: 13px; max-width: 85%; box-shadow: 0 1px 3px rgba(0,0,0,0.05); font-weight: 600; }
 
         /* التحكم السفلي الثابت والمحمي بالكامل والمصلح للأجهزة الذكية */
-        .bottom-controls-container { position: absolute; bottom: 0; left: 0; width: 100%; display: flex; flex-direction: column; z-index: 999; background-color: #fff; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); }
+        .bottom-controls-container { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; display: flex; flex-direction: column; z-index: 999; background-color: #fff; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); }
         .chat-input-bar { background-color: #ffffff; padding: 8px 10px; display: flex; align-items: center; gap: 8px; border-top: 1px solid #e1e8ed; }
         .input-container { flex: 1; display: flex; align-items: center; background-color: #f1f3f5; border-radius: 20px; padding: 0 12px; }
         .chat-input { width: 100%; background: none; border: none; padding: 8px 0; outline: none; font-size: 14px; }
@@ -101,12 +101,10 @@
 </head>
 <body>
 
-<!-- مشغل يوتيوب الحقيقي المخفي للبث الصوتي المباشر للأعضاء -->
 <div id="ytPlayerContainer" style="display:none; position:absolute; width:1px; height:1px; opacity:0;"></div>
 
 <div class="chat-container">
 
-    <!-- لوحة الترحيب البدئية الذهبية المتكاملة شات حسوني -->
     <div id="welcomeWelcomePanel">
         <div class="gold-banner">
             <h1>شات حسوني</h1>
@@ -139,7 +137,6 @@
         </div>
     </div>
     
-    <!-- الشريط العلوي المستقر للمحادثة -->
     <div class="chat-header">
         <div class="header-top-row">
             <div class="logo-area"><i class="fa-solid fa-heart" style="color: #e53e3e;"></i> شات حسوني</div>
@@ -154,7 +151,6 @@
         </div>
     </div>
 
-    <!-- ❤️ قسم المايكات القلوب الصغيرة المنفصلة الفاخرة ❤️ -->
     <div class="mics-section">
         <div class="mic-box" id="micNode1" onclick="handleMicClick(1)"><div class="heart-icon-wrapper"><div class="heart-inner-icon"><i class="fa-solid fa-microphone"></i></div></div><div class="mic-name" id="mName1">فارغ</div><div class="mic-status-tag" id="mStatus1">مكتوم</div></div>
         <div class="mic-box" id="micNode2" onclick="handleMicClick(2)"><div class="heart-icon-wrapper"><div class="heart-inner-icon"><i class="fa-solid fa-microphone"></i></div></div><div class="mic-name" id="mName2">فارغ</div><div class="mic-status-tag" id="mStatus2">مكتوم</div></div>
@@ -162,10 +158,8 @@
         <div class="mic-box" id="micNode4" onclick="handleMicClick(4)"><div class="heart-icon-wrapper"><div class="heart-inner-icon"><i class="fa-solid fa-microphone"></i></div></div><div class="mic-name" id="mName4">فارغ</div><div class="mic-status-tag" id="mStatus4">مكتوم</div></div>
     </div>
 
-    <!-- مساحة الرسائل المحمية والمنفصلة -->
     <div class="chat-messages" id="chatMessages"></div>
 
-    <!-- حاوية التحكم السفلية الثابتة والمضمونة للوحة الإدخال والشريط السفلي -->
     <div class="bottom-controls-container">
         <div class="chat-input-bar">
             <button class="action-btn plus-btn" onclick="alert('إرسال ميديا')"><i class="fa-solid fa-plus"></i></button>
@@ -186,9 +180,6 @@
 
 </div>
 
-<!-- ================= النوافذ المنبثقة المدعومة بـ X والتأكيدات الحية ================= -->
-
-<!-- 1. نافذة تأكيد رغبة الصعود على المايك نعم / إلغاء -->
 <div class="popup-overlay" id="confirmMicJoinModal">
     <div class="popup-box" style="text-align: center;">
         <h3 style="margin-bottom:10px; color:#1a202c;">الصعود للميكروفون</h3>
@@ -200,7 +191,6 @@
     </div>
 </div>
 
-<!-- 2. لوحة تحكم المايك الخاص بك (كتم، أغاني، نزول) -->
 <div class="popup-overlay" id="myMicControlPanelModal">
     <div class="popup-box">
         <button class="close-x-btn" onclick="closeAllModals()">X</button>
@@ -212,7 +202,6 @@
     </div>
 </div>
 
-<!-- 3. نافذة نسخ وتشغيل روابط أغاني يوتيوب الحقيقية -->
 <div class="popup-overlay" id="musicSearchModal">
     <div class="popup-box">
         <button class="close-x-btn" onclick="closeAllModals()">X</button>
@@ -225,7 +214,6 @@
     </div>
 </div>
 
-<!-- 4. كارت البروفايل المتكامل والتسجيل -->
 <div class="popup-overlay" id="loginPopupModal">
     <div class="popup-box">
         <button class="close-x-btn" onclick="closeAllModals()">X</button>
@@ -255,23 +243,11 @@
                 <div><strong>العمر:</strong> <span id="pAgeDisplay">--</span></div>
             </div>
             <div id="selfEditContainer" style="background:#f7f9fa; padding:10px; border-radius:8px; text-align:right;">
-                <input type="text" id="inputEditName" class="form-control" style="margin-bottom:6px;" placeholder="تعديل الاسم">
-                <input type="number" id="inputEditAge" class="form-control" style="margin-bottom:6px;" placeholder="تعديل العمر">
-                <select id="inputEditGender" class="form-control" style="margin-bottom:6px;"><option value="ذكر">ذكر</option><option value="أنثى">أنثى</option></select>
-                
-                <label style="font-size:11px;font-weight:bold;color:#4a5568;">رفع صورة شخصية جديدة:</label>
-                <input type="file" id="fileAvatarInput" accept="image/*" class="form-control" style="margin-bottom:6px;">
-                
-                <label style="font-size:11px;font-weight:bold;color:#4a5568;">رفع غلاف بروفايل جديد:</label>
-                <input type="file" id="fileCoverInput" accept="image/*" class="form-control" style="margin-bottom:6px;">
-                
-                <button class="popup-btn" style="background:#2b6cb0; padding:5px;" onclick="saveLocalProfileData()">حفظ التغييرات</button>
-            </div>
+                </div>
         </div>
     </div>
 </div>
 
-<!-- تحميل مكتبة يوتيوب الرسمية لتشغيل الروابط الحقيقية بدقة -->
 <script src="https://www.youtube.com/iframe_api"></script>
 
 <script>
@@ -311,6 +287,9 @@
         accountData.name = inputName;
         accountData.age = document.getElementById('initAgeInput').value;
         accountData.gender = document.getElementById('initGenderInput').value;
+        accountData.rank = "visitor";
+        
+        localStorage.setItem('hasoni_secure_session', JSON.stringify(accountData));
         document.getElementById('welcomeWelcomePanel').style.display = 'none';
         applyUserSessionUI();
     }
@@ -346,11 +325,13 @@
         document.getElementById('welcomeWelcomePanel').style.display = 'none';
         if(accountData.rank === "owner") {
             document.getElementById('topUserRank').innerHTML = `<span class="gold-trophy-badge-free"><i class="fa-solid fa-trophy"></i></span> صاحب الموقع`;
+            document.getElementById('keyAuthBtn').style.display = 'none';
         } else if(accountData.rank === "diamond") {
             document.getElementById('topUserRank').innerHTML = `<span class="diamond-badge-free"><i class="fa-solid fa-gem"></i></span> عضو ماسي للأبد`;
             document.getElementById('keyAuthBtn').style.display = 'none';
         } else {
             document.getElementById('topUserRank').innerText = accountData.name + " ✨";
+            document.getElementById('keyAuthBtn').style.display = 'flex';
         }
     }
 
@@ -359,8 +340,8 @@
         if (activeMicSlot === slotNum) {
             document.getElementById('myMicControlPanelModal').style.display = 'flex';
         } else {
-            const currentOccupant = document.getElementById(`mName${slotNum}`).innerText;
-            if (currentOccupant === "فارغ" || currentOccupant.includes("فارغ")) {
+            const currentOccupant = document.getElementById(`mName${slotNum}`).innerText.trim();
+            if (currentOccupant === "فارغ") {
                 selectedMicTarget = slotNum;
                 document.getElementById('confirmMicJoinModal').style.display = 'flex';
             } else {
@@ -502,6 +483,26 @@
             coverDiv.style.backgroundPosition = 'center';
         } else {
             coverDiv.style.background = accountData.cover;
+        }
+
+        const editContainer = document.getElementById('selfEditContainer');
+        if (accountData.rank === 'visitor') {
+            editContainer.innerHTML = `<p style="text-align:center; font-size:12px; color:#e53e3e; font-weight:bold; padding:5px;">⚠️ يجب عليك "التسجيل للأبد" أولاً لتتمكن من تعديل ملفك الشخصي ورفع الصور!</p>`;
+        } else {
+            editContainer.innerHTML = `
+                <input type="text" id="inputEditName" class="form-control" style="margin-bottom:6px;" placeholder="تعديل الاسم" value="${accountData.name}">
+                <input type="number" id="inputEditAge" class="form-control" style="margin-bottom:6px;" placeholder="تعديل العمر" value="${accountData.age}">
+                <select id="inputEditGender" class="form-control" style="margin-bottom:6px;"><option value="ذكر">ذكر</option><option value="أنثى">أنثى</option></select>
+                
+                <label style="font-size:11px;font-weight:bold;color:#4a5568;">رفع صورة شخصية جديدة:</label>
+                <input type="file" id="fileAvatarInput" accept="image/*" class="form-control" style="margin-bottom:6px;">
+                
+                <label style="font-size:11px;font-weight:bold;color:#4a5568;">رفع غلاف بروفايل جديد:</label>
+                <input type="file" id="fileCoverInput" accept="image/*" class="form-control" style="margin-bottom:6px;">
+                
+                <button class="popup-btn" style="background:#2b6cb0; padding:5px;" onclick="saveLocalProfileData()">حفظ التغييرات</button>
+            `;
+            document.getElementById('inputEditGender').value = accountData.gender;
         }
         
         document.getElementById('profileCardModal').style.display = 'flex';
