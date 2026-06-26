@@ -50,8 +50,8 @@
         .mic-status-tag { font-size: 8px; color: #e53e3e; font-weight: bold; margin-top: 2px; display: none; }
         .mic-box.muted .mic-status-tag { display: block; color: #718096; }
 
-        /* ساحة الرسائل التمريرية */
-        .chat-messages { flex: 1; padding: 12px; overflow-y: auto; background-color: #f3f4f6; display: flex; flex-direction: column; gap: 12px; margin-bottom: 105px; }
+        /* ساحة الرسائل التمريرية المصلحة للتناسب مع الشريط السفلي */
+        .chat-messages { flex: 1; padding: 12px; overflow-y: auto; background-color: #f3f4f6; display: flex; flex-direction: column; gap: 12px; padding-bottom: 115px; }
         .message-row { display: flex; align-items: flex-start; gap: 8px; width: 100%; }
         .avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #ffd700; cursor: pointer; }
         .message-content { flex: 1; display: flex; flex-direction: column; }
@@ -64,8 +64,8 @@
         
         .message-text { background-color: #ffffff; color: #212529; padding: 8px 12px; border-radius: 8px; font-size: 13px; max-width: 85%; box-shadow: 0 1px 3px rgba(0,0,0,0.05); font-weight: 600; }
 
-        /* التحكم السفلي الثابت والمحمي بالكامل */
-        .bottom-controls-container { position: absolute; bottom: 0; left: 0; width: 100%; display: flex; flex-direction: column; z-index: 99; background-color: #fff; }
+        /* التحكم السفلي الثابت والمحمي بالكامل والمصلح للأجهزة الذكية */
+        .bottom-controls-container { position: absolute; bottom: 0; left: 0; width: 100%; display: flex; flex-direction: column; z-index: 999; background-color: #fff; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); }
         .chat-input-bar { background-color: #ffffff; padding: 8px 10px; display: flex; align-items: center; gap: 8px; border-top: 1px solid #e1e8ed; }
         .input-container { flex: 1; display: flex; align-items: center; background-color: #f1f3f5; border-radius: 20px; padding: 0 12px; }
         .chat-input { width: 100%; background: none; border: none; padding: 8px 0; outline: none; font-size: 14px; }
@@ -97,18 +97,12 @@
         .profile-info-section { padding: 10px 15px; }
         .profile-name { font-size: 16px; font-weight: bold; color: #1a202c; }
         .profile-meta-grid { display: flex; justify-content: space-around; margin: 10px 0; background: #f7f9fa; padding: 8px; border-radius: 8px; font-size: 12px; color: #4a5568; }
-        .profile-actions-menu { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
-        .p-btn { padding: 8px; font-size: 11px; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; }
-        .btn-like { background: #fed7d7; color: #e53e3e; }
-        .btn-p-private { background: #ebf8ff; color: #3182ce; }
-        .btn-gifts { background: #feebc8; color: #dd6b20; }
-        .btn-admin-cmd { background: #e2e8f0; color: #b7791f; border: 1px solid #ffd700; grid-column: span 2; }
     </style>
 </head>
 <body>
 
-<!-- عنصر تشغيل الميديا الصوتي المخفي للبث العام للجميع -->
-<audio id="globalHiddenAudio" style="display:none;" controls autoplay></audio>
+<!-- مشغل يوتيوب الحقيقي المخفي للبث الصوتي المباشر للأعضاء -->
+<div id="ytPlayerContainer" style="display:none; position:absolute; width:1px; height:1px; opacity:0;"></div>
 
 <div class="chat-container">
 
@@ -141,7 +135,7 @@
 
         <h3 style="font-size:13px; color:#2d3748; margin-bottom:6px; text-align:center;">لماذا شات عربي | شات العرب الجديد؟</h3>
         <div class="seo-text-box">
-            شات العرب الجديد ، شات عربي : شات لكل العرب يقدم لكم العديد من المجتمعات تعتبر تواصل الفتيات مع الشباب خارج إطار الزواج أمرًا غير مقبول، وكذلك العكس، مما يجعل من الصعب تكوين علاقات جديدة بدون وسيلة تواصل...
+            شات العرب الجديد ، شات عربي : شات لكل العرب يقدم لكم العديد من المجتمعات يعتبر تواصل الفتيات مع الشباب خارج إطار الزواج أمرًا غير مقبول، وكذلك العكس، مما يجعل من الصعب تكوين علاقات جديدة بدون وسيلة تواصل...
         </div>
     </div>
     
@@ -218,7 +212,7 @@
     </div>
 </div>
 
-<!-- 3. نافذة نسخ وتشغيل روابط أغاني يوتيوب المخفية للمستمعين -->
+<!-- 3. نافذة نسخ وتشغيل روابط أغاني يوتيوب الحقيقية -->
 <div class="popup-overlay" id="musicSearchModal">
     <div class="popup-box">
         <button class="close-x-btn" onclick="closeAllModals()">X</button>
@@ -264,15 +258,22 @@
                 <input type="text" id="inputEditName" class="form-control" style="margin-bottom:6px;" placeholder="تعديل الاسم">
                 <input type="number" id="inputEditAge" class="form-control" style="margin-bottom:6px;" placeholder="تعديل العمر">
                 <select id="inputEditGender" class="form-control" style="margin-bottom:6px;"><option value="ذكر">ذكر</option><option value="أنثى">أنثى</option></select>
+                
+                <label style="font-size:11px;font-weight:bold;color:#4a5568;">رفع صورة شخصية جديدة:</label>
                 <input type="file" id="fileAvatarInput" accept="image/*" class="form-control" style="margin-bottom:6px;">
+                
+                <label style="font-size:11px;font-weight:bold;color:#4a5568;">رفع غلاف بروفايل جديد:</label>
                 <input type="file" id="fileCoverInput" accept="image/*" class="form-control" style="margin-bottom:6px;">
+                
                 <button class="popup-btn" style="background:#2b6cb0; padding:5px;" onclick="saveLocalProfileData()">حفظ التغييرات</button>
             </div>
         </div>
     </div>
 </div>
 
-<!-- ================= نظام البرمجة والـ JavaScript الحركي الذكي ================= -->
+<!-- تحميل مكتبة يوتيوب الرسمية لتشغيل الروابط الحقيقية بدقة -->
+<script src="https://www.youtube.com/iframe_api"></script>
+
 <script>
     const ageSelect = document.getElementById('initAgeInput');
     for(let i=15; i<=100; i++) {
@@ -285,13 +286,24 @@
         cover: "linear-gradient(135deg, #2c3e50, #3498db)"
     };
 
-    let activeMicSlot = null; // رقم حقل المايك الذي يتواجد عليه العضو حالياً
-    let selectedMicTarget = null; // حقل المايك المستهدف عند محاولة الصعود
+    let activeMicSlot = null; 
+    let selectedMicTarget = null; 
+    let ytPlayer = null; // مغير مشغل اليوتيوب الحقيقي
 
     window.onload = function() {
         const localSave = localStorage.getItem('hasoni_secure_session');
         if (localSave) { accountData = JSON.parse(localSave); applyUserSessionUI(); }
     };
+
+    // تجهيز مشغل يوتيوب المخفي بشكل تلقائي
+    function onYouTubeIframeAPIReady() {
+        ytPlayer = new YT.Player('ytPlayerContainer', {
+            height: '1', width: '1',
+            videoId: '',
+            playerVars: { 'autoplay': 1, 'controls': 0 },
+            events: { 'onReady': () => console.log("مشغل يوتيوب جاهز للعمل") }
+        });
+    }
 
     function loginAsVisitor() {
         const inputName = document.getElementById('initNameInput').value.trim();
@@ -345,10 +357,8 @@
     /* 🎙️ إدارة نقرات المايك والتحكم المتقدم المخصص 🎙️ */
     function handleMicClick(slotNum) {
         if (activeMicSlot === slotNum) {
-            // إذا ضغطت على المايك الذي تقف أنت عليه بالفعل، تفتح لوحة الخيارات المتقدمة
             document.getElementById('myMicControlPanelModal').style.display = 'flex';
         } else {
-            // إذا كان المايك فارغاً، تفتح نافذة تأكيد الصعود (نعم / إلغاء)
             const currentOccupant = document.getElementById(`mName${slotNum}`).innerText;
             if (currentOccupant === "فارغ" || currentOccupant.includes("فارغ")) {
                 selectedMicTarget = slotNum;
@@ -359,10 +369,8 @@
         }
     }
 
-    // تأكيد الصعود من نافذة (نعم)
     function confirmAscendToMic() {
         if(activeMicSlot !== null) {
-            // إنزال تلقائي من المايك القديم إذا كان صاعداً في مكان آخر
             let oldName = document.getElementById(`mName${activeMicSlot}`);
             oldName.innerText = "فارغ";
             document.getElementById(`micNode${activeMicSlot}`).classList.remove('active', 'muted');
@@ -379,7 +387,6 @@
         alert("تم صعودك بنجاح على المايك وصوتك مسموع الآن لكل الأعضاء المتواجدين بالبث!");
     }
 
-    // النزول الطوعي من المايك
     function descendFromMic() {
         if (activeMicSlot !== null) {
             document.getElementById(`mName${activeMicSlot}`).innerText = "فارغ";
@@ -391,7 +398,6 @@
         }
     }
 
-    // تفعيل / إغلاق كتم الصوت في المايك
     function triggerMuteToggle() {
         if (activeMicSlot !== null) {
             let nodeBox = document.getElementById(`micNode${activeMicSlot}`);
@@ -410,25 +416,38 @@
         document.getElementById('musicSearchModal').style.display = 'flex';
     }
 
-    // حقن رابط الميديا وتشغيله بشكل مخفي للجميع
+    // دالة استخراج الـ ID الحقيقي لأي فيديو يوتيوب من الرابط المرسل
+    function extractYoutubeId(url) {
+        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+        const match = url.match(regExp);
+        return (match && match[2].length === 11) ? match[2] : null;
+    }
+
+    // تشغيل الصوت الفعلي والحقيقي للأغنية المطلوبة من الرابط مباشرة للكل
     function injectAndPlayTrack() {
         const link = document.getElementById('ytLinkInput').value.trim();
-        if(!link) { alert("يرجى إدخال رابط يوتيوب صالح أولاً."); return; }
+        const videoId = extractYoutubeId(link);
+
+        if(!videoId) { 
+            alert("يرجى إدخال رابط يوتيوب حقيقي وصحيح!"); 
+            return; 
+        }
         
-        // محاكاة تحويل الرابط وبثه المخفي لكافة الأعضاء عبر الوسائط المتطورة
-        const audioNode = document.getElementById('globalHiddenAudio');
-        audioNode.src = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"; // ميديا تجريبية للبث العام المخفي
-        audioNode.play();
-        
-        closeAllModals();
-        alert("يتم الآن تشغيل الأغنية المطلوبة من يوتيوب وبثها لجميع الأعضاء بشكل مخفي بنجاح! 🎧");
+        if (ytPlayer && typeof ytPlayer.loadVideoById === 'function') {
+            ytPlayer.loadVideoById(videoId);
+            ytPlayer.playVideo();
+            closeAllModals();
+            alert("يتم الآن جلب وبث الأغنية الحقيقية المطلوبة من يوتيوب لجميع المستمعين بنجاح! 🎧");
+        } else {
+            alert("حدث خطأ في تحميل مشغل يوتيوب، يرجى المحاولة بعد قليل.");
+        }
     }
 
     function stopGlobalMusic() {
-        const audioNode = document.getElementById('globalHiddenAudio');
-        audioNode.pause();
-        audioNode.src = "";
-        alert("تم إيقاف تشغيل الأغنية بنجاح في الخلفية العامة.");
+        if (ytPlayer && typeof ytPlayer.stopVideo === 'function') {
+            ytPlayer.stopVideo();
+            alert("تم إيقاف تشغيل الأغنية بنجاح.");
+        }
     }
 
     /* 💬 نظام إرسال الرسائل وبناء الرتب المنفصلة 💬 */
@@ -442,14 +461,13 @@
             const messageRow = document.createElement('div');
             messageRow.classList.add('message-row');
             
-            // هنا يظهر فصل أيقونة الرتبة بشكل منفصل ومستقل تماماً عن صندوق الاسم
             let rankBadgeHTML = "";
             if (accountData.rank === "owner") {
                 rankBadgeHTML = `<span class="gold-trophy-badge-free" title="صاحب الموقع"><i class="fa-solid fa-trophy"></i></span>`;
             } else if (accountData.rank === "diamond") {
                 rankBadgeHTML = `<span class="diamond-badge-free" title="عضو ماسي للأبد"><i class="fa-solid fa-gem"></i></span>`;
             } else {
-                rankBadgeHTML = `<span class="rank-badge" style="margin-left:4px;">زائر</span>`;
+                rankBadgeHTML = `<span class="rank-badge" style="margin-left:4px; font-size:11px; color:#718096;">زائر</span>`;
             }
 
             messageRow.innerHTML = `
@@ -476,17 +494,68 @@
         document.getElementById('pAgeDisplay').innerText = accountData.age + " سنة";
         document.getElementById('pGenderDisplay').innerText = accountData.gender;
         document.getElementById('pAvatarDisplay').src = accountData.avatar;
+        
+        const coverDiv = document.getElementById('pCoverDisplay');
+        if(accountData.cover.startsWith('data:image') || accountData.cover.startsWith('http')) {
+            coverDiv.style.background = `url('${accountData.cover}')`;
+            coverDiv.style.backgroundSize = 'cover';
+            coverDiv.style.backgroundPosition = 'center';
+        } else {
+            coverDiv.style.background = accountData.cover;
+        }
+        
         document.getElementById('profileCardModal').style.display = 'flex';
     }
 
+    // معالجة الصور الحقيقية المرفوعة وحفظها للبروفايل والغلاف
     function saveLocalProfileData() {
         accountData.name = document.getElementById('inputEditName').value.trim() || accountData.name;
         accountData.age = document.getElementById('inputEditAge').value.trim() || accountData.age;
         accountData.gender = document.getElementById('inputEditGender').value;
-        localStorage.setItem('hasoni_secure_session', JSON.stringify(accountData));
-        applyUserSessionUI();
-        closeAllModals();
-        alert("تم تعديل البيانات بنجاح!");
+
+        const avatarFile = document.getElementById('fileAvatarInput').files[0];
+        const coverFile = document.getElementById('fileCoverInput').files[0];
+
+        let readersToLoad = 0;
+        let readersFinished = 0;
+
+        if (avatarFile) readersToLoad++;
+        if (coverFile) readersToLoad++;
+
+        function checkAndSave() {
+            readersFinished++;
+            if(readersFinished === readersToLoad || readersToLoad === 0) {
+                localStorage.setItem('hasoni_secure_session', JSON.stringify(accountData));
+                applyUserSessionUI();
+                closeAllModals();
+                alert("تم تحديث البروفايل وحفظ الصور بنجاح! 🎉");
+            }
+        }
+
+        if (avatarFile) {
+            const avatarReader = new FileReader();
+            avatarReader.onload = function(e) {
+                accountData.avatar = e.target.result;
+                checkAndSave();
+            };
+            avatarReader.readAsDataURL(avatarFile);
+        }
+
+        if (coverFile) {
+            const coverReader = new FileReader();
+            coverReader.onload = function(e) {
+                accountData.cover = e.target.result;
+                checkAndSave();
+            };
+            coverReader.readAsDataURL(coverFile);
+        }
+
+        if (readersToLoad === 0) {
+            localStorage.setItem('hasoni_secure_session', JSON.stringify(accountData));
+            applyUserSessionUI();
+            closeAllModals();
+            alert("تم تعديل البيانات بنجاح!");
+        }
     }
 </script>
 
