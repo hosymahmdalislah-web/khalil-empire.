@@ -718,7 +718,63 @@
 
     sendBtn.addEventListener('click', sendMessage);
     chatInput.addEventListener('keypress', function(e) { if (e.key === 'Enter') { sendMessage(); } });
-</script>
+// أضف هذه الدوال داخل وسم <script> الموجود في كودك الأصلي:
+
+// 1. نظام اقتباس الرسائل (الضغط مرتين للرسالة، مرة للاسم)
+function quoteMessage(msgText) {
+    document.getElementById('chatInput').value = msgText;
+}
+function quoteName(userName) {
+    document.getElementById('chatInput').value = "@" + userName + " ";
+}
+
+// 2. تحديث دالة إرسال الرسائل لدعم الروابط كأغاني/فيديو
+function sendMessage() {
+    const text = chatInput.value.trim();
+    if (text !== "") {
+        // فحص إذا كان الرابط يوتيوب أو صورة
+        let isMedia = text.includes('youtube.com') || text.includes('youtu.be') || text.match(/\.(jpeg|jpg|gif|png|mp4)$/);
+        
+        const packedMsg = {
+            name: accountData.name, avatar: accountData.avatar, rank: accountData.rank, 
+            nameBg: accountData.nameBg, text: text, isMedia: isMedia
+        };
+        database.ref('messages').push(packedMsg);
+        chatInput.value = "";
+    }
+}
+
+// 3. تحديث عرض الرسالة (لإزالة الفقاعات وإظهار الرتبة بجانب الأيقونة)
+function renderHistoricalMessage(msgObj) {
+    const messageRow = document.createElement('div');
+    messageRow.className = 'message-row';
+    const rankInfo = sysRanksConfig[msgObj.rank] || sysRanksConfig['visitor'];
+    
+    // إزالة الفقاعات: جعل الخلفية شفافة والنصوص مباشرة
+    messageRow.innerHTML = `
+        <img src="${msgObj.avatar}" class="avatar" onclick="openAnyUserProfileCard(accountData)">
+        <div class="message-content">
+            <div class="user-tag-bar">
+                <span class="rank-icon-inline">${rankInfo.icon}</span>
+                <div class="username-container" style="background:${msgObj.nameBg || '#ffffff'}" onclick="quoteName('${msgObj.name}')" ondblclick="quoteMessage('${msgObj.text}')">
+                    <span>${msgObj.name}</span>
+                </div>
+            </div>
+            <div class="message-text">${msgObj.isMedia ? `<a href="${msgObj.text}" target="_blank">📺 تشغيل الوسائط</a>` : msgObj.text}</div>
+        </div>
+    `;
+    chatMessages.appendChild(messageRow);
+}
+
+// 4. نظام المايكات (التحقق عند الضغط)
+function confirmAscendToMic() {
+    activeMicSlot = selectedMicTarget;
+    let nodeName = document.getElementById(`mName${activeMicSlot}`);
+    nodeName.innerText = accountData.name;
+    // إضافة منطق الأغاني والتحكم للمايك هنا...
+    closeAllModals();
+}
+
 
 </body>
 </html>
