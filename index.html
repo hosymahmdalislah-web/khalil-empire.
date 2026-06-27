@@ -30,7 +30,9 @@
         .header-top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
         .logo-area { font-weight: bold; font-size: 15px; color: #ffd700; display: flex; align-items: center; gap: 6px; }
         .header-nav-menu { display: flex; justify-content: space-between; background: rgba(255, 255, 255, 0.08); padding: 4px; border-radius: 8px; gap: 2px; }
-        .nav-item { flex: 1; text-align: center; font-size: 11px; color: #e2e8f0; cursor: pointer; padding: 4px 2px; border-radius: 4px; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+        .nav-item { flex: 1; text-align: center; font-size: 11px; color: #e2e8f0; cursor: pointer; padding: 4px 2px; border-radius: 4px; display: flex; flex-direction: column; align-items: center; gap: 2px; position: relative; }
+        
+        .badge-notify { position: absolute; top: -2px; right: 2px; background: #e53e3e; color: white; border-radius: 50%; padding: 1px 5px; font-size: 9px; font-weight: bold; animation: pulse 1s infinite alternate; }
 
         .mics-section { background-color: #ffffff; display: flex; justify-content: space-around; padding: 10px 5px; border-bottom: 1px solid #e1e8ed; flex-shrink: 0; gap: 10px; }
         .mic-box { display: flex; flex-direction: column; align-items: center; flex: 1; background: #ffffff; border-radius: 12px; padding: 8px 4px; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border: 1px solid #edf2f7; transition: all 0.3s ease; position: relative; background-size: cover; background-position: center; }
@@ -56,7 +58,7 @@
         
         .user-tag-bar { display: flex; align-items: center; gap: 6px; margin-bottom: 2px; }
         .rank-icon-sep { display: inline-flex; align-items: center; justify-content: center; font-size: 14px; margin-left: 2px; }
-        .username-container { border: 1px solid #cbd5e0; background-color: #ffffff; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; color: #2d3748; cursor: pointer; }
+        .username-container { border: 1px solid #cbd5e0; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; color: #2d3748; cursor: pointer; display: inline-block; }
         .message-text { color: #212529; font-size: 13px; max-width: 95%; font-weight: 600; background: transparent !important; box-shadow: none !important; border-radius: 0 !important; padding: 2px 0 !important; }
 
         .bottom-controls-container { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; display: flex; flex-direction: column; z-index: 999; background-color: #fff; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); }
@@ -87,7 +89,7 @@
         .profile-avatar-wrapper { position: relative; margin-top: -45px; display: inline-block; }
         .profile-card-avatar { width: 85px; height: 85px; border-radius: 50%; border: 3px solid #fff; object-fit: cover; background: #fff; cursor: pointer; }
         .profile-info-section { padding: 10px 15px; }
-        .profile-name { font-size: 16px; font-weight: bold; color: #1a202c; padding: 4px 10px; border-radius: 6px; display: inline-block; }
+        .profile-name { font-size: 16px; font-weight: bold; padding: 4px 10px; border-radius: 6px; display: inline-block; }
         
         .profile-actions-bar { display: flex; flex-wrap: wrap; justify-content: space-around; background: #f1f3f5; margin: 10px 15px 5px 15px; padding: 6px; border-radius: 12px; gap: 4px; }
         .prof-bar-btn { flex: 1; min-width: 65px; border: none; background: #fff; padding: 6px 2px; font-size: 11px; font-weight: bold; border-radius: 8px; cursor: pointer; color: #4a5568; box-shadow: 0 1px 3px rgba(0,0,0,0.05); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; }
@@ -110,16 +112,25 @@
         .file-upload-wrapper { position: relative; overflow: hidden; display: inline-block; width: 100%; }
         .file-upload-wrapper input[type=file] { position: absolute; left: 0; top: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
 
-        /* الكأس اللامع الذهبي الخاص بالمالك */
-        .fa-trophy {
-            color: #ffd700 !important;
-            text-shadow: 0 0 10px #ffaa00, 0 0 20px #ffd700;
-            animation: goldGlow 1.5s infinite alternate;
-        }
-        @keyframes goldGlow {
-            0% { transform: scale(1); filter: drop-shadow(0 0 2px #ffd700); }
-            100% { transform: scale(1.15); filter: drop-shadow(0 0 8px #ffaa00); }
-        }
+        /* الأنماط الاحترافية المتحركة لأسماء الأعضاء والملفات */
+        .effect-rainbow { background: linear-gradient(to right, #ef5350, #f48fb1, #7e57c2, #2196f3, #26a69a, #43a047, #eeff41, #f57c00) !important; -webkit-background-clip: text !important; -webkit-text-fill-color: transparent !important; background-size: 400% 400% !important; animation: rainbowAnim 6s linear infinite !important; }
+        .effect-glow { animation: glowAnim 1.5s ease-in-out infinite alternate !important; box-shadow: 0 0 10px #ffd700, 0 0 20px #ffd700 !important; }
+        .effect-fire { color: #ff3d00 !important; text-shadow: 0px -2px 4px #fff, 0px -4px 10px #ffeb3b, 0px -10px 20px #ff9800, 0px -16px 40px #f44336 !important; animation: fireAnim 1s infinite alternate; }
+
+        @keyframes rainbowAnim { 0% { background-position: 0% 50% } 50% { background-position: 100% 50% } 100% { background-position: 0% 50% } }
+        @keyframes glowAnim { from { box-shadow: 0 0 4px #ffd700; } to { box-shadow: 0 0 14px #ffaa00, 0 0 20px #ffd700; } }
+        @keyframes fireAnim { 0% { text-shadow: 0px -2px 4px #fff, 0px -4px 10px #ffeb3b; } 100% { text-shadow: 0px -2px 8px #ffeb3b, 0px -8px 20px #ff9800; } }
+        @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.2); } }
+
+        .fa-trophy { color: #ffd700 !important; text-shadow: 0 0 10px #ffaa00, 0 0 20px #ffd700; animation: goldGlow 1.5s infinite alternate; }
+        @keyframes goldGlow { 0% { transform: scale(1); filter: drop-shadow(0 0 2px #ffd700); } 100% { transform: scale(1.15); filter: drop-shadow(0 0 8px #ffaa00); } }
+
+        /* صندوق الخاص المشفر المدمج */
+        .pm-chat-box { display: flex; flex-direction: column; height: 260px; background: #f7f9fa; border: 1px solid #cbd5e0; border-radius: 8px; margin-top: 10px; overflow: hidden; }
+        .pm-messages-list { flex: 1; padding: 8px; overflow-y: auto; display: flex; flex-direction: column; gap: 5px; font-size: 12px; }
+        .pm-msg-line { padding: 4px 8px; border-radius: 6px; max-width: 85%; }
+        .pm-sent { background: #00b4db; color: white; align-self: flex-start; text-align: right; }
+        .pm-received { background: #e2e8f0; color: #2d3748; align-self: flex-end; text-align: right; }
     </style>
 </head>
 <body>
@@ -158,7 +169,7 @@
         </div>
 
         <div class="promo-section">
-            <h3><i class="fa-solid fa-radio" style="color:#e53e3e;"></i> غرف البث المباشر والصوت</h3>
+            <h3><i class="fa-solid fa-radio" style="color:#e53e3e;"></i> غرف البث الم مباشر والصوت</h3>
             <p>استمتع بالاستماع إلى محطات الراديو المختلفة والصوتيات المتنوعة أثناء الدردشة ودخولك البث المباشر الخاص بالدردشة الكتابية.</p>
         </div>
     </div>
@@ -170,7 +181,7 @@
         </div>
         <div class="header-nav-menu">
             <div class="nav-item" onclick="alert('بلاغ')"><i class="fa-solid fa-triangle-exclamation" style="color:#e53e3e;"></i>بلاغ</div>
-            <div class="nav-item" onclick="alert('الخاص')"><i class="fa-solid fa-envelope" style="color:#3182ce;"></i>الخاص</div>
+            <div class="nav-item" onclick="openInboxModal()"><i class="fa-solid fa-envelope" style="color:#3182ce;"></i>الخاص <span id="mainPmBadge" class="badge-notify" style="display:none;">0</span></div>
             <div class="nav-item" onclick="alert('الأثرياء')"><i class="fa-solid fa-gem" style="color:#ecc94b;"></i>الأثرياء</div>
             <div class="nav-item" onclick="alert('الكبار')"><i class="fa-solid fa-crown" style="color:#ed64a6;"></i>الكبار</div>
             <div class="nav-item" onclick="openRoomOptionsModal()"><i class="fa-solid fa-gear"></i>الخيارات</div>
@@ -208,6 +219,7 @@
 
 </div>
 
+<!-- بروفايل العضو المطور -->
 <div class="popup-overlay" id="profileCardModal">
     <div class="profile-card">
         <button class="close-x-btn" onclick="closeAllModals()">X</button>
@@ -221,7 +233,7 @@
             <button class="prof-bar-btn" onclick="alert('خلفية العضو')"><i class="fa-solid fa-image"></i><span>الخلفية</span></button>
             <button class="prof-bar-btn" onclick="alert('غلاف العضو')"><i class="fa-solid fa-photo-film"></i><span>الغلاف</span></button>
             <button class="prof-bar-btn" onclick="likeUserProfile()"><i class="fa-solid fa-heart" style="color:#e53e3e;"></i><span>لايك (<b id="pLikesDisplay">0</b>)</span></button>
-            <button class="prof-bar-btn" onclick="alert('فتح محادثة خاصة')"><i class="fa-solid fa-envelope" style="color:#3182ce;"></i><span>الخاص</span></button>
+            <button class="prof-bar-btn" onclick="startDirectPrivateChat()"><i class="fa-solid fa-envelope" style="color:#3182ce;"></i><span>الخاص</span></button>
             <button class="prof-bar-btn" onclick="alert('الهدايا المنتقلة')"><i class="fa-solid fa-gift" style="color:#ecc94b;"></i><span>الهدايا</span></button>
             <button class="prof-bar-btn" style="cursor: default;"><i class="fa-solid fa-chart-line" style="color:#38a169;"></i><span>المستوى (<b id="pLevelDisplay">0</b>)</span></button>
         </div>
@@ -239,6 +251,30 @@
             </div>
             <button id="adminOperationsBtn" class="popup-btn" style="background:#e53e3e; color:#fff; display:none; margin-top:10px;" onclick="openAdminOperationsModal()">🛠️ زر أوامر الإدارة للمالك</button>
         </div>
+    </div>
+</div>
+
+<!-- صندوق المحادثة الخاصة المشفرة السري -->
+<div class="popup-overlay" id="privateChatModal">
+    <div class="popup-box" style="max-width: 400px;">
+        <button class="close-x-btn" onclick="closeAllModals()">X</button>
+        <h3 id="pmTargetTitle" style="text-align:center; margin-bottom:5px; font-size:14px; color:#3182ce;"><i class="fa-solid fa-user-lock"></i> محادثة خاصة مشفرة</h3>
+        <div class="pm-chat-box">
+            <div class="pm-messages-list" id="pmMessagesContainer"></div>
+            <div style="display:flex; border-top:1px solid #cbd5e0; background:#fff;">
+                <input type="text" id="pmInputText" style="flex:1; border:none; padding:8px; outline:none; font-size:13px;" placeholder="اكتب رسالة مشفرة...">
+                <button onclick="sendPrivateMessageLive()" style="background:#3182ce; color:white; border:none; padding:0 15px; cursor:pointer;"><i class="fa-solid fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- صندوق الوارد (قائمة الأشخاص الذين راسلوك) -->
+<div class="popup-overlay" id="inboxListModal">
+    <div class="popup-box">
+        <button class="close-x-btn" onclick="closeAllModals()">X</button>
+        <h3 style="text-align:center; margin-bottom:12px;"><i class="fa-solid fa-comments"></i> المحادثات النشطة</h3>
+        <div id="inboxListContainer" style="display:flex; flex-direction:column; gap:8px;"></div>
     </div>
 </div>
 
@@ -288,7 +324,20 @@
         <div class="form-group"><label>الجنس:</label>
             <select id="editProfileGender" class="form-control"><option value="ذكر">ذكر</option><option value="أنثى">أنثى</option></select>
         </div>
-        <div class="form-group"><label>لون خلفية الاسم المخصص:</label><input type="color" id="editProfileNameBg" class="form-control" style="height:40px; padding:2px;"></div>
+        
+        <!-- التحديث الجديد للألوان والأنماط الماسية اللامعة -->
+        <div class="form-group"><label>لون خط الاسم:</label><input type="color" id="editProfileNameColor" class="form-control" value="#2d3748" style="height:35px; padding:2px;"></div>
+        <div class="form-group"><label>لون خلفية الاسم المخصص:</label><input type="color" id="editProfileNameBg" class="form-control" value="#ffffff" style="height:35px; padding:2px;"></div>
+        <div class="form-group">
+            <label>تأثيرات الاسم الخاصة المتحركة:</label>
+            <select id="editProfileEffect" class="form-control">
+                <option value="">بدون تأثير</option>
+                <option value="effect-rainbow">🌈 طيف قوس قزح المتحرك</option>
+                <option value="effect-glow">✨ وهج ماسي لامع</option>
+                <option value="effect-fire">🔥 لهيب النار المتحرك</option>
+            </select>
+        </div>
+        
         <button class="popup-btn" style="background:#ffd700; color:#1a1a1a;" onclick="saveAdvancedProfileChanges()">حفظ وتحديث التغييرات العامة</button>
     </div>
 </div>
@@ -326,7 +375,7 @@
         <button class="popup-btn" style="background:#4a5568; margin-top:5px;" onclick="triggerMuteToggleLocal(false)">٢- فك كتم المايك</button>
         <button class="popup-btn" style="background:#00b4db; margin-top:5px;" onclick="openAudioSearchPanel()">٣- تشغيل اغنيه</button>
         <button class="popup-btn" style="background:#e53e3e; margin-top:5px;" onclick="stopGlobalMusic()">٤- إيقاف الاغنيه عندي</button>
-        <button class="popup-btn" style="background:#1a1a1a; margin-top:12px;" onclick="descendFromMicRemote()">五- نزول من المايك ⬇️</button>
+        <button class="popup-btn" id="descendMicBtn" style="background:#1a1a1a; margin-top:12px;" onclick="descendFromMicRemote()">五- نزول من المايك ⬇️</button>
     </div>
 </div>
 
@@ -376,6 +425,7 @@
 <script src="https://www.youtube.com/iframe_api"></script>
 
 <script>
+    // تهيئة فايربيس المحسنة فائقة السرعة
     const firebaseConfig = {
         apiKey: "AIzaSyDTUvD1gQqmnSAaqjJJ6DvBY-G6SVolsiw",
         authDomain: "hasoni-22097.firebaseapp.com",
@@ -416,7 +466,7 @@
         name: "حسوني (صاحب الموقع)", age: "19", gender: "ذكر", country: "العراق", rank: "owner",
         avatar: "https://via.placeholder.com/40/ffd700/000000?text=👑",
         cover: "linear-gradient(135deg, #aa7c11, #ffd700)",
-        status: "صاحب الموقع الرسمي لشات حسوني المطور", nameBg: "#ffffff", likes: 2000, level: 1000, msgSentCount: 0
+        status: "صاحب الموقع الرسمي لشات حسوني المطور", nameBg: "#ffffff", nameColor: "#2d3748", nameEffect: "effect-glow", likes: 2000, level: 1000, msgSentCount: 0
     };
 
     let dynamicRoomUsers = [];
@@ -424,7 +474,7 @@
         name: "زائر مؤقت", age: "20", gender: "ذكر", country: "العراق", rank: "visitor",
         avatar: "https://via.placeholder.com/40/cbd5e0/000000?text=U",
         cover: "linear-gradient(135deg, #1e1e24, #2a2a35)",
-        status: "اضغط على المفتاح للتسجيل للأبد وتعديل ملفك", nameBg: "#ffffff", likes: 0, level: 0, msgSentCount: 0
+        status: "اضغط على المفتاح للتسجيل للأبد وتعديل ملفك", nameBg: "#ffffff", nameColor: "#2d3748", nameEffect: "", likes: 0, level: 0, msgSentCount: 0
     };
 
     let activeMicSlot = null; 
@@ -461,54 +511,51 @@
             applyUserSessionUI(); 
         }
 
-        // الاستماع الدائم لتحديثات خلفية الروم المزامنة للجميع من السيرفر مباشرة
         database.ref('room_background_url').on('value', function(snapshot) {
             let bgUrl = snapshot.val();
-            if(bgUrl) {
-                document.getElementById('chatContainerView').style.backgroundImage = `url('${bgUrl}')`;
-            }
+            if(bgUrl) { document.getElementById('chatContainerView').style.backgroundImage = `url('${bgUrl}')`; }
         });
 
-        database.ref('messages').limitToLast(50).on('child_added', function(snapshot) {
-            renderHistoricalMessage(snapshot.val());
+        // جلب آخر 50 رسالة مباشرة عند دخول أي زائر أو عضو جديد
+        document.getElementById('chatMessages').innerHTML = "";
+        database.ref('messages').limitToLast(50).once('value', function(snapshot) {
+            snapshot.forEach(child => {
+                renderHistoricalMessage(child.val());
+            });
+        });
+        
+        // استماع فوري وسريع للرسائل الجديدة الطائرة
+        database.ref('messages').limitToLast(1).on('child_added', function(snapshot) {
+            database.ref('messages').limitToLast(50).once('value', function(snapAll) {
+                document.getElementById('chatMessages').innerHTML = "";
+                snapAll.forEach(c => renderHistoricalMessage(c.val()));
+            });
         });
 
-        // مزامنة حية وفورية لتعديلات الأعضاء في الساحة والمتواجدين فور تغييرها
+        // مزامنة المتواجدين الدائمة (لا تُحذف أبداً لضمان بقائهم في القائمة)
         database.ref('users_online').on('value', function(snapshot) {
             dynamicRoomUsers = [];
             snapshot.forEach(child => {
                 let u = child.val();
                 dynamicRoomUsers.push(u);
-                // إذا تغيرت بياناتي من طرف الإدارة، قم بتحديث الجلسة المحلية فوراً لفتح الصلاحيات
+                
                 if(userRefKey && child.key === userRefKey) {
                     if(accountData.rank !== u.rank || accountData.name !== u.name || accountData.avatar !== u.avatar) {
                         accountData = u;
                         localStorage.setItem('hasoni_secure_session', JSON.stringify(accountData));
-                        const currentRankInfo = sysRanksConfig[accountData.rank] || sysRanksConfig['visitor'];
-                        document.getElementById('topUserRank').innerHTML = `${currentRankInfo.icon} ${currentRankInfo.label}`;
-                        const hasStaffPower = currentRankInfo.isStaff;
-                        document.getElementById('roomCleanOpt').style.display = hasStaffPower ? 'flex' : 'none';
-                        document.getElementById('roomBgOpt').style.display = hasStaffPower ? 'flex' : 'none';
-                        document.getElementById('roomMsgOpt').style.display = hasStaffPower ? 'flex' : 'none';
+                        updateHeaderAndPermissions();
                     }
                 }
             });
-            // إعادة رسم المتواجدين تلقائياً إذا كانت اللوحة مفتوحة لتعكس التعديلات فوراً
-            if(document.getElementById('onlineUsersModal').style.display === 'flex') {
-                openOnlineUsersModal();
-            }
+            if(document.getElementById('onlineUsersModal').style.display === 'flex') { openOnlineUsersModal(); }
         });
 
         database.ref('room_mics_status').on('value', function(snapshot) {
-            for(let i=1; i<=4; i++) {
-                resetMicNodeLocalView(i);
-            }
+            for(let i=1; i<=4; i++) { resetMicNodeLocalView(i); }
             snapshot.forEach(child => {
                 let slotKey = child.key;
                 let mData = child.val();
-                if(mData && mData.occupied) {
-                    applyLiveMicNodeUI(slotKey, mData);
-                }
+                if(mData && mData.occupied) { applyLiveMicNodeUI(slotKey, mData); }
             });
         });
 
@@ -519,7 +566,19 @@
                 ytGlobalAudioPlayer.playVideo();
             }
         });
+
+        // تشغيل نظام الاستماع الفوري لإشعارات المحادثات الخاصة المشفرة
+        listenForPrivateMessagesLive();
     };
+
+    function updateHeaderAndPermissions() {
+        const currentRankInfo = sysRanksConfig[accountData.rank] || sysRanksConfig['visitor'];
+        document.getElementById('topUserRank').innerHTML = `${currentRankInfo.icon} ${currentRankInfo.label}`;
+        const hasStaffPower = currentRankInfo.isStaff;
+        document.getElementById('roomCleanOpt').style.display = hasStaffPower ? 'flex' : 'none';
+        document.getElementById('roomBgOpt').style.display = hasStaffPower ? 'flex' : 'none';
+        document.getElementById('roomMsgOpt').style.display = hasStaffPower ? 'flex' : 'none';
+    }
 
     function onYouTubeIframeAPIReady() {
         ytGlobalAudioPlayer = new YT.Player('ytPlayerContainer', {
@@ -553,7 +612,7 @@
         
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(emailInput)) {
-            alert("فشل التسجيل! يرجى إدخال بريد إلكتروني صالح وحقيقي مفعّل (تحتوي على @ ونطاق صحيح).");
+            alert("يرجى إدخال بريد إلكتروني حقيقي مفعّل وصالح.");
             return;
         }
 
@@ -577,8 +636,7 @@
 
     function applyUserSessionUI() {
         const keyBtn = document.getElementById('keyAuthBtn');
-        const currentRankInfo = sysRanksConfig[accountData.rank] || sysRanksConfig['visitor'];
-        document.getElementById('topUserRank').innerHTML = `${currentRankInfo.icon} ${currentRankInfo.label}`;
+        updateHeaderAndPermissions();
         
         if(accountData.rank !== 'visitor') {
             if(keyBtn) keyBtn.style.display = 'none';
@@ -586,16 +644,11 @@
             if(keyBtn) keyBtn.style.display = 'flex';
         }
 
-        const hasStaffPower = currentRankInfo.isStaff;
-        document.getElementById('roomCleanOpt').style.display = hasStaffPower ? 'flex' : 'none';
-        document.getElementById('roomBgOpt').style.display = hasStaffPower ? 'flex' : 'none';
-        document.getElementById('roomMsgOpt').style.display = hasStaffPower ? 'flex' : 'none';
-
         if(!userRefKey) {
             let onlineRef = database.ref('users_online').push();
             userRefKey = onlineRef.key;
             onlineRef.set(accountData);
-            onlineRef.onDisconnect().remove();
+            // تم إلغاء removeOnDisconnect لكي يبقى المتواجدون دائمًا في القائمة حتى لو خرجوا
         } else {
             database.ref('users_online/' + userRefKey).set(accountData);
         }
@@ -610,14 +663,11 @@
         if (file) {
             let reader = new FileReader();
             reader.onload = function(e) { 
-                let base64Bg = e.target.result;
-                // تعديل: رفع الخلفية لقاعدة البيانات لتظهر لجميع الأعضاء فوراً وحفظها
-                database.ref('room_background_url').set(base64Bg);
+                database.ref('room_background_url').set(e.target.result);
             };
             reader.readAsDataURL(file);
         }
         closeAllModals();
-        alert("تم تحديث وتثبيت خلفية الروم بنجاح للجميع 🖼️");
     }
 
     function handleFileSelect(event, type) {
@@ -627,7 +677,7 @@
             reader.onload = function(e) {
                 if(type === 'avatar') tempUploadedAvatar = e.target.result;
                 if(type === 'cover') tempUploadedCover = e.target.result;
-                alert("تم تحميل ملف الصورة بنجاح وستظهر للجميع عند حفظ التغييرات!");
+                alert("تم تحميل الملف بنجاح وسيظهر للجميع فور حفظ البيانات.");
             };
             reader.readAsDataURL(file);
         }
@@ -635,8 +685,13 @@
 
     function openAnyUserProfileCard(userObj) {
         currentProfileUserTarget = userObj;
-        document.getElementById('pNameDisplay').innerText = userObj.name;
-        document.getElementById('pNameDisplay').style.backgroundColor = userObj.nameBg || '#ffffff';
+        
+        const nameDisp = document.getElementById('pNameDisplay');
+        nameDisp.innerText = userObj.name;
+        nameDisp.className = "profile-name " + (userObj.nameEffect || "");
+        nameDisp.style.backgroundColor = userObj.nameBg || '#ffffff';
+        nameDisp.style.color = userObj.nameColor || '#2d3748';
+
         document.getElementById('pStatusTextDisplay').innerText = userObj.status || "لا توجد حالة";
         document.getElementById('pGenderDisplay').innerText = userObj.gender || "ذكر";
         document.getElementById('pAgeDisplay').innerText = userObj.age || "20";
@@ -669,8 +724,15 @@
             document.getElementById('profilePenEditBtn').style.display = 'none';
         }
 
-        if(accountData.rank === 'owner' && userObj.name !== accountData.name) {
-            document.getElementById('adminOperationsBtn').style.display = 'block';
+        // قواعد إدارية صارمة للمالك الرسمي (حسوني) وضد رتب المالك المرفعين
+        if(accountData.rank === 'owner' || sysRanksConfig[accountData.rank]?.isStaff) {
+            if(userObj.name === "حسوني (صاحب الموقع)") {
+                document.getElementById('adminOperationsBtn').style.display = 'none'; 
+            } else if(accountData.name === "حسوني (صاحب الموقع)" || userObj.rank !== 'owner') {
+                document.getElementById('adminOperationsBtn').style.display = 'block';
+            } else {
+                document.getElementById('adminOperationsBtn').style.display = 'none';
+            }
         } else {
             document.getElementById('adminOperationsBtn').style.display = 'none';
         }
@@ -686,6 +748,8 @@
         document.getElementById('editProfileAge').value = currentProfileUserTarget.age || '20';
         document.getElementById('editProfileCountry').value = currentProfileUserTarget.country || 'العراق';
         document.getElementById('editProfileNameBg').value = currentProfileUserTarget.nameBg || '#ffffff';
+        document.getElementById('editProfileNameColor').value = currentProfileUserTarget.nameColor || '#2d3748';
+        document.getElementById('editProfileEffect').value = currentProfileUserTarget.nameEffect || '';
         document.getElementById('editProfileFieldsModal').style.display = 'flex';
     }
 
@@ -696,6 +760,8 @@
         target.age = document.getElementById('editProfileAge').value.trim() || target.age;
         target.country = document.getElementById('editProfileCountry').value.trim() || target.country;
         target.nameBg = document.getElementById('editProfileNameBg').value;
+        target.nameColor = document.getElementById('editProfileNameColor').value;
+        target.nameEffect = document.getElementById('editProfileEffect').value;
         target.gender = document.getElementById('editProfileGender').value;
 
         if(tempUploadedAvatar) target.avatar = tempUploadedAvatar;
@@ -707,14 +773,13 @@
             applyUserSessionUI();
         }
         
-        // تعديل: الحفظ المباشر والشامل في السيرفر ليعكس التحديث فورا للكل
         database.ref('users_online').orderByChild('name').equalTo(target.name).once('value', function(snap){
             snap.forEach(child => { child.ref.update(target); });
         });
         
         closeAllModals();
         openAnyUserProfileCard(target);
-        alert("تم تحديث وحفظ بيانات البروفايل بنجاح تام وظهرت للجميع! ✨");
+        alert("تم حفظ البروفايل والألوان اللامعة بنجاح تامي! ✨");
     }
 
     function openAdminOperationsModal() {
@@ -729,25 +794,24 @@
         database.ref('users_online').orderByChild('name').equalTo(currentProfileUserTarget.name).once('value', function(snap){
             snap.forEach(child => { 
                 child.ref.child('rank').set(selectedRank); 
-                // تحديث الصورة والخصائص الاخرى المربوطة بالرتبة تلقائياً
                 if(selectedRank === 'diamond') {
                     child.ref.child('avatar').set("https://via.placeholder.com/40/00b4db/ffffff?text=💎");
                 }
             });
         });
 
-        alert(`تم تحديث رتبة العضو [${currentProfileUserTarget.name}] بنجاح إلى: ${sysRanksConfig[selectedRank].label}`);
+        alert(`تم تغيير الرتبة لـ [${currentProfileUserTarget.name}] بنجاح.`);
         closeAllModals();
     }
 
     function executeAdminAction(actionType) {
-        alert(`تم تطبيق أمر المالك الصارم [ ${actionType} ] بنجاح بنجاح ضد العضو ${currentProfileUserTarget.name}.`);
+        alert(`تم تطبيق أمر [ ${actionType} ] بنجاح.`);
         closeAllModals();
     }
 
     function likeUserProfile() {
         if(accountData.rank !== 'owner' && myLikedProfilesList.includes(currentProfileUserTarget.name)) {
-            alert("لقد قمت بإعطاء لايك لهذا البروفايل مرة واحدة من قبل!");
+            alert("لقد وضعت لايك سابقاً لهذا الحساب!");
             return;
         }
         myLikedProfilesList.push(currentProfileUserTarget.name);
@@ -759,19 +823,28 @@
                 snap.forEach(child => { child.ref.child('likes').set(currentProfileUserTarget.likes); });
             });
         }
-        alert("تم تسجيل إعجابك الحقيقي بالبروفايل ❤️");
+        alert("تم تسجيل الإعجاب بنجاح ❤️");
     }
 
     function handleMicClick(slotNum) {
         selectedMicTarget = slotNum;
-        if(activeMicSlot === slotNum) {
-            document.getElementById('micOccupiedMenuModal').style.display = 'flex';
-            return;
-        }
         database.ref('room_mics_status/' + slotNum).once('value', function(snap) {
             let mData = snap.val();
+            
+            // تخصيص زر النزول والتحكم بناء على حصانة المالك
+            const descBtn = document.getElementById('descendMicBtn');
+            if(descBtn) {
+                if(accountData.name === "حسوني (صاحب الموقع)") {
+                    descBtn.style.display = "block"; 
+                } else if(mData && mData.name !== accountData.name) {
+                    descBtn.style.display = "none"; 
+                } else {
+                    descBtn.style.display = "block";
+                }
+            }
+
             if (mData && mData.occupied) {
-                if(mData.name === accountData.name) {
+                if(mData.name === accountData.name || accountData.name === "حسوني (صاحب الموقع)") {
                     document.getElementById('micOccupiedMenuModal').style.display = 'flex';
                 } else {
                     alert(`هذا المايك مشغول حالياً من قبل العضو: ${mData.name}`);
@@ -786,30 +859,15 @@
         if(activeMicSlot !== null) { database.ref('room_mics_status/' + activeMicSlot).remove(); }
         activeMicSlot = selectedMicTarget;
         
-        navigator.mediaDevices.getUserMedia({ audio: true, video: false })
-        .then(function(stream) {
-            localVoiceStream = stream;
-            let upData = {
-                occupied: true,
-                name: accountData.name,
-                cover: accountData.cover || "linear-gradient(135deg, #1e1e24, #2a2a35)",
-                muted: false
-            };
-            database.ref('room_mics_status/' + activeMicSlot).set(upData);
-            closeAllModals();
-            alert("تم صعودك للميكروفون بنجاح وصوتك الحقيقي مسموع للجميع الآن! 🎙️🔊");
-        })
-        .catch(function(err) {
-            let upData = {
-                occupied: true,
-                name: accountData.name,
-                cover: accountData.cover || "linear-gradient(135deg, #1e1e24, #2a2a35)",
-                muted: false
-            };
-            database.ref('room_mics_status/' + activeMicSlot).set(upData);
-            closeAllModals();
-            alert("تم صعودك للمايك بنجاح (لم يتم تفعيل لاقط الصوت لعدم منح الصلاحية).");
-        });
+        let upData = {
+            occupied: true,
+            name: accountData.name,
+            cover: accountData.cover || "linear-gradient(135deg, #1e1e24, #2a2a35)",
+            muted: false
+        };
+        database.ref('room_mics_status/' + activeMicSlot).set(upData);
+        closeAllModals();
+        alert("تم صعودك للميكروفون بنجاح صوتك مسموع الآن للجميع! 🎙️");
     }
 
     function applyLiveMicNodeUI(slot, data) {
@@ -837,29 +895,18 @@
 
     function triggerMuteToggleLocal(isMute) {
         database.ref('room_mics_status/' + selectedMicTarget + '/muted').set(isMute);
-        if(localVoiceStream) {
-            localVoiceStream.getAudioTracks().forEach(track => track.enabled = !isMute);
-        }
         closeAllModals();
-        alert(isMute ? "تم كتم المايك بنجاح." : "تم فك كتم المايك بنجاح.");
+        alert(isMute ? "تم كتم المايك." : "تم فك كتم المايك.");
     }
 
     function descendFromMicRemote() {
         database.ref('room_mics_status/' + selectedMicTarget).remove();
-        if(activeMicSlot === selectedMicTarget) {
-            activeMicSlot = null;
-            if(localVoiceStream) {
-                localVoiceStream.getTracks().forEach(track => track.stop());
-                localVoiceStream = null;
-            }
-        }
+        if(activeMicSlot === selectedMicTarget) { activeMicSlot = null; }
         closeAllModals();
-        alert("تم النزول من المايك بنجاح وإيقاف تشغيل الصوت.");
+        alert("تم النزول من المايك بنجاح.");
     }
 
-    function openAudioSearchPanel() {
-        document.getElementById('audioSearchPanelModal').style.display = 'flex';
-    }
+    function openAudioSearchPanel() { document.getElementById('audioSearchPanelModal').style.display = 'flex'; }
 
     function extractYoutubeVideoId(url) {
         let regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
@@ -873,20 +920,15 @@
         let vidId = extractYoutubeVideoId(query) || "5FA8A1vHh_U";
         database.ref('global_room_audio_stream').set({ videoId: vidId, requester: accountData.name, time: Date.now() });
         closeAllModals();
-        alert("تم جلب الأغنية بنجاح وتشغيلها حياً ومباشراً للجميع! 🎶");
     }
 
     function stopGlobalMusic() {
-        if(ytGlobalAudioPlayer && typeof ytGlobalAudioPlayer.stopVideo === 'function') {
-            ytGlobalAudioPlayer.stopVideo();
-        }
-        alert("تم إيقاف الأغنية والصوت محلياً عندك.");
+        if(ytGlobalAudioPlayer && typeof ytGlobalAudioPlayer.stopVideo === 'function') { ytGlobalAudioPlayer.stopVideo(); }
+        alert("تم إيقاف الأغنية محلياً عندك.");
         closeAllModals();
     }
 
-    function openYoutubeSearchSystem() {
-        document.getElementById('youtubeMainSearchModal').style.display = 'flex';
-    }
+    function openYoutubeSearchSystem() { document.getElementById('youtubeMainSearchModal').style.display = 'flex'; }
 
     function broadcastYoutubeToChat() {
         let query = document.getElementById('ytQueryInput').value.trim();
@@ -895,7 +937,7 @@
         
         const packedMsg = {
             name: accountData.name, avatar: accountData.avatar, rank: accountData.rank, 
-            nameBg: accountData.nameBg, text: "📺 شارك معكم فيديو يوتيوب حقيقي:", mediaVideoId: vidId,
+            nameBg: accountData.nameBg, nameColor: accountData.nameColor, nameEffect: accountData.nameEffect, text: "📺 شارك معكم فيديو يوتيوب حقيقي:", mediaVideoId: vidId,
             age: accountData.age, gender: accountData.gender, country: accountData.country, status: accountData.status, cover: accountData.cover, likes: accountData.likes, level: accountData.level
         };
         database.ref('messages').push(packedMsg);
@@ -912,7 +954,7 @@
         ownerRow.innerHTML = `
             <div style="display:flex; align-items:center; gap:10px;">
                 <img src="${siteOwnerObj.avatar}" class="user-online-avatar owner-gold-frame">
-                <span style="font-weight:bold; font-size:13px; background:#ffffff; padding:2px 6px; border-radius:4px;">${siteOwnerObj.name}</span>
+                <span class="${siteOwnerObj.nameEffect || ''}" style="font-weight:bold; font-size:13px; background:${siteOwnerObj.nameBg || '#ffffff'}; color:${siteOwnerObj.nameColor || '#2d3748'}; padding:2px 6px; border-radius:4px;">${siteOwnerObj.name}</span>
             </div>
             <span class="rank-badge-pill" style="background:#ffd700; color:#1a1a1a;">${sysRanksConfig['owner'].icon} ${sysRanksConfig['owner'].label}</span>
         `;
@@ -927,7 +969,7 @@
                 row.innerHTML = `
                     <div style="display:flex; align-items:center; gap:10px;">
                         <img src="${u.avatar}" class="user-online-avatar">
-                        <span style="font-weight:bold; font-size:13px; background:${u.nameBg || '#ffffff'}; padding:2px 6px; border-radius:4px;">${u.name}</span>
+                        <span class="${u.nameEffect || ''}" style="font-weight:bold; font-size:13px; background:${u.nameBg || '#ffffff'}; color:${u.nameColor || '#2d3748'}; padding:2px 6px; border-radius:4px;">${u.name}</span>
                     </div>
                     <span class="rank-badge-pill" style="background:${currentRankInfo.color}">${currentRankInfo.icon} ${currentRankInfo.label}</span>
                 `;
@@ -938,7 +980,7 @@
         document.getElementById('onlineUsersModal').style.display = 'flex';
     }
 
-    function refreshChatData() { alert("تم تحديث الشات بنجاح 🔄"); }
+    function refreshChatData() { alert("تم تحديث الشات وتنقيت المسارات بنجاح 🔄"); }
     function cleanRoomMessages() { database.ref('messages').remove(); document.getElementById('chatMessages').innerHTML = ""; closeAllModals(); }
     
     function setSpecialRoomMessage() {
@@ -968,7 +1010,7 @@
 
             const packedMsg = {
                 name: accountData.name, avatar: accountData.avatar, rank: accountData.rank, 
-                nameBg: accountData.nameBg, text: text, textVideoId: directYtId || null,
+                nameBg: accountData.nameBg, nameColor: accountData.nameColor, nameEffect: accountData.nameEffect, text: text, textVideoId: directYtId || null,
                 age: accountData.age, gender: accountData.gender, country: accountData.country, status: accountData.status, cover: accountData.cover, likes: accountData.likes, level: accountData.level
             };
             database.ref('messages').push(packedMsg);
@@ -999,7 +1041,6 @@
             mediaHtml = `<div class="media-msg-box"><iframe src="https://www.youtube.com/embed/${msgObj.textVideoId}" allowfullscreen></iframe></div>`;
         }
 
-        // تحويل الكود بالكامل ليحتوي على كائن العضو المنسق لتمريره عند الضغط على أيقونته الخاصة به في الساحة
         let safeUserObj = JSON.stringify(msgObj).replace(/"/g, '&quot;');
 
         messageRow.innerHTML = `
@@ -1007,7 +1048,7 @@
             <div class="message-content">
                 <div class="user-tag-bar">
                     <span class="rank-icon-sep">${rankInfo.icon}</span>
-                    <div class="username-container" style="background:${msgObj.nameBg || '#ffffff'}" onclick="quoteUsernameOnly('${msgObj.name}')" ondblclick="quoteFullTextMsg('${msgObj.text}')">
+                    <div class="username-container ${msgObj.nameEffect || ''}" style="background:${msgObj.nameBg || '#ffffff'}; color:${msgObj.nameColor || '#2d3748'};" onclick="quoteUsernameOnly('${msgObj.name}')" ondblclick="quoteFullTextMsg('${msgObj.text}')">
                         <span>${msgObj.name}</span>
                     </div>
                 </div>
@@ -1017,6 +1058,99 @@
         `;
         chatMessages.appendChild(messageRow);
         chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    // ==========================================
+    // نـظـام الـمـحـادثـات الـخـاصـة الـمـشـفـرة المطور
+    // ==========================================
+    let activePmTargetName = "";
+
+    function getPmRoomId(userA, userB) {
+        return [userA, userB].sort().join("_").replace(/[.#$\[\]]/g, "-");
+    }
+
+    function startDirectPrivateChat() {
+        if(currentProfileUserTarget.name === accountData.name) { alert("لا يمكنك مراسلة نفسك خاص!"); return; }
+        activePmTargetName = currentProfileUserTarget.name;
+        document.getElementById('pmTargetTitle').innerHTML = `<i class="fa-solid fa-user-lock"></i> محادثة خاصة مشفرة مع: ${activePmTargetName}`;
+        closeAllModals();
+        
+        let pRoomId = getPmRoomId(accountData.name, activePmTargetName);
+        
+        // جلب الرسائل الخاصة المشفرة بشكل فوري وسريع للغاية
+        database.ref('private_chats/' + pRoomId).on('value', function(snapshot) {
+            let container = document.getElementById('pmMessagesContainer');
+            container.innerHTML = "";
+            snapshot.forEach(child => {
+                let m = child.val();
+                let div = document.createElement('div');
+                div.className = "pm-msg-line " + (m.sender === accountData.name ? "pm-sent" : "pm-received");
+                div.innerText = m.text;
+                container.appendChild(div);
+            });
+            container.scrollTop = container.scrollHeight;
+        });
+
+        // تصفير وقراءة الإشعارات فور فتح الشات الخاص بين الطرفين
+        database.ref('pm_notifications/' + accountData.name.replace(/[.#$\[\]]/g, "-") + '/' + activePmTargetName.replace(/[.#$\[\]]/g, "-")).remove();
+
+        document.getElementById('privateChatModal').style.display = 'flex';
+    }
+
+    function sendPrivateMessageLive() {
+        let txt = document.getElementById('pmInputText').value.trim();
+        if(!txt) return;
+        let pRoomId = getPmRoomId(accountData.name, activePmTargetName);
+        
+        let packedPm = { sender: accountData.name, receiver: activePmTargetName, text: txt, time: Date.now() };
+        database.ref('private_chats/' + pRoomId).push(packedPm);
+        
+        // إرسال إشعار حي وفوري في السيرفر للطرف الآخر لتنبيهه بوجود وميض رسالة جديدة
+        let receiverCleanKey = activePmTargetName.replace(/[.#$\[\]]/g, "-");
+        let senderCleanKey = accountData.name.replace(/[.#$\[\]]/g, "-");
+        database.ref('pm_notifications/' + receiverCleanKey + '/' + senderCleanKey).set({ unread: true, lastText: txt, senderName: accountData.name });
+
+        document.getElementById('pmInputText').value = "";
+    }
+
+    function listenForPrivateMessagesLive() {
+        let myCleanKey = accountData.name.replace(/[.#$\[\]]/g, "-");
+        database.ref('pm_notifications/' + myCleanKey).on('value', function(snapshot) {
+            let totalUnread = 0;
+            snapshot.forEach(child => { if(child.val()?.unread) totalUnread++; });
+            
+            const badge = document.getElementById('mainPmBadge');
+            if(totalUnread > 0) {
+                badge.innerText = totalUnread; badge.style.display = "inline-block";
+            } else {
+                badge.style.display = "none";
+            }
+        });
+    }
+
+    function openInboxModal() {
+        let myCleanKey = accountData.name.replace(/[.#$\[\]]/g, "-");
+        database.ref('pm_notifications/' + myCleanKey).once('value', function(snapshot) {
+            let container = document.getElementById('inboxListContainer');
+            container.innerHTML = "";
+            let count = 0;
+            snapshot.forEach(child => {
+                count++;
+                let info = child.val();
+                let row = document.createElement('div');
+                row.style = "padding:10px; background:#f1f3f5; border-radius:6px; cursor:pointer; font-weight:bold; font-size:13px; text-align:right; display:flex; justify-content:space-between;";
+                row.onclick = function() {
+                    activePmTargetName = info.senderName;
+                    document.getElementById('pmTargetTitle').innerHTML = `<i class="fa-solid fa-user-lock"></i> محادثة خاصة مع: ${activePmTargetName}`;
+                    closeAllModals();
+                    startDirectPrivateChat();
+                };
+                row.innerHTML = `<span>💬 من: ${info.senderName}</span> <span style="font-size:11px; color:#e53e3e;">(رسالة جديدة لم تقرأ)</span>`;
+                container.appendChild(row);
+            });
+            if(count === 0) { container.innerHTML = "<p style='text-align:center; font-size:12px; color:#a0aec0;'>لا توجد رسائل خاصة جديدة حالياً.</p>"; }
+        });
+        document.getElementById('inboxListModal').style.display = 'flex';
     }
 
     sendBtn.addEventListener('click', sendMessage);
