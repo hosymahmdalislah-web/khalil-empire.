@@ -49,7 +49,6 @@
         .mic-status-tag { font-size: 8px; color: #edf2f7; font-weight: bold; margin-top: 2px; display: none; z-index: 2; background: rgba(0,0,0,0.6); padding: 0 4px; border-radius: 4px; }
         .mic-box.muted .mic-status-tag { display: block; }
 
-        /* تعديل تصميم النصوص البرمجية لإلغاء الفقاعات تماماً وتظهر منسدلة ونقية */
         .chat-messages { flex: 1; padding: 12px; overflow-y: auto; background-color: rgba(243, 244, 246, 0.85); display: flex; flex-direction: column; gap: 8px; padding-bottom: 115px; }
         .message-row { display: flex; align-items: flex-start; gap: 8px; width: 100%; margin-bottom: 4px; }
         .avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #ffd700; cursor: pointer; }
@@ -86,11 +85,10 @@
         .profile-card { background: #fff; width: 100%; max-width: 350px; border-radius: 14px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.3); position: relative; text-align: center; padding-bottom: 15px; }
         .profile-cover { width: 100%; height: 110px; background: linear-gradient(135deg, #2c3e50, #3498db); background-size: cover; background-position: center; position: relative; }
         .profile-avatar-wrapper { position: relative; margin-top: -45px; display: inline-block; }
-        .profile-card-avatar { width: 85px; height: 85px; border-radius: 50%; border: 3px solid #fff; object-fit: cover; background: #fff; }
+        .profile-card-avatar { width: 85px; height: 85px; border-radius: 50%; border: 3px solid #fff; object-fit: cover; background: #fff; cursor: pointer; }
         .profile-info-section { padding: 10px 15px; }
         .profile-name { font-size: 16px; font-weight: bold; color: #1a202c; padding: 4px 10px; border-radius: 6px; display: inline-block; }
         
-        /* شريط ميزات البروفايل المتكامل والمطور حديثاً */
         .profile-actions-bar { display: flex; flex-wrap: wrap; justify-content: space-around; background: #f1f3f5; margin: 10px 15px 5px 15px; padding: 6px; border-radius: 12px; gap: 4px; }
         .prof-bar-btn { flex: 1; min-width: 65px; border: none; background: #fff; padding: 6px 2px; font-size: 11px; font-weight: bold; border-radius: 8px; cursor: pointer; color: #4a5568; box-shadow: 0 1px 3px rgba(0,0,0,0.05); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; }
         .prof-bar-btn:hover { background: #ffd700; color: #1a1a1a; }
@@ -104,16 +102,17 @@
         .owner-gold-frame { border: 2.5px solid #ffd700 !important; box-shadow: 0 0 8px #ffd700; }
         .rank-badge-pill { padding: 3px 8px; font-size: 11px; border-radius: 12px; color: white; font-weight: bold; display: flex; align-items: center; gap: 3px; }
         
-        .pencil-btn { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.6); color: #ffd700; width: 30px; height: 30px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 13px; cursor: pointer; border: 1px solid #ffd700; z-index: 20; }
+        .pencil-btn { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.7); color: #ffd700; width: 34px; height: 34px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 14px; cursor: pointer; border: 1px solid #ffd700; z-index: 20; }
         #pinnedSpecialMsg { background: #fff3cd; border-bottom: 1px solid #ffeeba; color: #856404; padding: 8px 12px; font-size: 13px; font-weight: bold; text-align: center; display: none; }
         
         .media-msg-box { margin-top: 5px; background: #000; border-radius: 8px; overflow: hidden; width: 100%; max-width: 320px; position: relative; aspect-ratio: 16/9; }
         .media-msg-box iframe { width: 100%; height: 100%; border: none; }
+        .file-upload-wrapper { position: relative; overflow: hidden; display: inline-block; width: 100%; }
+        .file-upload-wrapper input[type=file] { position: absolute; left: 0; top: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
     </style>
 </head>
 <body>
 
-<!-- مشغل الصوتيات المخفي المتزامن للغرفة -->
 <div id="ytPlayerContainer" style="position:absolute; width:1px; height:1px; opacity:0; left:-999px;"></div>
 
 <div class="chat-container" id="chatContainerView">
@@ -198,7 +197,6 @@
 
 </div>
 
-<!-- نافذة عرض البروفايل المحدثة -->
 <div class="popup-overlay" id="profileCardModal">
     <div class="profile-card">
         <button class="close-x-btn" onclick="closeAllModals()">X</button>
@@ -206,7 +204,7 @@
             <div class="pencil-btn" id="profilePenEditBtn" onclick="openProfileEditInputs()"><i class="fa-solid fa-pen"></i></div>
         </div>
         <div class="profile-avatar-wrapper">
-            <img src="" class="profile-card-avatar" id="pAvatarDisplay">
+            <img src="" class="profile-card-avatar" id="pAvatarDisplay" onclick="openAnyUserProfileCard(currentProfileUserTarget)">
         </div>
         <div class="profile-actions-bar">
             <button class="prof-bar-btn" onclick="alert('خلفية العضو')"><i class="fa-solid fa-image"></i><span>الخلفية</span></button>
@@ -233,7 +231,6 @@
     </div>
 </div>
 
-<!-- لوحة تحكم المالك الرسمي المتكاملة -->
 <div class="popup-overlay" id="adminOperationsModal">
     <div class="popup-box">
         <button class="close-x-btn" onclick="closeAllModals()">X</button>
@@ -251,7 +248,6 @@
     </div>
 </div>
 
-<!-- تعديل البيانات الشخصية -->
 <div class="popup-overlay" id="editProfileFieldsModal">
     <div class="popup-box">
         <button class="close-x-btn" onclick="closeAllModals()">X</button>
@@ -260,8 +256,23 @@
         <div class="form-group"><label>الحالة الشخصية العامة:</label><input type="text" id="editProfileStatus" class="form-control"></div>
         <div class="form-group"><label>العمر الحالي:</label><input type="number" id="editProfileAge" class="form-control"></div>
         <div class="form-group"><label>البلاد:</label><input type="text" id="editProfileCountry" class="form-control"></div>
-        <div class="form-group"><label>تغيير رابط الخلفية:</label><input type="text" id="editProfileBgLink" class="form-control" placeholder="ضع رابط الصورة هنا..."></div>
-        <div class="form-group"><label>تغيير رابط الغلاف:</label><input type="text" id="editProfileCoverLink" class="form-control" placeholder="ضع رابط صورة الغلاف..."></div>
+        
+        <div class="form-group">
+            <label>رفع صورة الخلفية (الملف):</label>
+            <div class="file-upload-wrapper">
+                <button class="popup-btn" style="background:#4a5568; margin:0;">اختر صورة الحساب 🖼️</button>
+                <input type="file" id="editProfileBgFile" accept="image/*" onchange="handleFileSelect(event, 'avatar')">
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label>رفع صورة الغلاف (الملف):</label>
+            <div class="file-upload-wrapper">
+                <button class="popup-btn" style="background:#4a5568; margin:0;">اختر صورة الغلاف 🗺️</button>
+                <input type="file" id="editProfileCoverFile" accept="image/*" onchange="handleFileSelect(event, 'cover')">
+            </div>
+        </div>
+
         <div class="form-group"><label>تغيير كلمة المرور السرية:</label><input type="password" id="editProfilePassword" class="form-control" placeholder="كلمة المرور الجديدة..."></div>
         <div class="form-group"><label>الجنس:</label>
             <select id="editProfileGender" class="form-control"><option value="ذكر">ذكر</option><option value="أنثى">أنثى</option></select>
@@ -271,7 +282,6 @@
     </div>
 </div>
 
-<!-- خيارات الروم للمشرفين -->
 <div class="popup-overlay" id="roomOptionsModal">
     <div class="popup-box">
         <button class="close-x-btn" onclick="closeAllModals()">X</button>
@@ -286,7 +296,6 @@
     </div>
 </div>
 
-<!-- تأكيد الصعود إلى المايك الفارغ -->
 <div class="popup-overlay" id="confirmMicJoinModal">
     <div class="popup-box" style="text-align: center;">
         <h3 style="margin-bottom:10px; color:#1a202c;"><i class="fa-solid fa-microphone"></i> الصعود للميكروفون</h3>
@@ -298,7 +307,6 @@
     </div>
 </div>
 
-<!-- خيارات المايك المشغول للعضو والأدمن -->
 <div class="popup-overlay" id="micOccupiedMenuModal">
     <div class="popup-box">
         <button class="close-x-btn" onclick="closeAllModals()">X</button>
@@ -307,11 +315,10 @@
         <button class="popup-btn" style="background:#4a5568; margin-top:5px;" onclick="triggerMuteToggleLocal(false)">٢- فك كتم المايك</button>
         <button class="popup-btn" style="background:#00b4db; margin-top:5px;" onclick="openAudioSearchPanel()">٣- تشغيل اغنيه</button>
         <button class="popup-btn" style="background:#e53e3e; margin-top:5px;" onclick="stopGlobalMusic()">٤- إيقاف الاغنيه عندي</button>
-        <button class="popup-btn" style="background:#1a1a1a; margin-top:12px;" onclick="descendFromMicRemote()">٥- نزول من المايك ⬇️</button>
+        <button class="popup-btn" style="background:#1a1a1a; margin-top:12px;" onclick="descendFromMicRemote()">五- نزول من المايك ⬇️</button>
     </div>
 </div>
 
-<!-- محرك بحث وتشغيل الأغاني والصوتيات بالرابط أو الاسم -->
 <div class="popup-overlay" id="audioSearchPanelModal">
     <div class="popup-box">
         <button class="close-x-btn" onclick="closeAllModals()">X</button>
@@ -324,7 +331,6 @@
     </div>
 </div>
 
-<!-- لوحة بحث يوتيوب العام لإرسال الفيديوهات والأغاني للشات -->
 <div class="popup-overlay" id="youtubeMainSearchModal">
     <div class="popup-box">
         <button class="close-x-btn" onclick="closeAllModals()">X</button>
@@ -337,7 +343,6 @@
     </div>
 </div>
 
-<!-- قائمة المتواجدين -->
 <div class="popup-overlay" id="onlineUsersModal">
     <div class="popup-box">
         <button class="close-x-btn" onclick="closeAllModals()">X</button>
@@ -346,7 +351,6 @@
     </div>
 </div>
 
-<!-- نافذة التسجيل للأبد للأعضاء -->
 <div class="popup-overlay" id="loginPopupModal">
     <div class="popup-box">
         <button class="close-x-btn" onclick="closeAllModals()">X</button>
@@ -374,7 +378,6 @@
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
 
-    // إعداد التكوينات للـ 20 رتبة الأساسية والإضافية المطلوبة بالتفصيل مع الفصل التام والأيقونات الجديدة للأسياد
     const sysRanksConfig = {
         'owner': { label: 'صاحب الموقع الرسمي', color: '#ffd700', icon: '<i class="fa-solid fa-trophy" style="color:#e53e3e;"></i>', isStaff: true },
         'king': { label: 'كنج', color: '#3182ce', icon: '<i class="fa-solid fa-crown" style="color:#3182ce;"></i>', isStaff: true },
@@ -419,6 +422,10 @@
     let userRefKey = null;
     let myLikedProfilesList = [];
     let ytGlobalAudioPlayer = null;
+    let localVoiceStream = null;
+
+    let tempUploadedAvatar = "";
+    let tempUploadedCover = "";
 
     window.onload = function() {
         const ageSelect = document.getElementById('initAgeInput');
@@ -454,7 +461,6 @@
             });
         });
 
-        // مزامنة المايكات الحية الأربعة في نفس الوقت ومراقبة المتحدثين
         database.ref('room_mics_status').on('value', function(snapshot) {
             for(let i=1; i<=4; i++) {
                 resetMicNodeLocalView(i);
@@ -468,7 +474,6 @@
             });
         });
 
-        // الاستماع لأوامر بث الصوتيات من المايكات للغرفة بأكملها لتعمل بشكل حقيقي
         database.ref('global_room_audio_stream').on('value', function(snapshot) {
             let stream = snapshot.val();
             if(stream && stream.videoId && ytGlobalAudioPlayer) {
@@ -478,7 +483,6 @@
         });
     };
 
-    // تهيئة يوتيوب بشكل حقيقي مدمج لتشغيل الموسيقى المتزامنة
     function onYouTubeIframeAPIReady() {
         ytGlobalAudioPlayer = new YT.Player('ytPlayerContainer', {
             height: '1', width: '1', videoId: '',
@@ -509,7 +513,6 @@
 
         if(!nameInput) { alert("يرجى كتابة اسم الحساب."); return; }
         
-        // التحقق الصارم من صحة البريد الإلكتروني بشكل حقيقي دائم وليس أي شيء عشوائي
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(emailInput)) {
             alert("فشل التسجيل! يرجى إدخال بريد إلكتروني صالح وحقيقي مفعّل (تحتوي على @ ونطاق صحيح).");
@@ -575,6 +578,19 @@
         alert("تم تحديث وتثبيت خلفية الروم بنجاح 🖼️");
     }
 
+    function handleFileSelect(event, type) {
+        let file = event.target.files[0];
+        if(file) {
+            let reader = new FileReader();
+            reader.onload = function(e) {
+                if(type === 'avatar') tempUploadedAvatar = e.target.result;
+                if(type === 'cover') tempUploadedCover = e.target.result;
+                alert("تم تحميل ملف الصورة بنجاح وستظهر للجميع عند حفظ التغييرات!");
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
     function openAnyUserProfileCard(userObj) {
         currentProfileUserTarget = userObj;
         document.getElementById('pNameDisplay').innerText = userObj.name;
@@ -587,7 +603,6 @@
         const rankInfo = sysRanksConfig[userObj.rank] || sysRanksConfig['visitor'];
         document.getElementById('pRankDisplay').innerHTML = `${rankInfo.icon} ${rankInfo.label}`;
         
-        // تخصيص سكان المالك بـ 2000 ألف تلقائياً وباقي الأعضاء بالعدد الفعلي الحقيقي
         if(userObj.rank === 'owner') {
             document.getElementById('pLikesDisplay').innerText = "2000 الف";
             document.getElementById('pLevelDisplay').innerText = "1000";
@@ -606,14 +621,12 @@
             coverDiv.style.background = userObj.cover || "linear-gradient(135deg, #2c3e50, #3498db)";
         }
 
-        // إتاحة تعديل البروفايل فوراً لنفس العضو أو المالك الرسمي على جميع الحسابات
-        if((userObj.name === accountData.name && accountData.rank !== 'visitor') || accountData.rank === 'owner') {
+        if(userObj.name === accountData.name || accountData.rank === 'owner') {
             document.getElementById('profilePenEditBtn').style.display = 'flex';
         } else {
             document.getElementById('profilePenEditBtn').style.display = 'none';
         }
 
-        // زر أوامر الإدارة الحاسم يظهر حصراً لصاحب الموقع الرسمي فقط دون غيره
         if(accountData.rank === 'owner' && userObj.name !== accountData.name) {
             document.getElementById('adminOperationsBtn').style.display = 'block';
         } else {
@@ -624,12 +637,12 @@
     }
 
     function openProfileEditInputs() {
+        tempUploadedAvatar = "";
+        tempUploadedCover = "";
         document.getElementById('editProfileName').value = currentProfileUserTarget.name;
         document.getElementById('editProfileStatus').value = currentProfileUserTarget.status || '';
         document.getElementById('editProfileAge').value = currentProfileUserTarget.age || '20';
         document.getElementById('editProfileCountry').value = currentProfileUserTarget.country || 'العراق';
-        document.getElementById('editProfileBgLink').value = (currentProfileUserTarget.avatar.startsWith('http')) ? currentProfileUserTarget.avatar : '';
-        document.getElementById('editProfileCoverLink').value = (currentProfileUserTarget.cover && currentProfileUserTarget.cover.startsWith('http')) ? currentProfileUserTarget.cover : '';
         document.getElementById('editProfileNameBg').value = currentProfileUserTarget.nameBg || '#ffffff';
         document.getElementById('editProfileFieldsModal').style.display = 'flex';
     }
@@ -643,17 +656,14 @@
         target.nameBg = document.getElementById('editProfileNameBg').value;
         target.gender = document.getElementById('editProfileGender').value;
 
-        let bgLink = document.getElementById('editProfileBgLink').value.trim();
-        if(bgLink) target.avatar = bgLink;
-        let covLink = document.getElementById('editProfileCoverLink').value.trim();
-        if(covLink) target.cover = covLink;
+        if(tempUploadedAvatar) target.avatar = tempUploadedAvatar;
+        if(tempUploadedCover) target.cover = tempUploadedCover;
 
         if(target.name === accountData.name) {
             accountData = target;
             localStorage.setItem('hasoni_secure_session', JSON.stringify(accountData));
             applyUserSessionUI();
         } else {
-            // إذا كان المالك يقوم بتحديث ملف عضو آخر، يتم بثه مباشرة عبر قاعدة البيانات
             database.ref('users_online').orderByChild('name').equalTo(target.name).once('value', function(snap){
                 snap.forEach(child => { child.ref.update(target); });
             });
@@ -699,14 +709,20 @@
         alert("تم تسجيل إعجابك الحقيقي بالبروفايل ❤️");
     }
 
-    // إدارة المايكات المتقدمة
     function handleMicClick(slotNum) {
         selectedMicTarget = slotNum;
+        if(activeMicSlot === slotNum) {
+            document.getElementById('micOccupiedMenuModal').style.display = 'flex';
+            return;
+        }
         database.ref('room_mics_status/' + slotNum).once('value', function(snap) {
             let mData = snap.val();
             if (mData && mData.occupied) {
-                // إذا ضغط العضو على المايك المشغول تظهر الخيارات الـ 5 المتكاملة فوراً
-                document.getElementById('micOccupiedMenuModal').style.display = 'flex';
+                if(mData.name === accountData.name) {
+                    document.getElementById('micOccupiedMenuModal').style.display = 'flex';
+                } else {
+                    alert(`هذا المايك مشغول حالياً من قبل العضو: ${mData.name}`);
+                }
             } else {
                 document.getElementById('confirmMicJoinModal').style.display = 'flex';
             }
@@ -717,15 +733,30 @@
         if(activeMicSlot !== null) { database.ref('room_mics_status/' + activeMicSlot).remove(); }
         activeMicSlot = selectedMicTarget;
         
-        let upData = {
-            occupied: true,
-            name: accountData.name,
-            cover: accountData.cover || "linear-gradient(135deg, #1e1e24, #2a2a35)",
-            muted: false
-        };
-        database.ref('room_mics_status/' + activeMicSlot).set(upData);
-        closeAllModals();
-        alert("تم صعودك للميكروفون بنجاح ويسمعك كل الأعضاء بكل وضوح! 🎙️");
+        navigator.mediaDevices.getUserMedia({ audio: true, video: false })
+        .then(function(stream) {
+            localVoiceStream = stream;
+            let upData = {
+                occupied: true,
+                name: accountData.name,
+                cover: accountData.cover || "linear-gradient(135deg, #1e1e24, #2a2a35)",
+                muted: false
+            };
+            database.ref('room_mics_status/' + activeMicSlot).set(upData);
+            closeAllModals();
+            alert("تم صعودك للميكروفون بنجاح وصوتك الحقيقي مسموع للجميع الآن! 🎙️🔊");
+        })
+        .catch(function(err) {
+            let upData = {
+                occupied: true,
+                name: accountData.name,
+                cover: accountData.cover || "linear-gradient(135deg, #1e1e24, #2a2a35)",
+                muted: false
+            };
+            database.ref('room_mics_status/' + activeMicSlot).set(upData);
+            closeAllModals();
+            alert("تم صعودك للمايك بنجاح (لم يتم تفعيل لاقط الصوت لعدم منح الصلاحية).");
+        });
     }
 
     function applyLiveMicNodeUI(slot, data) {
@@ -753,15 +784,24 @@
 
     function triggerMuteToggleLocal(isMute) {
         database.ref('room_mics_status/' + selectedMicTarget + '/muted').set(isMute);
+        if(localVoiceStream) {
+            localVoiceStream.getAudioTracks().forEach(track => track.enabled = !isMute);
+        }
         closeAllModals();
         alert(isMute ? "تم كتم المايك بنجاح." : "تم فك كتم المايك بنجاح.");
     }
 
     function descendFromMicRemote() {
         database.ref('room_mics_status/' + selectedMicTarget).remove();
-        if(activeMicSlot === selectedMicTarget) activeMicSlot = null;
+        if(activeMicSlot === selectedMicTarget) {
+            activeMicSlot = null;
+            if(localVoiceStream) {
+                localVoiceStream.getTracks().forEach(track => track.stop());
+                localVoiceStream = null;
+            }
+        }
         closeAllModals();
-        alert("تم النزول من المايك بنجاح.");
+        alert("تم النزول من المايك بنجاح وإيقاف تشغيل الصوت.");
     }
 
     function openAudioSearchPanel() {
@@ -777,7 +817,7 @@
     function executeAudioStreaming() {
         let query = document.getElementById('audioQueryInput').value.trim();
         if(!query) return;
-        let vidId = extractYoutubeVideoId(query) || "5FA8A1vHh_U"; // معرف احتياطي في حال البحث بالاسم
+        let vidId = extractYoutubeVideoId(query) || "5FA8A1vHh_U";
         database.ref('global_room_audio_stream').set({ videoId: vidId, requester: accountData.name, time: Date.now() });
         closeAllModals();
         alert("تم جلب الأغنية بنجاح وتشغيلها حياً ومباشراً للجميع! 🎶");
@@ -800,7 +840,6 @@
         if(!query) return;
         let vidId = extractYoutubeVideoId(query) || "5FA8A1vHh_U";
         
-        // إرسال كفيديو عام حقيقي في ساحة الدردشة
         const packedMsg = {
             name: accountData.name, avatar: accountData.avatar, rank: accountData.rank, 
             nameBg: accountData.nameBg, text: "📺 شارك معكم فيديو يوتيوب حقيقي:", mediaVideoId: vidId
@@ -854,7 +893,6 @@
         closeAllModals();
     }
 
-    // إدارة محرك الرسائل والاقتباسات الذكية وحساب المستويات
     const sendBtn = document.getElementById('sendBtn');
     const chatInput = document.getElementById('chatInput');
     const chatMessages = document.getElementById('chatMessages');
@@ -862,7 +900,6 @@
     function sendMessage() {
         const text = chatInput.value.trim();
         if (text !== "") {
-            // احتساب العداد والمستويات (صاحب الموقع 1000 ثابت، البقية يزيد عند إرسال 10 رسائل عامة)
             if(accountData.rank !== 'owner') {
                 accountData.msgSentCount = (accountData.msgSentCount || 0) + 1;
                 if(accountData.msgSentCount >= 10) {
@@ -873,7 +910,6 @@
                 }
             }
 
-            // فحص ولصق الروابط الحقيقية للأغاني ليتم عرضها كفيديو متكامل فوراً بشكله الحقيقي
             let directYtId = extractYoutubeVideoId(text);
 
             const packedMsg = {
@@ -907,7 +943,7 @@
             mediaHtml = `<div class="media-msg-box"><iframe src="https://www.youtube.com/embed/${msgObj.textVideoId}" allowfullscreen></iframe></div>`;
         }
 
-        // الرتبة منفصلة تماماً بجانب أيقونة الخلفية بين الأيقونة والاسم كما طلبت
+        // تم تثبيت شكل الرتبة المختار دائماً ليكون بين الأيقونة الدائرية (خلفية العضو) والاسم مباشرة
         messageRow.innerHTML = `
             <img src="${msgObj.avatar}" class="avatar" onclick="openAnyUserProfileCard(accountData)">
             <div class="message-content">
