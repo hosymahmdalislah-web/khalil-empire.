@@ -53,7 +53,6 @@
         .pfp-main-frame { width: 44px; height: 44px; border-radius: 50%; border: 2px solid var(--gold); box-shadow: 0 0 8px var(--gold); display: flex; align-items: center; justify-content: center; background: #000; flex-shrink: 0; }
         .pfp-main { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; cursor: pointer; }
         
-        /* أيقونة الرتبة المنفصلة بين الصورة والاسم */
         .rank-standalone-icon {
             font-size: 16px;
             display: flex;
@@ -67,7 +66,6 @@
             flex-shrink: 0;
         }
 
-        /* إطار الاسم الفخم المنفصل */
         .king-name-container {
             display: inline-flex;
             align-items: center;
@@ -243,7 +241,6 @@
 </div>
 
 <script>
-    // ربط مشروع Firebase السحابي الجديد الخاص بك بنجاح
     const firebaseConfig = {
         apiKey: "AIzaSyCZ9Uh8sTZXsChbLXVvoaK81lxMU9dWsOc",
         authDomain: "soobr-9dbcf.firebaseapp.com",
@@ -304,6 +301,7 @@
     window.activeMicsListener = null;
     window.activeRoomSettingsListener = null;
     window.activeSessionListener = null;
+    window.activeOnlineUsersListener = null;
 
     window.tempUploadedCover = "";
     window.tempUploadedPfp = "";
@@ -420,8 +418,8 @@
         checkSavedSessionOnLoad: () => {
             let savedUser = localStorage.getItem("hassouni_user_session");
             if(savedUser) {
-                window.currentUser = JSON.parse(savedUser);
-                db.collection("users").doc(window.currentUser.uid).get().then((doc)=>{
+                let parsedUser = JSON.parse(savedUser);
+                db.collection("users").doc(parsedUser.uid).get().then((doc)=>{
                     if(doc.exists){
                         let sData = doc.data();
                         if(sData.isBanned) {
@@ -431,11 +429,14 @@
                         }
                         window.currentUser = sData;
                         localStorage.setItem("hassouni_user_session", JSON.stringify(window.currentUser));
+                    } else {
+                        window.currentUser = parsedUser;
                     }
                     document.getElementById('authBtn').style.display = 'none';
                     document.getElementById('welcomeOverlay').style.display = 'none'; 
                     ui.enterChat();
                 }).catch(() => {
+                    window.currentUser = parsedUser;
                     document.getElementById('welcomeOverlay').style.display = 'none';
                     ui.enterChat();
                 });
@@ -452,18 +453,22 @@
             ui.listenToActiveMics();
             ui.listenToRoomSettings();
             ui.listenToSessionSecurity();
+            ui.listenOnlineUsersRealtime();
         },
         clearAllListeners: () => {
             if(window.activeMessagesListener) window.activeMessagesListener();
             if(window.activeMicsListener) window.activeMicsListener();
             if(window.activeRoomSettingsListener) window.activeRoomSettingsListener();
             if(window.activeSessionListener) window.activeSessionListener();
+            if(window.activeOnlineUsersListener) window.activeOnlineUsersListener();
         },
         listenToSessionSecurity: () => {
             if(!window.currentUser || !window.currentUser.uid) return;
             window.activeSessionListener = db.collection("users").doc(window.currentUser.uid).onSnapshot((doc) => {
                 if(doc.exists) {
                     let data = doc.data();
+                    window.currentUser = data;
+                    localStorage.setItem("hassouni_user_session", JSON.stringify(window.currentUser));
                     if(window.currentUser.sessionToken && data.sessionToken && data.sessionToken !== window.currentUser.sessionToken) {
                         alert("تم تسجيل الدخول إلى هذا الحساب من هاتف آخر.");
                         ui.logoutBackToWelcome();
@@ -491,11 +496,11 @@
         listenToGlobalMessages: () => {
             window.activeMessagesListener = db.collection("rooms").doc(window.currentRoom).collection("messages")
               .orderBy("timestamp", "asc")
-              .limit(70)
               .onSnapshot((snapshot) => {
                   let chatBox = document.getElementById('chatBox');
                   chatBox.innerHTML = "";
                   ui.renderMsg(window.defaultOwnerData, "مرحباً بكم في شات حسوني الإمبراطوري الحصري والآمن 🏆🔥");
+                  
                   snapshot.forEach((doc) => {
                       let mData = doc.data();
                       if (mData.user) {
@@ -532,6 +537,34 @@
                   });
               });
         },
+        listenOnlineUsersRealtime: () => {
+            window.activeOnlineUsersListener = db.collection("users").onSnapshot((snap) => {
+                let list = []; 
+                snap.forEach(doc => {
+                    let uData = doc.data();
+                    if(uData.isOnline) list.push(uData);
+                });
+                
+                list.sort((a, b) => {
+                    let orderA = window.rolesOrder[a.role] || 99;
+                    let orderB = window.rolesOrder[b.role] || 99;
+                    return orderA - orderB;
+                });
+
+                let usersHtml = list.map(u => {
+                    let rObj = window.chatRanksData[u.role] || { icon: "fas fa-user", color: "#fff" };
+                    return `
+                        <div class="menu-item" onclick="ui.viewProfileCard('${u.uid}')">
+                            <span style="color:${rObj.color}; font-weight: bold;"><i class="${rObj.icon}" style="margin-left:5px;"></i> ${u.name}</span>
+                            <span style="font-size:11px; color:${rObj.color}; background: rgba(0,0,0,0.4); padding: 2px 6px; border-radius: 10px; border: 1px solid ${rObj.color};">${rObj.text}</span>
+                        </div>
+                    `;
+                }).join('');
+                
+                let bodyEl = document.getElementById('onlineUsersListBody');
+                if(bodyEl) bodyEl.innerHTML = usersHtml;
+            });
+        },
         refreshChatWindowOnly: () => {
             ui.enterChat();
             let box = document.getElementById('chatBox');
@@ -545,20 +578,26 @@
             
             inp.value = '';
             
-            let cleanUserObj = {
-                uid: window.currentUser.uid,
-                name: window.currentUser.name,
-                role: window.currentUser.role,
-                img: window.currentUser.img,
-                nameBg: window.currentUser.nameBg || "transparent"
-            };
+            db.collection("users").doc(window.currentUser.uid).get().then((doc) => {
+                let latestUser = window.currentUser;
+                if(doc.exists) {
+                    latestUser = doc.data();
+                }
+                let cleanUserObj = {
+                    uid: latestUser.uid,
+                    name: latestUser.name,
+                    role: latestUser.role,
+                    img: latestUser.img,
+                    nameBg: latestUser.nameBg || "transparent"
+                };
 
-            db.collection("rooms").doc(window.currentRoom).collection("messages").add({
-                user: cleanUserObj,
-                text: t,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            }).catch((err) => {
-                alert("خطأ: " + err.message);
+                db.collection("rooms").doc(window.currentRoom).collection("messages").add({
+                    user: cleanUserObj,
+                    text: t,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                }).catch((err) => {
+                    alert("خطأ: " + err.message);
+                });
             });
         },
         quoteUserText: (userName, textContent) => {
@@ -569,32 +608,45 @@
         
         renderMsg: (user, text) => {
             if (!user) return;
-            let div = document.createElement('div');
-            div.className = 'msg-wrap';
             
-            let rankObj = window.chatRanksData[user.role] || { icon: "fas fa-user", color: "#fff", text: "عضو" };
-            
-            div.innerHTML = `
-                <div class="msg-header">
-                    <div class="pfp-main-frame">
-                        <img src="${user.img || 'https://cdn-icons-png.flaticon.com/512/1042/1042291.png'}" class="pfp-main" onclick="ui.viewProfileCard('${user.uid}')">
+            db.collection("users").doc(user.uid).get().then((doc) => {
+                let currentRole = user.role;
+                let currentName = user.name;
+                let currentImg = user.img;
+                
+                if(doc.exists) {
+                    let d = doc.data();
+                    currentRole = d.role;
+                    currentName = d.name;
+                    currentImg = d.img;
+                }
+                
+                let div = document.createElement('div');
+                div.className = 'msg-wrap';
+                let rankObj = window.chatRanksData[currentRole] || { icon: "fas fa-user", color: "#fff", text: "عضو" };
+                
+                div.innerHTML = `
+                    <div class="msg-header">
+                        <div class="pfp-main-frame">
+                            <img src="${currentImg || 'https://cdn-icons-png.flaticon.com/512/1042/1042291.png'}" class="pfp-main" onclick="ui.viewProfileCard('${user.uid}')">
+                        </div>
+                        
+                        <div class="rank-standalone-icon" style="border-color: ${rankObj.color};">
+                            <i class="${rankObj.icon}" style="color: ${rankObj.color}; filter: drop-shadow(0 0 2px ${rankObj.color});"></i>
+                        </div>
+                        
+                        <div class="king-name-container" style="border-color: ${rankObj.color}; background: rgba(0,0,0,0.6);" onclick="ui.quoteUserText('${currentName}', '${text}')">
+                            <span class="king-name-tag" style="color: ${rankObj.color};">${currentName}</span>
+                        </div>
                     </div>
-                    
-                    <div class="rank-standalone-icon" style="border-color: ${rankObj.color};">
-                        <i class="${rankObj.icon}" style="color: ${rankObj.color}; filter: drop-shadow(0 0 2px ${rankObj.color});"></i>
-                    </div>
-                    
-                    <div class="king-name-container" style="border-color: ${rankObj.color}; background: rgba(0,0,0,0.6);" onclick="ui.quoteUserText('${user.name}', '${text}')">
-                        <span class="king-name-tag" style="color: ${rankObj.color};">${user.name}</span>
-                    </div>
-                </div>
-                <div class="msg-text">${text}</div>
-            `;
-            let box = document.getElementById('chatBox');
-            if (box) {
-                box.appendChild(div);
-                box.scrollTop = box.scrollHeight;
-            }
+                    <div class="msg-text">${text}</div>
+                `;
+                let box = document.getElementById('chatBox');
+                if (box) {
+                    box.appendChild(div);
+                    box.scrollTop = box.scrollHeight;
+                }
+            });
         },
         clickMicSlot: (num) => {
             window.selectedMicNum = num;
@@ -696,26 +748,11 @@
         
         toggleOnlineUsers: () => {
             let m = document.getElementById('onlineUsersHalfModal');
-            if(m.style.display === 'block') { m.style.display = 'none'; return; }
-            db.collection("users").get().then((snap) => {
-                let list = []; snap.forEach(doc => list.push(doc.data()));
-                
-                list.sort((a, b) => {
-                    let orderA = window.rolesOrder[a.role] || 99;
-                    let orderB = window.rolesOrder[b.role] || 99;
-                    return orderA - orderB;
-                });
-
-                document.getElementById('onlineUsersListBody').innerHTML = list.map(u => {
-                    let rObj = window.chatRanksData[u.role] || { icon: "fas fa-user", color: "#fff" };
-                    return `
-                    <div class="menu-item" onclick="ui.viewProfileCard('${u.uid}')">
-                        <span style="color:${rObj.color};"><i class="${rObj.icon}" style="margin-left:5px;"></i> ${u.name}</span>
-                        <span style="font-size:11px; color:#aaa;">⭐</span>
-                    </div>
-                `}).join('');
-            });
-            m.style.display = 'block';
+            if(m.style.display === 'block') { 
+                m.style.display = 'none'; 
+            } else {
+                m.style.display = 'block';
+            }
         },
 
         viewProfileCard: (uid) => {
@@ -735,12 +772,15 @@
                 let adminOptionsBtn = isAmOwner && !isMe ? 
                     `<button class="send-btn" style="width:100%; margin-top:10px; background:linear-gradient(to left, #cb2d3e, #ef473a); color:#fff;" onclick="ui.openAdminControls('${uid}')">⚙️ إدارة الحساب والإجراءات</button>` : '';
 
+                let rObj = window.chatRanksData[u.role] || { icon: "fas fa-user", color: "#fff", text: "عضو" };
+
                 document.getElementById('featureModalBody').innerHTML = `
                     <div class="profile-card-wrapper">
                         ${pencilHtml}
                         <img src="${u.cover || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=400'}" class="profile-card-cover" id="cardCoverImg">
                         <img src="${u.img || 'https://cdn-icons-png.flaticon.com/512/1042/1042291.png'}" class="profile-card-pfp" id="cardPfpImg">
-                        <h2 style="color:var(--gold); margin:5px 0 2px;">${u.name}</h2>
+                        <h2 style="color:${rObj.color}; margin:5px 0 2px;">${u.name}</h2>
+                        <p style="margin:0 0 10px; font-size:13px; color:${rObj.color}; font-weight:bold;"><i class="${rObj.icon}"></i> ${rObj.text}</p>
                         <p style="margin:0 0 10px; font-size:12px; color:#aaa;">${u.status || 'لا يوجد حالة'}</p>
                         
                         <div class="profile-action-bar">
@@ -874,7 +914,11 @@
 
         changeUserRole: (uid, newRole) => {
             db.collection("users").doc(uid).update({ role: newRole }).then(() => {
-                alert("تم تحديث رتبة العضو بنجاح!");
+                alert("تم تحديث رتبة العضو بنجاح وتثبيتها سحابياً!");
+                if (window.currentUser && window.currentUser.uid === uid) {
+                    window.currentUser.role = newRole;
+                    localStorage.setItem("hassouni_user_session", JSON.stringify(window.currentUser));
+                }
             });
         },
         toggleUserMute: (uid, state) => {
@@ -972,7 +1016,9 @@
         logoutBackToWelcome: () => {
             ui.updateUserOnlineStatus(false);
             localStorage.removeItem("hassouni_user_session");
-            window.location.reload();
+            setTimeout(() => {
+                window.location.reload();
+            }, 400);
         },
         openVIPList: (title) => alert(title)
     };
