@@ -109,6 +109,17 @@
         .media-msg-box iframe { width: 100%; height: 100%; border: none; }
         .file-upload-wrapper { position: relative; overflow: hidden; display: inline-block; width: 100%; }
         .file-upload-wrapper input[type=file] { position: absolute; left: 0; top: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
+
+        /* الكأس اللامع الذهبي الخاص بالمالك */
+        .fa-trophy {
+            color: #ffd700 !important;
+            text-shadow: 0 0 10px #ffaa00, 0 0 20px #ffd700;
+            animation: goldGlow 1.5s infinite alternate;
+        }
+        @keyframes goldGlow {
+            0% { transform: scale(1); filter: drop-shadow(0 0 2px #ffd700); }
+            100% { transform: scale(1.15); filter: drop-shadow(0 0 8px #ffaa00); }
+        }
     </style>
 </head>
 <body>
@@ -204,7 +215,7 @@
             <div class="pencil-btn" id="profilePenEditBtn" onclick="openProfileEditInputs()"><i class="fa-solid fa-pen"></i></div>
         </div>
         <div class="profile-avatar-wrapper">
-            <img src="" class="profile-card-avatar" id="pAvatarDisplay" onclick="openAnyUserProfileCard(currentProfileUserTarget)">
+            <img src="" class="profile-card-avatar" id="pAvatarDisplay">
         </div>
         <div class="profile-actions-bar">
             <button class="prof-bar-btn" onclick="alert('خلفية العضو')"><i class="fa-solid fa-image"></i><span>الخلفية</span></button>
@@ -299,7 +310,7 @@
 <div class="popup-overlay" id="confirmMicJoinModal">
     <div class="popup-box" style="text-align: center;">
         <h3 style="margin-bottom:10px; color:#1a202c;"><i class="fa-solid fa-microphone"></i> الصعود للميكروفون</h3>
-        <p style="font-size:14px; color:#4a5568; font-weight:bold;">هل تريد الصعود والتحدث بنجاح لجميع الأعضاء؟</p>
+        <p style="font-size:14px; color:#4a5568; font-weight:bold;">هل تريد الصعود والتحدث بنجاح لجميع الأعضاء?</p>
         <div class="confirm-btn-group">
             <button class="btn-yes" onclick="confirmAscendToMic()">نعم، اصعد</button>
             <button class="btn-no" onclick="closeAllModals()">إلغاء</button>
@@ -379,7 +390,7 @@
     const database = firebase.database();
 
     const sysRanksConfig = {
-        'owner': { label: 'صاحب الموقع الرسمي', color: '#ffd700', icon: '<i class="fa-solid fa-trophy" style="color:#e53e3e;"></i>', isStaff: true },
+        'owner': { label: 'صاحب الموقع الرسمي', color: '#ffd700', icon: '<i class="fa-solid fa-trophy"></i>', isStaff: true },
         'king': { label: 'كنج', color: '#3182ce', icon: '<i class="fa-solid fa-crown" style="color:#3182ce;"></i>', isStaff: true },
         'prince': { label: 'برنس', color: '#ffaa00', icon: '<i class="fa-solid fa-crown" style="color:#ffd700;"></i>', isStaff: true },
         'honor': { label: 'انروا', color: '#e53e3e', icon: '<i class="fa-solid fa-crown" style="color:#e53e3e;"></i>', isStaff: true },
@@ -450,15 +461,42 @@
             applyUserSessionUI(); 
         }
 
+        // الاستماع الدائم لتحديثات خلفية الروم المزامنة للجميع من السيرفر مباشرة
+        database.ref('room_background_url').on('value', function(snapshot) {
+            let bgUrl = snapshot.val();
+            if(bgUrl) {
+                document.getElementById('chatContainerView').style.backgroundImage = `url('${bgUrl}')`;
+            }
+        });
+
         database.ref('messages').limitToLast(50).on('child_added', function(snapshot) {
             renderHistoricalMessage(snapshot.val());
         });
 
+        // مزامنة حية وفورية لتعديلات الأعضاء في الساحة والمتواجدين فور تغييرها
         database.ref('users_online').on('value', function(snapshot) {
             dynamicRoomUsers = [];
             snapshot.forEach(child => {
-                dynamicRoomUsers.push(child.val());
+                let u = child.val();
+                dynamicRoomUsers.push(u);
+                // إذا تغيرت بياناتي من طرف الإدارة، قم بتحديث الجلسة المحلية فوراً لفتح الصلاحيات
+                if(userRefKey && child.key === userRefKey) {
+                    if(accountData.rank !== u.rank || accountData.name !== u.name || accountData.avatar !== u.avatar) {
+                        accountData = u;
+                        localStorage.setItem('hasoni_secure_session', JSON.stringify(accountData));
+                        const currentRankInfo = sysRanksConfig[accountData.rank] || sysRanksConfig['visitor'];
+                        document.getElementById('topUserRank').innerHTML = `${currentRankInfo.icon} ${currentRankInfo.label}`;
+                        const hasStaffPower = currentRankInfo.isStaff;
+                        document.getElementById('roomCleanOpt').style.display = hasStaffPower ? 'flex' : 'none';
+                        document.getElementById('roomBgOpt').style.display = hasStaffPower ? 'flex' : 'none';
+                        document.getElementById('roomMsgOpt').style.display = hasStaffPower ? 'flex' : 'none';
+                    }
+                }
             });
+            // إعادة رسم المتواجدين تلقائياً إذا كانت اللوحة مفتوحة لتعكس التعديلات فوراً
+            if(document.getElementById('onlineUsersModal').style.display === 'flex') {
+                openOnlineUsersModal();
+            }
         });
 
         database.ref('room_mics_status').on('value', function(snapshot) {
@@ -571,11 +609,15 @@
         let file = event.target.files[0];
         if (file) {
             let reader = new FileReader();
-            reader.onload = function(e) { document.getElementById('chatContainerView').style.backgroundImage = `url('${e.target.result}')`; };
+            reader.onload = function(e) { 
+                let base64Bg = e.target.result;
+                // تعديل: رفع الخلفية لقاعدة البيانات لتظهر لجميع الأعضاء فوراً وحفظها
+                database.ref('room_background_url').set(base64Bg);
+            };
             reader.readAsDataURL(file);
         }
         closeAllModals();
-        alert("تم تحديث وتثبيت خلفية الروم بنجاح 🖼️");
+        alert("تم تحديث وتثبيت خلفية الروم بنجاح للجميع 🖼️");
     }
 
     function handleFileSelect(event, type) {
@@ -663,11 +705,13 @@
             accountData = target;
             localStorage.setItem('hasoni_secure_session', JSON.stringify(accountData));
             applyUserSessionUI();
-        } else {
-            database.ref('users_online').orderByChild('name').equalTo(target.name).once('value', function(snap){
-                snap.forEach(child => { child.ref.update(target); });
-            });
         }
+        
+        // تعديل: الحفظ المباشر والشامل في السيرفر ليعكس التحديث فورا للكل
+        database.ref('users_online').orderByChild('name').equalTo(target.name).once('value', function(snap){
+            snap.forEach(child => { child.ref.update(target); });
+        });
+        
         closeAllModals();
         openAnyUserProfileCard(target);
         alert("تم تحديث وحفظ بيانات البروفايل بنجاح تام وظهرت للجميع! ✨");
@@ -683,7 +727,13 @@
         currentProfileUserTarget.rank = selectedRank;
         
         database.ref('users_online').orderByChild('name').equalTo(currentProfileUserTarget.name).once('value', function(snap){
-            snap.forEach(child => { child.ref.child('rank').set(selectedRank); });
+            snap.forEach(child => { 
+                child.ref.child('rank').set(selectedRank); 
+                // تحديث الصورة والخصائص الاخرى المربوطة بالرتبة تلقائياً
+                if(selectedRank === 'diamond') {
+                    child.ref.child('avatar').set("https://via.placeholder.com/40/00b4db/ffffff?text=💎");
+                }
+            });
         });
 
         alert(`تم تحديث رتبة العضو [${currentProfileUserTarget.name}] بنجاح إلى: ${sysRanksConfig[selectedRank].label}`);
@@ -705,6 +755,9 @@
         
         if(currentProfileUserTarget.rank !== 'owner') {
             document.getElementById('pLikesDisplay').innerText = currentProfileUserTarget.likes;
+            database.ref('users_online').orderByChild('name').equalTo(currentProfileUserTarget.name).once('value', function(snap){
+                snap.forEach(child => { child.ref.child('likes').set(currentProfileUserTarget.likes); });
+            });
         }
         alert("تم تسجيل إعجابك الحقيقي بالبروفايل ❤️");
     }
@@ -842,7 +895,8 @@
         
         const packedMsg = {
             name: accountData.name, avatar: accountData.avatar, rank: accountData.rank, 
-            nameBg: accountData.nameBg, text: "📺 شارك معكم فيديو يوتيوب حقيقي:", mediaVideoId: vidId
+            nameBg: accountData.nameBg, text: "📺 شارك معكم فيديو يوتيوب حقيقي:", mediaVideoId: vidId,
+            age: accountData.age, gender: accountData.gender, country: accountData.country, status: accountData.status, cover: accountData.cover, likes: accountData.likes, level: accountData.level
         };
         database.ref('messages').push(packedMsg);
         closeAllModals();
@@ -914,7 +968,8 @@
 
             const packedMsg = {
                 name: accountData.name, avatar: accountData.avatar, rank: accountData.rank, 
-                nameBg: accountData.nameBg, text: text, textVideoId: directYtId || null
+                nameBg: accountData.nameBg, text: text, textVideoId: directYtId || null,
+                age: accountData.age, gender: accountData.gender, country: accountData.country, status: accountData.status, cover: accountData.cover, likes: accountData.likes, level: accountData.level
             };
             database.ref('messages').push(packedMsg);
             chatInput.value = "";
@@ -932,6 +987,7 @@
     }
 
     function renderHistoricalMessage(msgObj) {
+        if(!msgObj) return;
         const messageRow = document.createElement('div');
         messageRow.className = 'message-row';
         const rankInfo = sysRanksConfig[msgObj.rank] || sysRanksConfig['visitor'];
@@ -943,9 +999,11 @@
             mediaHtml = `<div class="media-msg-box"><iframe src="https://www.youtube.com/embed/${msgObj.textVideoId}" allowfullscreen></iframe></div>`;
         }
 
-        // تم تثبيت شكل الرتبة المختار دائماً ليكون بين الأيقونة الدائرية (خلفية العضو) والاسم مباشرة
+        // تحويل الكود بالكامل ليحتوي على كائن العضو المنسق لتمريره عند الضغط على أيقونته الخاصة به في الساحة
+        let safeUserObj = JSON.stringify(msgObj).replace(/"/g, '&quot;');
+
         messageRow.innerHTML = `
-            <img src="${msgObj.avatar}" class="avatar" onclick="openAnyUserProfileCard(accountData)">
+            <img src="${msgObj.avatar}" class="avatar" onclick="openAnyUserProfileCard(${safeUserObj})">
             <div class="message-content">
                 <div class="user-tag-bar">
                     <span class="rank-icon-sep">${rankInfo.icon}</span>
