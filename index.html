@@ -275,7 +275,7 @@
         "prince": { icon: "fas fa-trophy", color: "#aa0000", text: "برنس إمبراطوري" },
         "king": { icon: "fas fa-crown", color: "#FF0000", text: "الملك الملكي" },
         "honor": { icon: "fas fa-crown", color: "#0000FF", text: "تاج الشرف" },
-        "admin": { icon: "fas fa-star", color: "#FFD700", text: "إدارة العليا" },
+        "admin": { icon: "fas fa star", color: "#FFD700", text: "إدارة العليا" },
         "developer": { icon: "fas fa-code", color: "#00FF00", text: "مطور السيرفر" },
         "senior_mod": { icon: "fas fa-gem", color: "#00FFFF", text: "مشرف أول" },
         "mod": { icon: "fas fa-star", color: "#C0C0C0", text: "مشرف" },
@@ -303,7 +303,7 @@
         nameBg: "rgba(255,215,0,0.15)", 
         cover: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=400",
         likes: 742, gifts: "تاج ذهبي، سيف ملكي", profileUrl: "hassouni.chat/king_1", age: 19, gender: "ذكر", country: "اليمن", status: "متصل بأناقة الملك الملكية 🏆",
-        points: 5000, isMuted: false, isBanned: false
+        points: 5000, isMuted: false, isBanned: false, nameColor: "#ffd700"
     };
 
     window.currentUser = null;
@@ -397,7 +397,7 @@
                     img: "https://cdn-icons-png.flaticon.com/512/1042/1042291.png", nameBg: "rgba(255,215,0,0.05)", 
                     cover: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=400",
                     likes: 0, gifts: "لا يوجد بعد", profileUrl: "none", age: 20, gender: "ذكر", country: "عربي", status: "عضو ماسي جديد", points: 10, isMuted: false, isBanned: false,
-                    sessionToken: generatedToken
+                    sessionToken: generatedToken, nameColor: "#ffffff", password: ps
                 };
             }
             ui.saveUserToFirestoreAndSession(window.currentUser);
@@ -416,7 +416,7 @@
                 img: "https://cdn-icons-png.flaticon.com/512/1042/1042291.png", nameBg: "transparent", 
                 cover: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=400",
                 likes: 0, gifts: "ممنوع للزوار", profileUrl: "none", age: a, gender: g, country: "اليمن", status: "أنا زائر في شات حسوني", points: 0, isMuted: false, isBanned: false,
-                sessionToken: generatedToken
+                sessionToken: generatedToken, nameColor: "#ffffff"
             };
             ui.saveUserToFirestoreAndSession(window.currentUser);
             ui.enterChat();
@@ -438,7 +438,7 @@
                     img: "https://cdn-icons-png.flaticon.com/512/1042/1042291.png", nameBg: "rgba(255,215,0,0.05)", 
                     cover: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=400",
                     likes: 5, gifts: "وردة ترحيبية", profileUrl: "none", age: 21, gender: "ذكر", country: "الوطن العربي", status: "متواجد في الروم الإمبراطوري", points: 20, isMuted: false, isBanned: false,
-                    sessionToken: generatedToken
+                    sessionToken: generatedToken, nameColor: "#ffffff", password: passInp
                 };
             }
             ui.saveUserToFirestoreAndSession(window.currentUser);
@@ -507,11 +507,12 @@
             window.activeSessionListener = db.collection("users").doc(window.currentUser.uid).onSnapshot((doc) => {
                 if(doc.exists) {
                     let data = doc.data();
-                    window.currentUser = data;
-                    localStorage.setItem("hassouni_user_session", JSON.stringify(window.currentUser));
                     if(window.currentUser.sessionToken && data.sessionToken && data.sessionToken !== window.currentUser.sessionToken) {
                         alert("تم تسجيل الدخول إلى هذا الحساب من هاتف آخر.");
                         ui.logoutBackToWelcome();
+                    } else {
+                        window.currentUser = data;
+                        localStorage.setItem("hassouni_user_session", JSON.stringify(window.currentUser));
                     }
                 }
             });
@@ -534,6 +535,7 @@
             });
         },
         listenToGlobalMessages: () => {
+            if(window.activeMessagesListener) window.activeMessagesListener();
             window.activeMessagesListener = db.collection("rooms").doc(window.currentRoom).collection("messages")
               .orderBy("timestamp", "asc")
               .limitToLast(50)
@@ -608,10 +610,11 @@
 
                 let usersHtml = list.map(u => {
                     let rObj = window.chatRanksData[u.role] || { icon: "fas fa-user", color: "#fff", text: "عضو" };
+                    let displayCustomColor = u.nameColor || rObj.color;
                     return `
                         <div class="menu-item" onclick="ui.viewProfileCard('${u.uid}')">
-                            <span style="color:${rObj.color}; font-weight: bold;"><i class="${rObj.icon}" style="margin-left:5px;"></i> ${u.name}</span>
-                            <span style="font-size:11px; color:${rObj.color}; background: rgba(0,0,0,0.4); padding: 2px 6px; border-radius: 10px; border: 1px solid ${rObj.color};">${rObj.text}</span>
+                            <span style="color:${displayCustomColor}; font-weight: bold;"><i class="${rObj.icon}" style="margin-left:5px;"></i> ${u.name}</span>
+                            <span style="font-size:11px; color:${displayCustomColor}; background: ${u.nameBg || 'rgba(0,0,0,0.4)'}; padding: 2px 6px; border-radius: 10px; border: 1px solid ${displayCustomColor};">${rObj.text}</span>
                         </div>
                     `;
                 }).join('');
@@ -643,7 +646,8 @@
                     name: latestUser.name,
                     role: latestUser.role,
                     img: latestUser.img,
-                    nameBg: latestUser.nameBg || "transparent"
+                    nameBg: latestUser.nameBg || "transparent",
+                    nameColor: latestUser.nameColor || "#ffffff"
                 };
 
                 db.collection("rooms").doc(window.currentRoom).collection("messages").add({
@@ -668,19 +672,22 @@
             div.className = 'msg-wrap';
             let rankObj = window.chatRanksData[user.role] || { icon: "fas fa-user", color: "#fff", text: "عضو" };
             let timeStr = formatFirestoreTime(timestamp);
+            let displayCustomColor = user.nameColor || rankObj.color;
+            
+            div.style.backgroundColor = user.nameBg && user.nameBg !== 'transparent' ? user.nameBg : 'rgba(18, 22, 28, 0.94)';
             
             div.innerHTML = `
                 <div class="msg-header">
-                    <div class="pfp-main-frame">
+                    <div class="pfp-main-frame" style="border-color: ${displayCustomColor}; box-shadow: 0 0 8px ${displayCustomColor};">
                         <img src="${user.img || 'https://cdn-icons-png.flaticon.com/512/1042/1042291.png'}" class="pfp-main" onclick="ui.viewProfileCard('${user.uid}')">
                     </div>
                     
-                    <div class="rank-standalone-icon" style="border-color: ${rankObj.color};">
-                        <i class="${rankObj.icon}" style="color: ${rankObj.color}; filter: drop-shadow(0 0 2px ${rankObj.color});"></i>
+                    <div class="rank-standalone-icon" style="border-color: ${displayCustomColor};">
+                        <i class="${rankObj.icon}" style="color: ${displayCustomColor}; filter: drop-shadow(0 0 2px ${displayCustomColor});"></i>
                     </div>
                     
-                    <div class="king-name-container" style="border-color: ${rankObj.color}; background: rgba(0,0,0,0.6);" onclick="ui.quoteUserText('${user.name}', '${text}')">
-                        <span class="king-name-tag" style="color: ${rankObj.color};">${user.name}</span>
+                    <div class="king-name-container" style="border-color: ${displayCustomColor}; background: rgba(0,0,0,0.6);" onclick="ui.quoteUserText('${user.name}', '${text}')">
+                        <span class="king-name-tag" style="color: ${displayCustomColor};">${user.name}</span>
                     </div>
                     
                     <span class="msg-time-badge"><i class="far fa-clock" style="margin-left: 3px;"></i>${timeStr}</span>
@@ -824,7 +831,7 @@
                 
                 let rObj = window.chatRanksData[u.role] || { icon: "fas fa-user", color: "#fff", text: "عضو" };
                 
-                let rankColor = rObj.color;
+                let rankColor = u.nameColor || rObj.color;
                 let modalElement = document.getElementById('featureCardMainElement');
                 modalElement.style.background = `linear-gradient(135deg, #121212 60%, ${rankColor}33 100%)`;
                 modalElement.style.color = "#fff";
@@ -905,7 +912,7 @@
                 
                 document.getElementById('featureModalTitle').innerText = "تعديل بيانات الملف الشخصي";
                 document.getElementById('featureModalBody').innerHTML = `
-                    <div style="text-align:right;">
+                    <div style="text-align:right; max-height:65vh; overflow-y:auto; padding-left:5px;">
                         <label style="font-size:12px; color:var(--gold); font-weight:bold;">صورة الغلاف:</label>
                         <label for="fileCover" class="file-input-label"><i class="fas fa-upload"></i> اختر صورة غلاف</label>
                         <input type="file" id="fileCover" class="file-input-hidden" accept="image/*" onchange="ui.handleLocalFileProcessing(this, 'cover')">
@@ -914,16 +921,31 @@
                         <label for="filePfp" class="file-input-label"><i class="fas fa-image"></i> اختر صورة بروفايل</label>
                         <input type="file" id="filePfp" class="file-input-hidden" accept="image/*" onchange="ui.handleLocalFileProcessing(this, 'pfp')">
                         
-                        <label style="font-size:12px; color:var(--gold);">الاسم المستعار:</label>
+                        <label style="font-size:12px; color:var(--gold);">الاسم المستعار أو المزخرف:</label>
                         <input type="text" id="editName" class="form-control" value="${u.name || ''}">
                         
                         <label style="font-size:12px; color:var(--gold);">العمر:</label>
                         <input type="number" id="editAge" class="form-control" value="${u.age || ''}">
                         
-                        <label style="font-size:12px; color:var(--gold);">البلد:</label>
+                        <label style="font-size:12px; color:var(--gold);">الجنس الكوني:</label>
+                        <select id="editGender" class="form-select">
+                            <option value="ذكر" ${u.gender === 'ذكر' ? 'selected' : ''}>ذكر</option>
+                            <option value="أنثى" ${u.gender === 'أنثى' ? 'selected' : ''}>أنثى</option>
+                        </select>
+
+                        <label style="font-size:12px; color:var(--gold);">البلد والإقامة:</label>
                         <input type="text" id="editCountry" class="form-control" value="${u.country || ''}">
+
+                        <label style="font-size:12px; color:var(--gold);">لون الاسم:</label>
+                        <input type="color" id="editNameColor" class="form-control" style="height:40px; padding:2px;" value="${u.nameColor || '#ffffff'}">
+
+                        <label style="font-size:12px; color:var(--gold);">لون خلفية الاسم والرسالة:</label>
+                        <input type="color" id="editNameBg" class="form-control" style="height:40px; padding:2px;" value="${u.nameBg || '#000000'}">
+
+                        <label style="font-size:12px; color:var(--gold);">كلمة المرور الجديدة:</label>
+                        <input type="password" id="editPassword" class="form-control" placeholder="اتركها كما هي للحفاظ عليها..." value="${u.password || ''}">
                         
-                        <button class="send-btn" style="width:100%; margin-top:10px; border-radius:8px;" onclick="ui.saveProfileEdits('${uid}')">حفظ التغييرات</button>
+                        <button class="send-btn" style="width:100%; margin-top:10px; border-radius:8px;" onclick="ui.saveProfileEdits('${uid}')">حفظ التغييرات السحابية</button>
                     </div>
                 `;
             });
@@ -935,17 +957,25 @@
                 img: window.tempUploadedPfp,
                 name: document.getElementById('editName').value.trim(),
                 age: document.getElementById('editAge').value.trim(),
-                country: document.getElementById('editCountry').value.trim()
+                gender: document.getElementById('editGender').value,
+                country: document.getElementById('editCountry').value.trim(),
+                nameColor: document.getElementById('editNameColor').value,
+                nameBg: document.getElementById('editNameBg').value,
+                password: document.getElementById('editPassword').value
             };
 
+            if(!updated.name) { alert("الاسم المستعار مطلوب!"); return; }
+
             db.collection("users").doc(uid).update(updated).then(() => {
-                alert("تم تحديث البيانات المزامنة بنجاح!");
-                if(window.currentUser.uid === uid) {
+                if(window.currentUser && window.currentUser.uid === uid) {
                     window.currentUser = { ...window.currentUser, ...updated };
                     localStorage.setItem("hassouni_user_session", JSON.stringify(window.currentUser));
                 }
+                alert("تم تحديث البيانات والمزامنة بنجاح للأعضاء دون أي انقطاع!");
                 document.getElementById('featureModal').style.display = 'none';
                 document.getElementById('featureCardMainElement').style.background = '#121212';
+            }).catch((err) => {
+                alert("خطأ أثناء الحفظ: " + err.message);
             });
         },
 
@@ -1025,7 +1055,7 @@
             document.getElementById('featureModalBody').innerHTML = `
                 ${cleanRoomBtn}
                 ${adminFields}
-                <div class="menu-item" style="color:#fff;" onclick="ui.logoutBackToWelcome()"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</div>
+                <div class="menu-item" style="color:#fff;" onclick="ui.logoutBackToWelcome()"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج المباشر</div>
             `;
             document.getElementById('featureModal').style.display = 'flex';
         },
@@ -1075,11 +1105,21 @@
         },
 
         logoutBackToWelcome: () => {
-            ui.updateUserOnlineStatus(false);
-            localStorage.removeItem("hassouni_user_session");
-            setTimeout(() => {
+            if (window.currentUser) {
+                db.collection("users").doc(window.currentUser.uid).update({
+                    isOnline: false,
+                    lastSeen: firebase.firestore.FieldValue.serverTimestamp()
+                }).then(() => {
+                    localStorage.removeItem("hassouni_user_session");
+                    window.location.reload();
+                }).catch(() => {
+                    localStorage.removeItem("hassouni_user_session");
+                    window.location.reload();
+                });
+            } else {
+                localStorage.removeItem("hassouni_user_session");
                 window.location.reload();
-            }, 400);
+            }
         },
         openVIPList: (title) => alert(title)
     };
