@@ -419,8 +419,14 @@
         saveUserToFirestoreAndSession: (userObj) => {
             localStorage.setItem("hassouni_user_session", JSON.stringify(userObj));
             db.collection("users").doc(userObj.uid).set(userObj, { merge: true });
+            
+            // تحديث حالة ظهور المفتاح الملكي فوراً أثناء الحفظ الذكي لقواعد الدخول
             if(document.getElementById('authBtn')) {
-                document.getElementById('authBtn').style.display = 'none';
+                if (userObj.role === "guest") {
+                    document.getElementById('authBtn').style.display = 'block';
+                } else {
+                    document.getElementById('authBtn').style.display = 'none';
+                }
             }
         },
         updateUserOnlineStatus: (status) => {
@@ -448,15 +454,25 @@
                     } else {
                         window.currentUser = parsedUser;
                     }
+                    
+                    // التحكم بالمفتاح الملكي: يظهر للزائر فقط لتمكينه من الترقية، ويختفي للمسجلين
                     if(document.getElementById('authBtn')) {
-                        document.getElementById('authBtn').style.display = 'none';
+                        if (window.currentUser.role === "guest") {
+                            document.getElementById('authBtn').style.display = 'block';
+                        } else {
+                            document.getElementById('authBtn').style.display = 'none';
+                        }
                     }
                     document.getElementById('welcomeOverlay').style.display = 'none'; 
                     ui.enterChat();
                 }).catch(() => {
                     window.currentUser = parsedUser;
                     if(document.getElementById('authBtn')) {
-                        document.getElementById('authBtn').style.display = 'none';
+                        if (window.currentUser.role === "guest") {
+                            document.getElementById('authBtn').style.display = 'block';
+                        } else {
+                            document.getElementById('authBtn').style.display = 'none';
+                        }
                     }
                     document.getElementById('welcomeOverlay').style.display = 'none';
                     ui.enterChat();
@@ -472,6 +488,22 @@
         enterChat: () => {
             document.getElementById('welcomeOverlay').style.display = 'none';
             ui.updateUserOnlineStatus(true);
+            
+            // الاستماع الحي والمباشر لبيانات المستخدم لضمان عدم حدوث تداخل أو ثبات اسم قديم
+            db.collection("users").doc(window.currentUser.uid).onSnapshot((doc) => {
+                if (doc.exists) {
+                    window.currentUser = doc.data();
+                    localStorage.setItem("hassouni_user_session", JSON.stringify(window.currentUser));
+                    if(document.getElementById('authBtn')) {
+                        if (window.currentUser.role === "guest") {
+                            document.getElementById('authBtn').style.display = 'block';
+                        } else {
+                            document.getElementById('authBtn').style.display = 'none';
+                        }
+                    }
+                }
+            });
+
             ui.listenRoomsCloudList();
             ui.listenToGlobalMessages();
             ui.listenToActiveMics();
@@ -636,6 +668,7 @@
             
             inp.value = '';
             
+            // جلب فوري ومباشر لأحدث كائن لبيانات المستخدم الحالي لمنع أي تداخل في الأسماء
             let latestUser = window.currentUser;
             let cleanUserObj = {
                 uid: latestUser.uid,
