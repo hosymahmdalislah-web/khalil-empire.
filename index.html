@@ -21,7 +21,7 @@
         body, html { margin: 0; padding: 0; height: 100vh; background: var(--dark-bg); color: #fff; overflow: hidden; }
 
         #welcomeOverlay {
-            display: none; 
+            display: flex; 
             position: fixed; 
             inset: 0; 
             background: #0a0a0a; 
@@ -80,7 +80,6 @@
             font-weight: bold; 
         }
 
-        /* تنسيق التوقيت المصغر بجانب الرسالة */
         .msg-time {
             font-size: 10px;
             color: #888;
@@ -320,7 +319,6 @@
         return (match && match[2].length === 11) ? match[2] : null;
     }
 
-    // دالة لتنسيق الوقت بشكل مقروء وأنيق (ساعة:دقيقة AM/PM)
     function formatMessageTime(timestamp) {
         if (!timestamp) return "";
         let date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
@@ -421,7 +419,6 @@
         saveUserToFirestoreAndSession: (userObj) => {
             localStorage.setItem("hassouni_user_session", JSON.stringify(userObj));
             db.collection("users").doc(userObj.uid).set(userObj, { merge: true });
-            // إخفاء زر المفتاح الملكي فور تسجيل الدخول بنجاح
             if(document.getElementById('authBtn')) {
                 document.getElementById('authBtn').style.display = 'none';
             }
@@ -451,7 +448,6 @@
                     } else {
                         window.currentUser = parsedUser;
                     }
-                    // إخفاء زر المفتاح الملكي لوجود جلسة دخول سابقة نشطة حتى بعد التحديث
                     if(document.getElementById('authBtn')) {
                         document.getElementById('authBtn').style.display = 'none';
                     }
@@ -466,7 +462,6 @@
                     ui.enterChat();
                 });
             } else {
-                // إظهار زر المفتاح لو كان الزائر غير مسجل بعد
                 if(document.getElementById('authBtn')) {
                     document.getElementById('authBtn').style.display = 'block';
                 }
@@ -477,7 +472,6 @@
         enterChat: () => {
             document.getElementById('welcomeOverlay').style.display = 'none';
             ui.updateUserOnlineStatus(true);
-            ui.clearAllListeners();
             ui.listenRoomsCloudList();
             ui.listenToGlobalMessages();
             ui.listenToActiveMics();
@@ -494,6 +488,7 @@
             if(window.activeRoomsListListener) window.activeRoomsListListener();
         },
         listenRoomsCloudList: () => {
+            if(window.activeRoomsListListener) window.activeRoomsListListener();
             window.activeRoomsListListener = db.collection("rooms_list").onSnapshot((snap) => {
                 let list = ["العام"];
                 snap.forEach(doc => {
@@ -504,6 +499,7 @@
         },
         listenToSessionSecurity: () => {
             if(!window.currentUser || !window.currentUser.uid) return;
+            if(window.activeSessionListener) window.activeSessionListener();
             window.activeSessionListener = db.collection("users").doc(window.currentUser.uid).onSnapshot((doc) => {
                 if(doc.exists) {
                     let data = doc.data();
@@ -512,17 +508,11 @@
                         ui.logoutBackToWelcome();
                         return;
                     }
-                    window.currentUser = data;
-                    localStorage.setItem("hassouni_user_session", JSON.stringify(data));
-                    
-                    if(window.currentUser && window.currentUser.sessionToken && data.sessionToken && data.sessionToken !== window.currentUser.sessionToken) {
-                        alert("تم تسجيل الدخول إلى هذا الحساب من جهاز آخر.");
-                        ui.logoutBackToWelcome();
-                    }
                 }
             });
         },
         listenToRoomSettings: () => {
+            if(window.activeRoomSettingsListener) window.activeRoomSettingsListener();
             window.activeRoomSettingsListener = db.collection("room_settings").doc(window.currentRoom).onSnapshot((doc) => {
                 if(doc.exists) {
                     let data = doc.data();
@@ -544,11 +534,10 @@
             });
         },
         listenToGlobalMessages: () => {
-            let firstLoad = true;
+            if(window.activeMessagesListener) window.activeMessagesListener();
             let chatBox = document.getElementById('chatBox');
             chatBox.innerHTML = "";
             
-            // ترحيب الإدارة الافتراضي الثابت
             let divWel = document.createElement('div');
             divWel.className = 'msg-wrap';
             divWel.innerHTML = `
@@ -561,24 +550,23 @@
             `;
             chatBox.appendChild(divWel);
 
-            // تم إزالة قيد تعليق الفايرستور المتشدد لتحديث فوري وخفيف فائق السرعة
             window.activeMessagesListener = db.collection("rooms").doc(window.currentRoom).collection("messages")
               .orderBy("timestamp", "asc")
               .limitToLast(60)
               .onSnapshot((snapshot) => {
-                  snapshot.docChanges().forEach((change) => {
-                      if (change.type === "added") {
-                          let mData = change.doc.data();
-                          if (mData.user) {
-                              ui.renderMsg(mData.user, mData.text, mData.timestamp, !firstLoad);
-                          }
+                  chatBox.innerHTML = ""; 
+                  chatBox.appendChild(divWel); 
+                  snapshot.forEach((doc) => {
+                      let mData = doc.data();
+                      if (mData.user) {
+                          ui.renderMsg(mData.user, mData.text, mData.timestamp, true);
                       }
                   });
-                  firstLoad = false;
                   chatBox.scrollTop = chatBox.scrollHeight;
               });
         },
         listenToActiveMics: () => {
+            if(window.activeMicsListener) window.activeMicsListener();
             window.activeMicsListener = db.collection("rooms").doc(window.currentRoom).collection("mics")
               .onSnapshot((snapshot) => {
                   for(let i=1; i<=4; i++) {
@@ -609,6 +597,7 @@
               });
         },
         listenOnlineUsersRealtime: () => {
+            if(window.activeOnlineUsersListener) window.activeOnlineUsersListener();
             window.activeOnlineUsersListener = db.collection("users").onSnapshot((snap) => {
                 let list = []; 
                 snap.forEach(doc => {
@@ -676,8 +665,6 @@
             let div = document.createElement('div');
             div.className = 'msg-wrap';
             let rankObj = window.chatRanksData[user.role] || { icon: "fas fa-user", color: "#fff", text: "عضو" };
-            
-            // استخراج وتنسيق وقت الرسالة الحالي الفوري
             let timeString = timestamp ? formatMessageTime(timestamp) : formatMessageTime(new Date());
 
             div.innerHTML = `
@@ -694,7 +681,6 @@
                         <span class="king-name-tag" style="color: ${user.nameColor || rankObj.color};">${user.name}</span>
                     </div>
 
-                    <!-- طباعة التوقيت بجانب الاسم -->
                     <span class="msg-time">${timeString}</span>
                 </div>
                 <div class="msg-text" style="color:#ffffff;">${text}</div>
@@ -1028,7 +1014,7 @@
             document.getElementById('featureModalBody').innerHTML = `
                 ${cleanRoomBtn}
                 ${adminFields}
-                <div class="menu-item" style="color:#fff;" onclick="ui.logoutBackToWelcome()"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</div>
+                <div class="menu-item" style="color:#e74c3c; font-weight:bold;" onclick="ui.logoutBackToWelcome()"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج والعودة للقائمة الرئيسية</div>
             `;
             document.getElementById('featureModal').style.display = 'flex';
         },
@@ -1086,7 +1072,14 @@
         logoutBackToWelcome: () => {
             ui.updateUserOnlineStatus(false);
             localStorage.removeItem("hassouni_user_session");
-            setTimeout(() => { window.location.reload(); }, 400);
+            ui.clearAllListeners();
+            window.currentUser = null;
+            document.getElementById('featureModal').style.display = 'none';
+            document.getElementById('welcomeOverlay').style.display = 'flex';
+            if(document.getElementById('authBtn')) {
+                document.getElementById('authBtn').style.display = 'block';
+            }
+            ui.switchBranch('b1');
         },
         openVIPList: (title) => alert(`قائمة الحسابات المميزة برتبة: ${title}`)
     };
