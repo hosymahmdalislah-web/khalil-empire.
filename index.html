@@ -47,8 +47,8 @@
 
         #chatBox { height: calc(100vh - 190px); overflow-y: auto; padding: 135px 15px 85px; display: flex; flex-direction: column; gap: 12px; background: #0f0f0f url('https://i.ibb.co/6wXbYm2/butterflies.jpg') center center/cover no-repeat; }
         
-        .msg-wrap { display: flex; flex-direction: column; align-self: flex-start; width: 95%; max-width: 420px; background: rgba(18, 22, 28, 0.94); padding: 12px; border-radius: 18px; border: 1.5px solid rgba(255, 215, 0, 0.4); box-shadow: 0 4px 15px rgba(0,0,0,0.5); position: relative; }
-        .msg-header { display: flex; align-items: center; gap: 10px; width: 100%; position: relative; }
+        .msg-wrap { display: flex; flex-direction: column; align-self: flex-start; width: 95%; max-width: 420px; background: rgba(18, 22, 28, 0.94); padding: 12px; border-radius: 18px; border: 1.5px solid rgba(255, 215, 0, 0.4); box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        .msg-header { display: flex; align-items: center; gap: 10px; width: 100%; }
         
         .pfp-main-frame { width: 44px; height: 44px; border-radius: 50%; border: 2px solid var(--gold); box-shadow: 0 0 8px var(--gold); display: flex; align-items: center; justify-content: center; background: #000; flex-shrink: 0; }
         .pfp-main { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; cursor: pointer; }
@@ -82,16 +82,6 @@
             text-shadow: 0 0 3px rgba(255,215,0,0.3);
         }
         
-        .msg-time-badge {
-            font-size: 10px;
-            color: #888;
-            margin-right: auto;
-            align-self: center;
-            background: rgba(0,0,0,0.3);
-            padding: 2px 6px;
-            border-radius: 10px;
-        }
-
         .msg-text { color: #fff; font-size: 14px; line-height: 1.5; margin-top: 8px; padding-right: 5px; word-break: break-word; }
 
         .input-section { position: fixed; bottom: 60px; width: 100%; height: 65px; background: #111; padding: 10px; display: flex; align-items: center; gap: 8px; border-top: 1px solid #222; z-index: 1000; }
@@ -138,18 +128,18 @@
         .yt-preview-card:hover { transform: scale(1.02); }
         .yt-preview-icon { font-size: 28px; color: #ff3333; animation: pulseGlow 1.5s infinite; }
 
-        .profile-card-wrapper { text-align: center; color: #fff; position: relative; transition: all 0.3s ease; border-radius: 12px; padding: 10px; }
-        .profile-card-cover { width: 100%; height: 140px; border-radius: 10px; object-fit: cover; border: 1px solid rgba(255,255,255,0.1); }
+        .profile-card-wrapper { text-align: center; color: #fff; position: relative; }
+        .profile-card-cover { width: 100%; height: 140px; border-radius: 10px; object-fit: cover; border: 1px solid #333; }
         .profile-card-pfp { width: 90px; height: 90px; border-radius: 50%; border: 3px solid var(--gold); margin-top: -45px; object-fit: cover; background: #111; position: relative; z-index: 2; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
         .profile-edit-pencil { position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.7); border: 1px solid var(--gold); color: var(--gold); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 10; }
-        .profile-action-bar { display: flex; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255,255,255,0.1); padding: 10px; border-radius: 8px; justify-content: space-around; margin: 15px 0; align-items: center; }
+        .profile-action-bar { display: flex; background: rgba(255,255,255,0.04); border: 1px solid #333; padding: 10px; border-radius: 8px; justify-content: space-around; margin: 15px 0; align-items: center; }
         .profile-bar-btn { text-align: center; color: #fff; cursor: pointer; font-size: 12px; flex: 1; }
-        .profile-bar-btn i { display: block; font-size: 16px; color: inherit; margin-bottom: 3px; }
-        .profile-details-grid { background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 8px; text-align: right; font-size: 13px; }
-        .profile-grid-row { display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 6px; }
+        .profile-bar-btn i { display: block; font-size: 16px; color: var(--gold); margin-bottom: 3px; }
+        .profile-details-grid { background: #161616; border: 1px solid #222; border-radius: 8px; padding: 10px; display: flex; flex-direction: column; gap: 8px; text-align: right; font-size: 13px; }
+        .profile-grid-row { display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.02); padding-bottom: 6px; }
         .profile-grid-row:last-child { border: none; }
-        .profile-grid-row span:first-child { color: rgba(255, 255, 255, 0.7); }
-        .profile-grid-row span:last-child { font-weight: bold; color: inherit; }
+        .profile-grid-row span:first-child { color: #aaa; }
+        .profile-grid-row span:last-child { color: var(--gold); font-weight: bold; }
 
         #hiddenAudioNode { display: none; }
         #youtubeVideoFrameContainer { position: fixed; top: -9999px; left: -9999px; width: 1px; height: 1px; overflow: hidden; opacity: 0; }
@@ -243,14 +233,15 @@
 </div>
 
 <div id="featureModal" class="feature-modal">
-    <div class="feature-card" id="featureCardMainElement">
+    <div class="feature-card">
         <h3 id="featureModalTitle" style="color:var(--gold); text-align:center; margin-top:0;"></h3>
         <div id="featureModalBody"></div>
-        <button onclick="document.getElementById('featureModal').style.display='none'; document.getElementById('featureCardMainElement').style.background='#121212'; document.getElementById('featureCardMainElement').style.color='#fff';" class="send-btn" style="background:#c0392b; color:white; width:100%; margin-top:15px; border-radius:8px;">إغلاق النافذة</button>
+        <button onclick="document.getElementById('featureModal').style.display='none'" class="send-btn" style="background:#c0392b; color:white; width:100%; margin-top:15px; border-radius:8px;">إغلاق النافذة</button>
     </div>
 </div>
 
 <script>
+    // تم تحديث الإعدادات هنا بالكامل لمشروعك الجديد OSKAR بنجاح وبشكل متوافق ومستقر
     const firebaseConfig = {
         apiKey: "AIzaSyC6m8083RtFHgah8RuiRWULsCBl_54Ul3I",
         authDomain: "oskar-a937e.firebaseapp.com",
@@ -275,7 +266,7 @@
         "prince": { icon: "fas fa-trophy", color: "#aa0000", text: "برنس إمبراطوري" },
         "king": { icon: "fas fa-crown", color: "#FF0000", text: "الملك الملكي" },
         "honor": { icon: "fas fa-crown", color: "#0000FF", text: "تاج الشرف" },
-        "admin": { icon: "fas fa star", color: "#FFD700", text: "إدارة العليا" },
+        "admin": { icon: "fas fa-star", color: "#FFD700", text: "إدارة العليا" },
         "developer": { icon: "fas fa-code", color: "#00FF00", text: "مطور السيرفر" },
         "senior_mod": { icon: "fas fa-gem", color: "#00FFFF", text: "مشرف أول" },
         "mod": { icon: "fas fa-star", color: "#C0C0C0", text: "مشرف" },
@@ -303,7 +294,7 @@
         nameBg: "rgba(255,215,0,0.15)", 
         cover: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=400",
         likes: 742, gifts: "تاج ذهبي، سيف ملكي", profileUrl: "hassouni.chat/king_1", age: 19, gender: "ذكر", country: "اليمن", status: "متصل بأناقة الملك الملكية 🏆",
-        points: 5000, isMuted: false, isBanned: false, nameColor: "#ffd700"
+        points: 5000, isMuted: false, isBanned: false
     };
 
     window.currentUser = null;
@@ -328,24 +319,6 @@
         const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
         const match = url.match(regExp);
         return (match && match[2].length === 11) ? match[2] : null;
-    }
-
-    function formatFirestoreTime(timestamp) {
-        if(!timestamp) return "الآن";
-        let date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
-        let hours = date.getHours();
-        let minutes = date.getMinutes();
-        let ampm = hours >= 12 ? 'م' : 'ص';
-        hours = hours % 12;
-        hours = hours ? hours : 12; 
-        minutes = minutes < 10 ? '0'+minutes : minutes;
-        return hours + ':' + minutes + ' ' + ampm;
-    }
-
-    function formatLastSeenTime(timestamp) {
-        if(!timestamp) return "غير محدد";
-        let date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
-        return date.toLocaleDateString('ar-YE') + " " + formatFirestoreTime(timestamp);
     }
 
     window.ui = {
@@ -397,7 +370,7 @@
                     img: "https://cdn-icons-png.flaticon.com/512/1042/1042291.png", nameBg: "rgba(255,215,0,0.05)", 
                     cover: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=400",
                     likes: 0, gifts: "لا يوجد بعد", profileUrl: "none", age: 20, gender: "ذكر", country: "عربي", status: "عضو ماسي جديد", points: 10, isMuted: false, isBanned: false,
-                    sessionToken: generatedToken, nameColor: "#ffffff", password: ps
+                    sessionToken: generatedToken
                 };
             }
             ui.saveUserToFirestoreAndSession(window.currentUser);
@@ -416,7 +389,7 @@
                 img: "https://cdn-icons-png.flaticon.com/512/1042/1042291.png", nameBg: "transparent", 
                 cover: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=400",
                 likes: 0, gifts: "ممنوع للزوار", profileUrl: "none", age: a, gender: g, country: "اليمن", status: "أنا زائر في شات حسوني", points: 0, isMuted: false, isBanned: false,
-                sessionToken: generatedToken, nameColor: "#ffffff"
+                sessionToken: generatedToken
             };
             ui.saveUserToFirestoreAndSession(window.currentUser);
             ui.enterChat();
@@ -438,7 +411,7 @@
                     img: "https://cdn-icons-png.flaticon.com/512/1042/1042291.png", nameBg: "rgba(255,215,0,0.05)", 
                     cover: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=400",
                     likes: 5, gifts: "وردة ترحيبية", profileUrl: "none", age: 21, gender: "ذكر", country: "الوطن العربي", status: "متواجد في الروم الإمبراطوري", points: 20, isMuted: false, isBanned: false,
-                    sessionToken: generatedToken, nameColor: "#ffffff", password: passInp
+                    sessionToken: generatedToken
                 };
             }
             ui.saveUserToFirestoreAndSession(window.currentUser);
@@ -507,12 +480,11 @@
             window.activeSessionListener = db.collection("users").doc(window.currentUser.uid).onSnapshot((doc) => {
                 if(doc.exists) {
                     let data = doc.data();
+                    window.currentUser = data;
+                    localStorage.setItem("hassouni_user_session", JSON.stringify(window.currentUser));
                     if(window.currentUser.sessionToken && data.sessionToken && data.sessionToken !== window.currentUser.sessionToken) {
                         alert("تم تسجيل الدخول إلى هذا الحساب من هاتف آخر.");
                         ui.logoutBackToWelcome();
-                    } else {
-                        window.currentUser = data;
-                        localStorage.setItem("hassouni_user_session", JSON.stringify(window.currentUser));
                     }
                 }
             });
@@ -535,7 +507,6 @@
             });
         },
         listenToGlobalMessages: () => {
-            if(window.activeMessagesListener) window.activeMessagesListener();
             window.activeMessagesListener = db.collection("rooms").doc(window.currentRoom).collection("messages")
               .orderBy("timestamp", "asc")
               .limitToLast(50)
@@ -558,7 +529,7 @@
                   snapshot.forEach((doc) => {
                       let mData = doc.data();
                       if (mData.user) {
-                          ui.renderMsg(mData.user, mData.text, mData.timestamp);
+                          ui.renderMsg(mData.user, mData.text);
                       }
                   });
               });
@@ -600,21 +571,17 @@
                 });
                 
                 list.sort((a, b) => {
-                    if (a.uid === "owner_hassouni") return -1;
-                    if (b.uid === "owner_hassouni") return 1;
-                    
                     let orderA = window.rolesOrder[a.role] || 99;
                     let orderB = window.rolesOrder[b.role] || 99;
                     return orderA - orderB;
                 });
 
                 let usersHtml = list.map(u => {
-                    let rObj = window.chatRanksData[u.role] || { icon: "fas fa-user", color: "#fff", text: "عضو" };
-                    let displayCustomColor = u.nameColor || rObj.color;
+                    let rObj = window.chatRanksData[u.role] || { icon: "fas fa-user", color: "#fff" };
                     return `
                         <div class="menu-item" onclick="ui.viewProfileCard('${u.uid}')">
-                            <span style="color:${displayCustomColor}; font-weight: bold;"><i class="${rObj.icon}" style="margin-left:5px;"></i> ${u.name}</span>
-                            <span style="font-size:11px; color:${displayCustomColor}; background: ${u.nameBg || 'rgba(0,0,0,0.4)'}; padding: 2px 6px; border-radius: 10px; border: 1px solid ${displayCustomColor};">${rObj.text}</span>
+                            <span style="color:${rObj.color}; font-weight: bold;"><i class="${rObj.icon}" style="margin-left:5px;"></i> ${u.name}</span>
+                            <span style="font-size:11px; color:${rObj.color}; background: rgba(0,0,0,0.4); padding: 2px 6px; border-radius: 10px; border: 1px solid ${rObj.color};">${rObj.text}</span>
                         </div>
                     `;
                 }).join('');
@@ -646,8 +613,7 @@
                     name: latestUser.name,
                     role: latestUser.role,
                     img: latestUser.img,
-                    nameBg: latestUser.nameBg || "transparent",
-                    nameColor: latestUser.nameColor || "#ffffff"
+                    nameBg: latestUser.nameBg || "transparent"
                 };
 
                 db.collection("rooms").doc(window.currentRoom).collection("messages").add({
@@ -665,32 +631,26 @@
             document.getElementById('msgInp').focus();
         },
         
-        renderMsg: (user, text, timestamp) => {
+        renderMsg: (user, text) => {
             if (!user) return;
             
             let div = document.createElement('div');
             div.className = 'msg-wrap';
             let rankObj = window.chatRanksData[user.role] || { icon: "fas fa-user", color: "#fff", text: "عضو" };
-            let timeStr = formatFirestoreTime(timestamp);
-            let displayCustomColor = user.nameColor || rankObj.color;
-            
-            div.style.backgroundColor = user.nameBg && user.nameBg !== 'transparent' ? user.nameBg : 'rgba(18, 22, 28, 0.94)';
             
             div.innerHTML = `
                 <div class="msg-header">
-                    <div class="pfp-main-frame" style="border-color: ${displayCustomColor}; box-shadow: 0 0 8px ${displayCustomColor};">
+                    <div class="pfp-main-frame">
                         <img src="${user.img || 'https://cdn-icons-png.flaticon.com/512/1042/1042291.png'}" class="pfp-main" onclick="ui.viewProfileCard('${user.uid}')">
                     </div>
                     
-                    <div class="rank-standalone-icon" style="border-color: ${displayCustomColor};">
-                        <i class="${rankObj.icon}" style="color: ${displayCustomColor}; filter: drop-shadow(0 0 2px ${displayCustomColor});"></i>
+                    <div class="rank-standalone-icon" style="border-color: ${rankObj.color};">
+                        <i class="${rankObj.icon}" style="color: ${rankObj.color}; filter: drop-shadow(0 0 2px ${rankObj.color});"></i>
                     </div>
                     
-                    <div class="king-name-container" style="border-color: ${displayCustomColor}; background: rgba(0,0,0,0.6);" onclick="ui.quoteUserText('${user.name}', '${text}')">
-                        <span class="king-name-tag" style="color: ${displayCustomColor};">${user.name}</span>
+                    <div class="king-name-container" style="border-color: ${rankObj.color}; background: rgba(0,0,0,0.6);" onclick="ui.quoteUserText('${user.name}', '${text}')">
+                        <span class="king-name-tag" style="color: ${rankObj.color};">${user.name}</span>
                     </div>
-                    
-                    <span class="msg-time-badge"><i class="far fa-clock" style="margin-left: 3px;"></i>${timeStr}</span>
                 </div>
                 <div class="msg-text">${text}</div>
             `;
@@ -829,44 +789,35 @@
                 let isMe = (window.currentUser.uid === uid);
                 let isAmOwner = (window.currentUser.role === 'owner');
                 
-                let rObj = window.chatRanksData[u.role] || { icon: "fas fa-user", color: "#fff", text: "عضو" };
-                
-                let rankColor = u.nameColor || rObj.color;
-                let modalElement = document.getElementById('featureCardMainElement');
-                modalElement.style.background = `linear-gradient(135deg, #121212 60%, ${rankColor}33 100%)`;
-                modalElement.style.color = "#fff";
-                
-                document.getElementById('featureModalTitle').innerText = "الملف الشخصي الإمبراطوري";
+                document.getElementById('featureModalTitle').innerText = "الملف الشخصي";
                 
                 let pencilHtml = (isMe || isAmOwner) && (window.currentUser.role !== 'guest') ? 
-                    `<div class="profile-edit-pencil" onclick="ui.openEditProfileModal('${uid}')" style="color:${rankColor}; border-color:${rankColor};"><i class="fas fa-pencil-alt"></i></div>` : '';
+                    `<div class="profile-edit-pencil" onclick="ui.openEditProfileModal('${uid}')"><i class="fas fa-pencil-alt"></i></div>` : '';
                 
                 let adminOptionsBtn = isAmOwner && !isMe ? 
                     `<button class="send-btn" style="width:100%; margin-top:10px; background:linear-gradient(to left, #cb2d3e, #ef473a); color:#fff;" onclick="ui.openAdminControls('${uid}')">⚙️ إدارة الحساب والإجراءات</button>` : '';
 
-                let lastSeenStr = u.isOnline ? "متصل الآن حالياً 🟢" : formatLastSeenTime(u.lastSeen);
+                let rObj = window.chatRanksData[u.role] || { icon: "fas fa-user", color: "#fff", text: "عضو" };
 
                 document.getElementById('featureModalBody').innerHTML = `
-                    <div class="profile-card-wrapper" style="color:${rankColor};">
+                    <div class="profile-card-wrapper">
                         ${pencilHtml}
                         <img src="${u.cover || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=400'}" class="profile-card-cover" id="cardCoverImg">
-                        <img src="${u.img || 'https://cdn-icons-png.flaticon.com/512/1042/1042291.png'}" class="profile-card-pfp" id="cardPfpImg" style="border-color:${rankColor};">
-                        <h2 style="color:${rankColor}; margin:5px 0 2px;">${u.name}</h2>
-                        <p style="margin:0 0 10px; font-size:13px; color:${rankColor}; font-weight:bold;"><i class="${rObj.icon}"></i> ${rObj.text}</p>
-                        <p style="margin:0 0 10px; font-size:12px; color:#ccc;">${u.status || 'لا يوجد حالة'}</p>
+                        <img src="${u.img || 'https://cdn-icons-png.flaticon.com/512/1042/1042291.png'}" class="profile-card-pfp" id="cardPfpImg">
+                        <h2 style="color:${rObj.color}; margin:5px 0 2px;">${u.name}</h2>
+                        <p style="margin:0 0 10px; font-size:13px; color:${rObj.color}; font-weight:bold;"><i class="${rObj.icon}"></i> ${rObj.text}</p>
+                        <p style="margin:0 0 10px; font-size:12px; color:#aaa;">${u.status || 'لا يوجد حالة'}</p>
                         
-                        <div class="profile-action-bar" style="color:${rankColor}; border-color:${rankColor}55;">
-                            <div class="profile-bar-btn" onclick="ui.likeProfile('${uid}')"><i class="fas fa-heart" style="color:${rankColor};"></i> <span id="likeCountText">${u.likes || 0}</span> لاف</div>
-                            <div class="profile-bar-btn" onclick="alert('فتح الخاص')" style="color:${rankColor};"><i class="fas fa-paper-plane"></i> الخاص</div>
-                            <div class="profile-bar-btn" style="color:${rankColor};"><i class="fas fa-chart-line"></i> ليفل ${u.level || 1}</div>
+                        <div class="profile-action-bar">
+                            <div class="profile-bar-btn" onclick="ui.likeProfile('${uid}')"><i class="fas fa-heart"></i> <span id="likeCountText">${u.likes || 0}</span> لاف</div>
+                            <div class="profile-bar-btn" onclick="alert('فتح الخاص')"><i class="fas fa-paper-plane"></i> الخاص</div>
+                            <div class="profile-bar-btn"><i class="fas fa-chart-line"></i> ليفل ${u.level || 1}</div>
                         </div>
 
-                        <div class="profile-details-grid" style="color:${rankColor}; border-color:${rankColor}55;">
-                            <div class="profile-grid-row"><span>الاسم المستعار:</span><span style="color:${rankColor};">${u.name || 'غير محدد'}</span></div>
-                            <div class="profile-grid-row"><span>العمر الحالي:</span><span style="color:${rankColor};">${u.age || 'غير محدد'}</span></div>
-                            <div class="profile-grid-row"><span>الجنس الكوني:</span><span style="color:${rankColor};">${u.gender || 'غير مححدد'}</span></div>
-                            <div class="profile-grid-row"><span>البلد والإقامة:</span><span style="color:${rankColor};">${u.country || 'اليمن'}</span></div>
-                            <div class="profile-grid-row"><span>آخر ظهور للعضو:</span><span style="color:${rankColor}; font-size:11px;">${lastSeenStr}</span></div>
+                        <div class="profile-details-grid">
+                            <div class="profile-grid-row"><span>العمر:</span><span>${u.age || 'غير مححدد'}</span></div>
+                            <div class="profile-grid-row"><span>الجنس:</span><span>${u.gender || 'غير مححدد'}</span></div>
+                            <div class="profile-grid-row"><span>البلد:</span><span>${u.country || 'اليمن'}</span></div>
                         </div>
                         ${adminOptionsBtn}
                     </div>
@@ -912,7 +863,7 @@
                 
                 document.getElementById('featureModalTitle').innerText = "تعديل بيانات الملف الشخصي";
                 document.getElementById('featureModalBody').innerHTML = `
-                    <div style="text-align:right; max-height:65vh; overflow-y:auto; padding-left:5px;">
+                    <div style="text-align:right;">
                         <label style="font-size:12px; color:var(--gold); font-weight:bold;">صورة الغلاف:</label>
                         <label for="fileCover" class="file-input-label"><i class="fas fa-upload"></i> اختر صورة غلاف</label>
                         <input type="file" id="fileCover" class="file-input-hidden" accept="image/*" onchange="ui.handleLocalFileProcessing(this, 'cover')">
@@ -921,31 +872,16 @@
                         <label for="filePfp" class="file-input-label"><i class="fas fa-image"></i> اختر صورة بروفايل</label>
                         <input type="file" id="filePfp" class="file-input-hidden" accept="image/*" onchange="ui.handleLocalFileProcessing(this, 'pfp')">
                         
-                        <label style="font-size:12px; color:var(--gold);">الاسم المستعار أو المزخرف:</label>
+                        <label style="font-size:12px; color:var(--gold);">الاسم المستعار:</label>
                         <input type="text" id="editName" class="form-control" value="${u.name || ''}">
                         
                         <label style="font-size:12px; color:var(--gold);">العمر:</label>
                         <input type="number" id="editAge" class="form-control" value="${u.age || ''}">
                         
-                        <label style="font-size:12px; color:var(--gold);">الجنس الكوني:</label>
-                        <select id="editGender" class="form-select">
-                            <option value="ذكر" ${u.gender === 'ذكر' ? 'selected' : ''}>ذكر</option>
-                            <option value="أنثى" ${u.gender === 'أنثى' ? 'selected' : ''}>أنثى</option>
-                        </select>
-
-                        <label style="font-size:12px; color:var(--gold);">البلد والإقامة:</label>
+                        <label style="font-size:12px; color:var(--gold);">البلد:</label>
                         <input type="text" id="editCountry" class="form-control" value="${u.country || ''}">
-
-                        <label style="font-size:12px; color:var(--gold);">لون الاسم:</label>
-                        <input type="color" id="editNameColor" class="form-control" style="height:40px; padding:2px;" value="${u.nameColor || '#ffffff'}">
-
-                        <label style="font-size:12px; color:var(--gold);">لون خلفية الاسم والرسالة:</label>
-                        <input type="color" id="editNameBg" class="form-control" style="height:40px; padding:2px;" value="${u.nameBg || '#000000'}">
-
-                        <label style="font-size:12px; color:var(--gold);">كلمة المرور الجديدة:</label>
-                        <input type="password" id="editPassword" class="form-control" placeholder="اتركها كما هي للحفاظ عليها..." value="${u.password || ''}">
                         
-                        <button class="send-btn" style="width:100%; margin-top:10px; border-radius:8px;" onclick="ui.saveProfileEdits('${uid}')">حفظ التغييرات السحابية</button>
+                        <button class="send-btn" style="width:100%; margin-top:10px; border-radius:8px;" onclick="ui.saveProfileEdits('${uid}')">حفظ التغييرات</button>
                     </div>
                 `;
             });
@@ -957,25 +893,16 @@
                 img: window.tempUploadedPfp,
                 name: document.getElementById('editName').value.trim(),
                 age: document.getElementById('editAge').value.trim(),
-                gender: document.getElementById('editGender').value,
-                country: document.getElementById('editCountry').value.trim(),
-                nameColor: document.getElementById('editNameColor').value,
-                nameBg: document.getElementById('editNameBg').value,
-                password: document.getElementById('editPassword').value
+                country: document.getElementById('editCountry').value.trim()
             };
 
-            if(!updated.name) { alert("الاسم المستعار مطلوب!"); return; }
-
             db.collection("users").doc(uid).update(updated).then(() => {
-                if(window.currentUser && window.currentUser.uid === uid) {
+                alert("تم تحديث البيانات المزامنة بنجاح!");
+                if(window.currentUser.uid === uid) {
                     window.currentUser = { ...window.currentUser, ...updated };
                     localStorage.setItem("hassouni_user_session", JSON.stringify(window.currentUser));
                 }
-                alert("تم تحديث البيانات والمزامنة بنجاح للأعضاء دون أي انقطاع!");
                 document.getElementById('featureModal').style.display = 'none';
-                document.getElementById('featureCardMainElement').style.background = '#121212';
-            }).catch((err) => {
-                alert("خطأ أثناء الحفظ: " + err.message);
             });
         },
 
@@ -1023,14 +950,12 @@
             db.collection("users").doc(uid).update({ isMuted: state }).then(() => {
                 alert(state ? "تم الكتم" : "تم إلغاء الكتم");
                 document.getElementById('featureModal').style.display = 'none';
-                document.getElementById('featureCardMainElement').style.background = '#121212';
             });
         },
         toggleUserBan: (uid, state) => {
             db.collection("users").doc(uid).update({ isBanned: state }).then(() => {
                 alert(state ? "تم الحظر" : "تم إلغاء الحظر");
                 document.getElementById('featureModal').style.display = 'none';
-                document.getElementById('featureCardMainElement').style.background = '#121212';
             });
         },
 
@@ -1055,7 +980,7 @@
             document.getElementById('featureModalBody').innerHTML = `
                 ${cleanRoomBtn}
                 ${adminFields}
-                <div class="menu-item" style="color:#fff;" onclick="ui.logoutBackToWelcome()"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج المباشر</div>
+                <div class="menu-item" style="color:#fff;" onclick="ui.logoutBackToWelcome()"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</div>
             `;
             document.getElementById('featureModal').style.display = 'flex';
         },
@@ -1105,21 +1030,11 @@
         },
 
         logoutBackToWelcome: () => {
-            if (window.currentUser) {
-                db.collection("users").doc(window.currentUser.uid).update({
-                    isOnline: false,
-                    lastSeen: firebase.firestore.FieldValue.serverTimestamp()
-                }).then(() => {
-                    localStorage.removeItem("hassouni_user_session");
-                    window.location.reload();
-                }).catch(() => {
-                    localStorage.removeItem("hassouni_user_session");
-                    window.location.reload();
-                });
-            } else {
-                localStorage.removeItem("hassouni_user_session");
+            ui.updateUserOnlineStatus(false);
+            localStorage.removeItem("hassouni_user_session");
+            setTimeout(() => {
                 window.location.reload();
-            }
+            }, 400);
         },
         openVIPList: (title) => alert(title)
     };
