@@ -47,8 +47,8 @@
 
         #chatBox { height: calc(100vh - 190px); overflow-y: auto; padding: 135px 15px 85px; display: flex; flex-direction: column; gap: 12px; background: #0f0f0f url('https://i.ibb.co/6wXbYm2/butterflies.jpg') center center/cover no-repeat; transition: background 0.3s ease; }
         
-        .msg-wrap { display: flex; flex-direction: column; align-self: flex-start; width: 95%; max-width: 420px; background: rgba(18, 22, 28, 0.94); padding: 12px; border-radius: 18px; border: 1.5px solid rgba(255, 215, 0, 0.4); box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
-        .msg-header { display: flex; align-items: center; gap: 10px; width: 100%; }
+        .msg-wrap { display: flex; flex-direction: column; align-self: flex-start; width: 95%; max-width: 420px; background: rgba(18, 22, 28, 0.94); padding: 12px; border-radius: 18px; border: 1.5px solid rgba(255, 215, 0, 0.4); box-shadow: 0 4px 15px rgba(0,0,0,0.5); position: relative; }
+        .msg-header { display: flex; align-items: center; gap: 10px; width: 100%; position: relative; }
         
         .pfp-main-frame { width: 44px; height: 44px; border-radius: 50%; border: 2px solid var(--gold); box-shadow: 0 0 8px var(--gold); display: flex; align-items: center; justify-content: center; background: #000; flex-shrink: 0; }
         .pfp-main { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; cursor: pointer; }
@@ -78,6 +78,15 @@
         .king-name-tag { 
             font-size: 13px; 
             font-weight: bold; 
+        }
+
+        /* تنسيق التوقيت المصغر بجانب الرسالة */
+        .msg-time {
+            font-size: 10px;
+            color: #888;
+            margin-right: auto;
+            align-self: center;
+            direction: ltr;
         }
         
         .msg-text { font-size: 14px; line-height: 1.5; margin-top: 8px; padding-right: 5px; word-break: break-word; text-align: right; }
@@ -311,6 +320,19 @@
         return (match && match[2].length === 11) ? match[2] : null;
     }
 
+    // دالة لتنسيق الوقت بشكل مقروء وأنيق (ساعة:دقيقة AM/PM)
+    function formatMessageTime(timestamp) {
+        if (!timestamp) return "";
+        let date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+        let hours = date.getHours();
+        let minutes = date.getMinutes();
+        let ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12;
+        hours = hours ? hours : 12; 
+        minutes = minutes < 10 ? '0' + minutes : minutes;
+        return hours + ':' + minutes + ' ' + ampm;
+    }
+
     window.ui = {
         switchBranch: (id) => {
             document.querySelectorAll('.branch-content').forEach(c => c.style.display = 'none');
@@ -399,6 +421,10 @@
         saveUserToFirestoreAndSession: (userObj) => {
             localStorage.setItem("hassouni_user_session", JSON.stringify(userObj));
             db.collection("users").doc(userObj.uid).set(userObj, { merge: true });
+            // إخفاء زر المفتاح الملكي فور تسجيل الدخول بنجاح
+            if(document.getElementById('authBtn')) {
+                document.getElementById('authBtn').style.display = 'none';
+            }
         },
         updateUserOnlineStatus: (status) => {
             if (window.currentUser) {
@@ -425,14 +451,25 @@
                     } else {
                         window.currentUser = parsedUser;
                     }
+                    // إخفاء زر المفتاح الملكي لوجود جلسة دخول سابقة نشطة حتى بعد التحديث
+                    if(document.getElementById('authBtn')) {
+                        document.getElementById('authBtn').style.display = 'none';
+                    }
                     document.getElementById('welcomeOverlay').style.display = 'none'; 
                     ui.enterChat();
                 }).catch(() => {
                     window.currentUser = parsedUser;
+                    if(document.getElementById('authBtn')) {
+                        document.getElementById('authBtn').style.display = 'none';
+                    }
                     document.getElementById('welcomeOverlay').style.display = 'none';
                     ui.enterChat();
                 });
             } else {
+                // إظهار زر المفتاح لو كان الزائر غير مسجل بعد
+                if(document.getElementById('authBtn')) {
+                    document.getElementById('authBtn').style.display = 'block';
+                }
                 document.getElementById('welcomeOverlay').style.display = 'flex';
                 ui.switchBranch('b1');
             }
@@ -475,7 +512,6 @@
                         ui.logoutBackToWelcome();
                         return;
                     }
-                    // تحديث الجلسة المحلية فورياً عند تغير البيانات السحابية (الرتب والتعديلات)
                     window.currentUser = data;
                     localStorage.setItem("hassouni_user_session", JSON.stringify(data));
                     
@@ -525,23 +561,21 @@
             `;
             chatBox.appendChild(divWel);
 
+            // تم إزالة قيد تعليق الفايرستور المتشدد لتحديث فوري وخفيف فائق السرعة
             window.activeMessagesListener = db.collection("rooms").doc(window.currentRoom).collection("messages")
               .orderBy("timestamp", "asc")
               .limitToLast(60)
               .onSnapshot((snapshot) => {
-                  if (!snapshot.metadata.hasPendingWrites) {
-                      // معالجة فجوات السيرفر الزمنية والفرز الفوري فائق السرعة
-                      snapshot.docChanges().forEach((change) => {
-                          if (change.type === "added") {
-                              let mData = change.doc.data();
-                              if (mData.user) {
-                                  ui.renderMsg(mData.user, mData.text, !firstLoad);
-                              }
+                  snapshot.docChanges().forEach((change) => {
+                      if (change.type === "added") {
+                          let mData = change.doc.data();
+                          if (mData.user) {
+                              ui.renderMsg(mData.user, mData.text, mData.timestamp, !firstLoad);
                           }
-                      });
-                      firstLoad = false;
-                      chatBox.scrollTop = chatBox.scrollHeight;
-                  }
+                      }
+                  });
+                  firstLoad = false;
+                  chatBox.scrollTop = chatBox.scrollHeight;
               });
         },
         listenToActiveMics: () => {
@@ -613,7 +647,6 @@
             
             inp.value = '';
             
-            // سحب أحدث بيانات محدثة للألوان والخلفيات من الجلسة الملكية الفورية
             let latestUser = window.currentUser;
             let cleanUserObj = {
                 uid: latestUser.uid,
@@ -637,13 +670,16 @@
             document.getElementById('msgInp').value = ` ↩️ اقتباس [ ${userName} ]: "${cleanText}" -> `;
             document.getElementById('msgInp').focus();
         },
-        renderMsg: (user, text, shouldScroll) => {
+        renderMsg: (user, text, timestamp, shouldScroll) => {
             if (!user) return;
             
             let div = document.createElement('div');
             div.className = 'msg-wrap';
             let rankObj = window.chatRanksData[user.role] || { icon: "fas fa-user", color: "#fff", text: "عضو" };
             
+            // استخراج وتنسيق وقت الرسالة الحالي الفوري
+            let timeString = timestamp ? formatMessageTime(timestamp) : formatMessageTime(new Date());
+
             div.innerHTML = `
                 <div class="msg-header">
                     <div class="pfp-main-frame">
@@ -657,6 +693,9 @@
                     <div class="king-name-container" style="border-color: ${user.nameColor || rankObj.color}; background: ${user.nameBg || 'rgba(0,0,0,0.6)'};" onclick="ui.quoteUserText('${user.name}', '${text}')">
                         <span class="king-name-tag" style="color: ${user.nameColor || rankObj.color};">${user.name}</span>
                     </div>
+
+                    <!-- طباعة التوقيت بجانب الاسم -->
+                    <span class="msg-time">${timeString}</span>
                 </div>
                 <div class="msg-text" style="color:#ffffff;">${text}</div>
             `;
@@ -1013,7 +1052,6 @@
             document.getElementById('featureModalTitle').innerText = "الغرف المتوفرة السحابية";
             let isOwner = (window.currentUser && window.currentUser.role === 'owner');
             
-            // إضافة ميزة لوحة التحكم بإنشاء غرف مخصصة للمالك الرسمي فقط هنا
             let ownerCreateRoomBlock = isOwner ? `
                 <div style="border-bottom: 2px dashed var(--gold); padding-bottom: 12px; margin-bottom: 12px; text-align:right;">
                     <label style="font-size:12px; color:var(--gold); font-weight:bold;">👑 لوحة منشئ الغرف الإمبراطورية:</label>
