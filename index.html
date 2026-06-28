@@ -363,13 +363,15 @@
                 window.currentUser.name = n;
                 window.currentUser.password = ps;
                 window.currentUser.sessionToken = generatedToken;
+                window.currentUser.isOnline = true;
             } else {
                 window.currentUser = { 
                     uid: "u_"+Date.now(), name: n, role: "diamond", level: 50, password: ps, email: em,
                     img: "https://cdn-icons-png.flaticon.com/512/1042/1042291.png", nameBg: "rgba(255,215,0,0.05)", nameColor: "#8A2BE2", textBg: "", textColor: "#ffffff",
                     cover: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=400",
                     likes: 0, gifts: "لا يوجد بعد", profileUrl: "none", age: 20, gender: "ذكر", country: "عربي", status: "عضو ماسي جديد", points: 10, isMuted: false, isBanned: false,
-                    sessionToken: generatedToken
+                    sessionToken: generatedToken,
+                    isOnline: true
                 };
             }
             ui.saveUserToFirestoreAndSession(window.currentUser);
@@ -388,7 +390,8 @@
                 img: "https://cdn-icons-png.flaticon.com/512/1042/1042291.png", nameBg: "transparent", nameColor: "#ffffff", textBg: "", textColor: "#ffffff",
                 cover: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=400",
                 likes: 0, gifts: "ممنوع للزوار", profileUrl: "none", age: a, gender: g, country: "اليمن", status: "أنا زائر في شات حسوني", points: 0, isMuted: false, isBanned: false,
-                sessionToken: generatedToken
+                sessionToken: generatedToken,
+                isOnline: true
             };
             ui.saveUserToFirestoreAndSession(window.currentUser);
             ui.enterChat();
@@ -404,13 +407,15 @@
             if(userInp === "ghrwrkk2@gmail.com" || emailInp === "ghrwrkk2@gmail.com" || passInp === "owner123") {
                 window.currentUser = { ...window.defaultOwnerData };
                 window.currentUser.sessionToken = generatedToken;
+                window.currentUser.isOnline = true;
             } else {
                 window.currentUser = { 
                     uid: "u_"+Date.now(), name: userInp, role: "new", level: 1, password: passInp, email: emailInp,
                     img: "https://cdn-icons-png.flaticon.com/512/1042/1042291.png", nameBg: "rgba(255,215,0,0.05)", nameColor: "#32CD32", textBg: "", textColor: "#ffffff",
                     cover: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=400",
                     likes: 5, gifts: "وردة ترحيبية", profileUrl: "none", age: 21, gender: "ذكر", country: "الوطن العربي", status: "متواجد في الروم الإمبراطوري", points: 20, isMuted: false, isBanned: false,
-                    sessionToken: generatedToken
+                    sessionToken: generatedToken,
+                    isOnline: true
                 };
             }
             ui.saveUserToFirestoreAndSession(window.currentUser);
@@ -420,7 +425,6 @@
             localStorage.setItem("hassouni_user_session", JSON.stringify(userObj));
             db.collection("users").doc(userObj.uid).set(userObj, { merge: true });
             
-            // تحديث حالة ظهور المفتاح الملكي فوراً أثناء الحفظ الذكي لقواعد الدخول
             if(document.getElementById('authBtn')) {
                 if (userObj.role === "guest") {
                     document.getElementById('authBtn').style.display = 'block';
@@ -450,12 +454,13 @@
                             return;
                         }
                         window.currentUser = sData;
+                        window.currentUser.isOnline = true;
                         localStorage.setItem("hassouni_user_session", JSON.stringify(window.currentUser));
                     } else {
                         window.currentUser = parsedUser;
+                        window.currentUser.isOnline = true;
                     }
                     
-                    // التحكم بالمفتاح الملكي: يظهر للزائر فقط لتمكينه من الترقية، ويختفي للمسجلين
                     if(document.getElementById('authBtn')) {
                         if (window.currentUser.role === "guest") {
                             document.getElementById('authBtn').style.display = 'block';
@@ -467,6 +472,7 @@
                     ui.enterChat();
                 }).catch(() => {
                     window.currentUser = parsedUser;
+                    window.currentUser.isOnline = true;
                     if(document.getElementById('authBtn')) {
                         if (window.currentUser.role === "guest") {
                             document.getElementById('authBtn').style.display = 'block';
@@ -489,7 +495,6 @@
             document.getElementById('welcomeOverlay').style.display = 'none';
             ui.updateUserOnlineStatus(true);
             
-            // الاستماع الحي والمباشر لبيانات المستخدم لضمان عدم حدوث تداخل أو ثبات اسم قديم
             db.collection("users").doc(window.currentUser.uid).onSnapshot((doc) => {
                 if (doc.exists) {
                     window.currentUser = doc.data();
@@ -668,7 +673,6 @@
             
             inp.value = '';
             
-            // جلب فوري ومباشر لأحدث كائن لبيانات المستخدم الحالي لمنع أي تداخل في الأسماء
             let latestUser = window.currentUser;
             let cleanUserObj = {
                 uid: latestUser.uid,
@@ -868,6 +872,7 @@
                         <p style="margin:0 0 10px; font-size:12px; color:#aaa;">${u.status || 'لا يوجد حالة'}</p>
                         
                         <div class="profile-action-bar">
+                            <div class="profile-action-bar">
                             <div class="profile-bar-btn" onclick="ui.likeProfile('${uid}')"><i class="fas fa-heart"></i> <span id="likeCountText">${u.likes || 0}</span> لاف</div>
                             <div class="profile-bar-btn" onclick="alert('فتح الخاص المشفّر')"><i class="fas fa-paper-plane"></i> الخاص</div>
                             <div class="profile-bar-btn"><i class="fas fa-chart-line"></i> ليفل ${u.level || 1}</div>
