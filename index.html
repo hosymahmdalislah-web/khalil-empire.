@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>شات حسوني - النسخة الإمبراطورية السحابية</title>
+    <title>شات حسوني - النسخة الإمبراطورية السحابية المستقرة</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -47,13 +47,12 @@
 
         #chatBox { height: calc(100vh - 190px); overflow-y: auto; padding: 135px 15px 85px; display: flex; flex-direction: column; gap: 12px; background: #0f0f0f url('https://i.ibb.co/6wXbYm2/butterflies.jpg') center center/cover no-repeat; }
         
-        .msg-wrap { display: flex; flex-direction: column; align-self: flex-start; width: 95%; max-width: 420px; background: rgba(18, 22, 28, 0.94); padding: 12px; border-radius: 18px; border: 1.5px solid rgba(255, 215, 0, 0.4); box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
-        .msg-header { display: flex; align-items: center; gap: 10px; width: 100%; }
+        .msg-wrap { display: flex; flex-direction: column; align-self: flex-start; width: 95%; max-width: 420px; background: rgba(18, 22, 28, 0.94); padding: 12px; border-radius: 18px; border: 1.5px solid rgba(255, 215, 0, 0.4); box-shadow: 0 4px 15px rgba(0,0,0,0.5); position: relative; }
+        .msg-header { display: flex; align-items: center; gap: 10px; width: 100%; position: relative; }
         
         .pfp-main-frame { width: 44px; height: 44px; border-radius: 50%; border: 2px solid var(--gold); box-shadow: 0 0 8px var(--gold); display: flex; align-items: center; justify-content: center; background: #000; flex-shrink: 0; }
         .pfp-main { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; cursor: pointer; }
         
-        /* أيقونة الرتبة المنفصلة بين الصورة والاسم */
         .rank-standalone-icon {
             font-size: 16px;
             display: flex;
@@ -67,7 +66,6 @@
             flex-shrink: 0;
         }
 
-        /* إطار الاسم الفخم المنفصل */
         .king-name-container {
             display: inline-flex;
             align-items: center;
@@ -82,6 +80,13 @@
             font-size: 13px; 
             font-weight: bold; 
             text-shadow: 0 0 3px rgba(255,215,0,0.3);
+        }
+
+        .msg-time-badge {
+            font-size: 10px;
+            color: #888;
+            margin-right: auto;
+            align-self: center;
         }
         
         .msg-text { color: #fff; font-size: 14px; line-height: 1.5; margin-top: 8px; padding-right: 5px; word-break: break-word; }
@@ -243,7 +248,6 @@
 </div>
 
 <script>
-    // ربط مشروع Firebase السحابي الجديد الخاص بك بنجاح
     const firebaseConfig = {
         apiKey: "AIzaSyCZ9Uh8sTZXsChbLXVvoaK81lxMU9dWsOc",
         authDomain: "soobr-9dbcf.firebaseapp.com",
@@ -317,6 +321,19 @@
         const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
         const match = url.match(regExp);
         return (match && match[2].length === 11) ? match[2] : null;
+    }
+
+    // دالة فخمة لتنسيق الوقت من الفايربيس بجانب كل رسالة بالروم بالترتيب
+    function formatFirebaseTimestamp(timestamp) {
+        if(!timestamp) return "";
+        let date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+        let hours = date.getHours();
+        let minutes = date.getMinutes();
+        let ampm = hours >= 12 ? 'م' : 'ص';
+        hours = hours % 12;
+        hours = hours ? hours : 12;
+        minutes = minutes < 10 ? '0' + minutes : minutes;
+        return hours + ':' + minutes + ' ' + ampm;
     }
 
     window.ui = {
@@ -495,11 +512,11 @@
               .onSnapshot((snapshot) => {
                   let chatBox = document.getElementById('chatBox');
                   chatBox.innerHTML = "";
-                  ui.renderMsg(window.defaultOwnerData, "مرحباً بكم في شات حسوني الإمبراطوري الحصري والآمن 🏆🔥");
+                  ui.renderMsg(window.defaultOwnerData, "مرحباً بكم في شات حسوني الإمبراطوري الحصري والآمن 🏆🔥", null);
                   snapshot.forEach((doc) => {
                       let mData = doc.data();
                       if (mData.user) {
-                          ui.renderMsg(mData.user, mData.text);
+                          ui.renderMsg(mData.user, mData.text, mData.timestamp);
                       }
                   });
               });
@@ -545,20 +562,28 @@
             
             inp.value = '';
             
-            let cleanUserObj = {
-                uid: window.currentUser.uid,
-                name: window.currentUser.name,
-                role: window.currentUser.role,
-                img: window.currentUser.img,
-                nameBg: window.currentUser.nameBg || "transparent"
-            };
+            // قمنا بربط الكود ليجلب بيانات اليوزر الأحدث مباشرة لكي تظهر الزخرفة والصور الجديدة للجميع في الروم العام فوراً
+            db.collection("users").doc(window.currentUser.uid).get().then((uDoc) => {
+                let userDataForMsg = window.currentUser;
+                if(uDoc.exists) {
+                    userDataForMsg = uDoc.data();
+                }
+                
+                let cleanUserObj = {
+                    uid: userDataForMsg.uid,
+                    name: userDataForMsg.name,
+                    role: userDataForMsg.role,
+                    img: userDataForMsg.img,
+                    nameBg: userDataForMsg.nameBg || "transparent"
+                };
 
-            db.collection("rooms").doc(window.currentRoom).collection("messages").add({
-                user: cleanUserObj,
-                text: t,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            }).catch((err) => {
-                alert("خطأ: " + err.message);
+                db.collection("rooms").doc(window.currentRoom).collection("messages").add({
+                    user: cleanUserObj,
+                    text: t,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                }).catch((err) => {
+                    alert("خطأ: " + err.message);
+                });
             });
         },
         quoteUserText: (userName, textContent) => {
@@ -567,12 +592,13 @@
             document.getElementById('msgInp').focus();
         },
         
-        renderMsg: (user, text) => {
+        renderMsg: (user, text, timestamp) => {
             if (!user) return;
             let div = document.createElement('div');
             div.className = 'msg-wrap';
             
             let rankObj = window.chatRanksData[user.role] || { icon: "fas fa-user", color: "#fff", text: "عضو" };
+            let timeString = timestamp ? formatFirebaseTimestamp(timestamp) : "الآن";
             
             div.innerHTML = `
                 <div class="msg-header">
@@ -587,6 +613,7 @@
                     <div class="king-name-container" style="border-color: ${rankObj.color}; background: rgba(0,0,0,0.6);" onclick="ui.quoteUserText('${user.name}', '${text}')">
                         <span class="king-name-tag" style="color: ${rankObj.color};">${user.name}</span>
                     </div>
+                    <span class="msg-time-badge">${timeString}</span>
                 </div>
                 <div class="msg-text">${text}</div>
             `;
@@ -719,6 +746,7 @@
         },
 
         viewProfileCard: (uid) => {
+            // جلب البيانات من السيرفر مباشرة لكي تظهر تحديثات الخلفية والغلاف والزخرفة للأعضاء فوراً دون مشاكل
             db.collection("users").doc(uid).get().then((doc) => {
                 if(!doc.exists) return;
                 let u = doc.data();
@@ -807,8 +835,11 @@
                         <label for="filePfp" class="file-input-label"><i class="fas fa-image"></i> اختر صورة بروفايل</label>
                         <input type="file" id="filePfp" class="file-input-hidden" accept="image/*" onchange="ui.handleLocalFileProcessing(this, 'pfp')">
                         
-                        <label style="font-size:12px; color:var(--gold);">الاسم المستعار:</label>
+                        <label style="font-size:12px; color:var(--gold);">الاسم المستعار والزخرفة:</label>
                         <input type="text" id="editName" class="form-control" value="${u.name || ''}">
+                        
+                        <label style="font-size:12px; color:var(--gold);">الحالة الشخصية:</label>
+                        <input type="text" id="editStatus" class="form-control" value="${u.status || ''}">
                         
                         <label style="font-size:12px; color:var(--gold);">العمر:</label>
                         <input type="number" id="editAge" class="form-control" value="${u.age || ''}">
@@ -827,12 +858,13 @@
                 cover: window.tempUploadedCover,
                 img: window.tempUploadedPfp,
                 name: document.getElementById('editName').value.trim(),
+                status: document.getElementById('editStatus').value.trim(),
                 age: document.getElementById('editAge').value.trim(),
                 country: document.getElementById('editCountry').value.trim()
             };
 
             db.collection("users").doc(uid).update(updated).then(() => {
-                alert("تم تحديث البيانات المزامنة بنجاح!");
+                alert("تم تحديث البيانات المزامنة بنجاح وللجميع بالروم!");
                 if(window.currentUser.uid === uid) {
                     window.currentUser = { ...window.currentUser, ...updated };
                     localStorage.setItem("hassouni_user_session", JSON.stringify(window.currentUser));
@@ -897,7 +929,7 @@
             
             let adminFields = isOwner ? `
                 <div style="border-top:1px solid var(--gold); padding-top:10px; margin-top:10px; text-align:right;">
-                    <label style="font-size:12px; color:var(--gold); font-weight:bold;">تغيير خلفية الروم:</label>
+                    <label style="font-size:12px; color:var(--gold); font-weight:bold;">تغيير خلفية الروم السحابية للجميع:</label>
                     <label for="fileRoomBg" class="file-input-label"><i class="fas fa-images"></i> اختيار صورة خلفية للغرفة</label>
                     <input type="file" id="fileRoomBg" class="file-input-hidden" accept="image/*" onchange="ui.handleLocalFileProcessing(this, 'roomBg')">
                     <button class="send-btn" style="width:100%; margin-bottom:8px;" onclick="ui.saveRoomBgSetting()">تحديث خلفية الروم سحابياً</button>
@@ -919,7 +951,7 @@
         saveRoomBgSetting: () => {
             if(!window.tempUploadedRoomBg) { alert("الرجاء اختيار ملف صورة أولاً"); return; }
             db.collection("room_settings").doc(window.currentRoom).set({ roomBg: window.tempUploadedRoomBg }, { merge: true }).then(() => {
-                alert("تم تغيير وتثبيت خلفية الروم بنجاح!");
+                alert("تم تغيير وتثبيت خلفية الروم بنجاح ولدى كافة الزوار!");
                 document.getElementById('featureModal').style.display = 'none';
             });
         },
