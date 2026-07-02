@@ -53,6 +53,7 @@
         .pfp-main-frame { width: 44px; height: 44px; border-radius: 50%; border: 2px solid var(--gold); box-shadow: 0 0 8px var(--gold); display: flex; align-items: center; justify-content: center; background: #000; flex-shrink: 0; }
         .pfp-main { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; cursor: pointer; }
         
+        /* أيقونة الرتبة المنفصلة بين الصورة والاسم */
         .rank-standalone-icon {
             font-size: 16px;
             display: flex;
@@ -66,6 +67,7 @@
             flex-shrink: 0;
         }
 
+        /* إطار الاسم الفخم المنفصل */
         .king-name-container {
             display: inline-flex;
             align-items: center;
@@ -241,15 +243,15 @@
 </div>
 
 <script>
-    // تم تحديث الإعدادات هنا بالكامل لمشروعك الجديد OSKAR بنجاح وبشكل متوافق ومستقر
+    // ربط مشروع Firebase السحابي الجديد الخاص بك بنجاح
     const firebaseConfig = {
-        apiKey: "AIzaSyC6m8083RtFHgah8RuiRWULsCBl_54Ul3I",
-        authDomain: "oskar-a937e.firebaseapp.com",
-        projectId: "oskar-a937e",
-        storageBucket: "oskar-a937e.firebasestorage.app",
-        messagingSenderId: "411961765190",
-        appId: "1:411961765190:web:6241e57b746c970bdd4947",
-        measurementId: "G-3RZG5SMNLC"
+        apiKey: "AIzaSyCZ9Uh8sTZXsChbLXVvoaK81lxMU9dWsOc",
+        authDomain: "soobr-9dbcf.firebaseapp.com",
+        projectId: "soobr-9dbcf",
+        storageBucket: "soobr-9dbcf.firebasestorage.app",
+        messagingSenderId: "990736013570",
+        appId: "1:990736013570:web:8d2d78961d2326548f8a1b",
+        measurementId: "G-P13DV56ZFF"
     };
 
     if (!firebase.apps.length) {
@@ -259,7 +261,7 @@
     const db = firebase.firestore();
 
     window.currentRoom = "العام";
-    window.roomsList = ["العام"];
+    window.roomsList = ["العام", "ديوان الإمبراطورية", "ملوك الطرب والرياسة"];
     
     window.chatRanksData = {
         "owner": { icon: "fas fa-trophy", color: "#ffd700", text: "البرنس الأصلي" },
@@ -302,14 +304,10 @@
     window.activeMicsListener = null;
     window.activeRoomSettingsListener = null;
     window.activeSessionListener = null;
-    window.activeOnlineUsersListener = null;
 
     window.tempUploadedCover = "";
     window.tempUploadedPfp = "";
     window.tempUploadedRoomBg = "";
-
-    window.localAudioStream = null;
-    window.mediaRecorder = null;
 
     function validateEmailAddress(email) {
         return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email).toLowerCase());
@@ -329,28 +327,16 @@
             document.getElementById('btn_' + id).classList.add('active');
         },
         showAuthBranchDirect: () => {
-            if(window.currentUser && window.currentUser.role === 'owner') {
-                document.getElementById('featureModalTitle').innerText = "👑 لوحة التحكم والمفتاح الملكي";
-                document.getElementById('featureModalBody').innerHTML = `
-                    <div style="text-align:right;">
-                        <p style="font-size:14px; color:var(--gold); font-weight:bold; text-align:center;">مرحباً بك يا إمبراطور الموقع، يمكنك من هنا إدارة أو إنشاء الغرف سحابياً:</p>
-                        <input type="text" id="newRoomNameInp" class="form-control" placeholder="اسم الغرفة الجديدة...">
-                        <button class="send-btn" style="width:100%; border-radius:8px;" onclick="ui.createNewRoomCloud()">➕ إنشاء الغرفة سحابياً فوراً</button>
-                    </div>
-                `;
-                document.getElementById('featureModal').style.display = 'flex';
-            } else {
-                document.getElementById('featureModalTitle').innerText = "🔑 تفعيل المفتاح الماسي الفوري لكافة الأعضاء";
-                document.getElementById('featureModalBody').innerHTML = `
-                    <div style="text-align:right;">
-                        <input type="text" id="kName" class="form-control" placeholder="الاسم المستعار...">
-                        <input type="email" id="kEmail" class="form-control" placeholder="البريد الإلكتروني المعتمد...">
-                        <input type="password" id="kPass" class="form-control" placeholder="كلمة المرور الحالية...">
-                        <button class="send-btn" style="width:100%; border-radius:8px;" onclick="ui.executeKeyActivation()">التسجيل الفوري برتبة ماسي 💎</button>
-                    </div>
-                `;
-                document.getElementById('featureModal').style.display = 'flex';
-            }
+            document.getElementById('featureModalTitle').innerText = "🔑 تفعيل المفتاح الماسي الفوري لكافة الأعضاء";
+            document.getElementById('featureModalBody').innerHTML = `
+                <div style="text-align:right;">
+                    <input type="text" id="kName" class="form-control" placeholder="الاسم المستعار...">
+                    <input type="email" id="kEmail" class="form-control" placeholder="البريد الإلكتروني المعتمد...">
+                    <input type="password" id="kPass" class="form-control" placeholder="كلمة المرور الحالية...">
+                    <button class="send-btn" style="width:100%; border-radius:8px;" onclick="ui.executeKeyActivation()">التسجيل الفوري برتبة ماسي 💎</button>
+                </div>
+            `;
+            document.getElementById('featureModal').style.display = 'flex';
         },
         executeKeyActivation: () => {
             let n = document.getElementById('kName').value.trim();
@@ -374,6 +360,7 @@
                 };
             }
             ui.saveUserToFirestoreAndSession(window.currentUser);
+            document.getElementById('authBtn').style.display = 'none';
             document.getElementById('featureModal').style.display = 'none';
             ui.enterChat();
         },
@@ -415,6 +402,7 @@
                 };
             }
             ui.saveUserToFirestoreAndSession(window.currentUser);
+            document.getElementById('authBtn').style.display = 'none';
             ui.enterChat();
         },
         saveUserToFirestoreAndSession: (userObj) => {
@@ -432,8 +420,8 @@
         checkSavedSessionOnLoad: () => {
             let savedUser = localStorage.getItem("hassouni_user_session");
             if(savedUser) {
-                let parsedUser = JSON.parse(savedUser);
-                db.collection("users").doc(parsedUser.uid).get().then((doc)=>{
+                window.currentUser = JSON.parse(savedUser);
+                db.collection("users").doc(window.currentUser.uid).get().then((doc)=>{
                     if(doc.exists){
                         let sData = doc.data();
                         if(sData.isBanned) {
@@ -443,13 +431,11 @@
                         }
                         window.currentUser = sData;
                         localStorage.setItem("hassouni_user_session", JSON.stringify(window.currentUser));
-                    } else {
-                        window.currentUser = parsedUser;
                     }
+                    document.getElementById('authBtn').style.display = 'none';
                     document.getElementById('welcomeOverlay').style.display = 'none'; 
                     ui.enterChat();
                 }).catch(() => {
-                    window.currentUser = parsedUser;
                     document.getElementById('welcomeOverlay').style.display = 'none';
                     ui.enterChat();
                 });
@@ -466,22 +452,18 @@
             ui.listenToActiveMics();
             ui.listenToRoomSettings();
             ui.listenToSessionSecurity();
-            ui.listenOnlineUsersRealtime();
         },
         clearAllListeners: () => {
             if(window.activeMessagesListener) window.activeMessagesListener();
             if(window.activeMicsListener) window.activeMicsListener();
             if(window.activeRoomSettingsListener) window.activeRoomSettingsListener();
             if(window.activeSessionListener) window.activeSessionListener();
-            if(window.activeOnlineUsersListener) window.activeOnlineUsersListener();
         },
         listenToSessionSecurity: () => {
             if(!window.currentUser || !window.currentUser.uid) return;
             window.activeSessionListener = db.collection("users").doc(window.currentUser.uid).onSnapshot((doc) => {
                 if(doc.exists) {
                     let data = doc.data();
-                    window.currentUser = data;
-                    localStorage.setItem("hassouni_user_session", JSON.stringify(window.currentUser));
                     if(window.currentUser.sessionToken && data.sessionToken && data.sessionToken !== window.currentUser.sessionToken) {
                         alert("تم تسجيل الدخول إلى هذا الحساب من هاتف آخر.");
                         ui.logoutBackToWelcome();
@@ -509,23 +491,11 @@
         listenToGlobalMessages: () => {
             window.activeMessagesListener = db.collection("rooms").doc(window.currentRoom).collection("messages")
               .orderBy("timestamp", "asc")
-              .limitToLast(50)
+              .limit(70)
               .onSnapshot((snapshot) => {
                   let chatBox = document.getElementById('chatBox');
                   chatBox.innerHTML = "";
-                  
-                  let divWel = document.createElement('div');
-                  divWel.className = 'msg-wrap';
-                  divWel.innerHTML = `
-                     <div class="msg-header">
-                        <div class="king-name-container" style="border-color: var(--gold); background: rgba(0,0,0,0.6);">
-                            <span class="king-name-tag" style="color: var(--gold);">الإدارة العامة</span>
-                        </div>
-                     </div>
-                     <div class="msg-text">مرحباً بكم في شات حسوني الإمبراطوري الحصري والآمن 🏆🔥</div>
-                  `;
-                  chatBox.appendChild(divWel);
-                  
+                  ui.renderMsg(window.defaultOwnerData, "مرحباً بكم في شات حسوني الإمبراطوري الحصري والآمن 🏆🔥");
                   snapshot.forEach((doc) => {
                       let mData = doc.data();
                       if (mData.user) {
@@ -562,34 +532,6 @@
                   });
               });
         },
-        listenOnlineUsersRealtime: () => {
-            window.activeOnlineUsersListener = db.collection("users").onSnapshot((snap) => {
-                let list = []; 
-                snap.forEach(doc => {
-                    let uData = doc.data();
-                    if(uData.isOnline) list.push(uData);
-                });
-                
-                list.sort((a, b) => {
-                    let orderA = window.rolesOrder[a.role] || 99;
-                    let orderB = window.rolesOrder[b.role] || 99;
-                    return orderA - orderB;
-                });
-
-                let usersHtml = list.map(u => {
-                    let rObj = window.chatRanksData[u.role] || { icon: "fas fa-user", color: "#fff" };
-                    return `
-                        <div class="menu-item" onclick="ui.viewProfileCard('${u.uid}')">
-                            <span style="color:${rObj.color}; font-weight: bold;"><i class="${rObj.icon}" style="margin-left:5px;"></i> ${u.name}</span>
-                            <span style="font-size:11px; color:${rObj.color}; background: rgba(0,0,0,0.4); padding: 2px 6px; border-radius: 10px; border: 1px solid ${rObj.color};">${rObj.text}</span>
-                        </div>
-                    `;
-                }).join('');
-                
-                let bodyEl = document.getElementById('onlineUsersListBody');
-                if(bodyEl) bodyEl.innerHTML = usersHtml;
-            });
-        },
         refreshChatWindowOnly: () => {
             ui.enterChat();
             let box = document.getElementById('chatBox');
@@ -603,26 +545,20 @@
             
             inp.value = '';
             
-            db.collection("users").doc(window.currentUser.uid).get().then((doc) => {
-                let latestUser = window.currentUser;
-                if(doc.exists) {
-                    latestUser = doc.data();
-                }
-                let cleanUserObj = {
-                    uid: latestUser.uid,
-                    name: latestUser.name,
-                    role: latestUser.role,
-                    img: latestUser.img,
-                    nameBg: latestUser.nameBg || "transparent"
-                };
+            let cleanUserObj = {
+                uid: window.currentUser.uid,
+                name: window.currentUser.name,
+                role: window.currentUser.role,
+                img: window.currentUser.img,
+                nameBg: window.currentUser.nameBg || "transparent"
+            };
 
-                db.collection("rooms").doc(window.currentRoom).collection("messages").add({
-                    user: cleanUserObj,
-                    text: t,
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                }).catch((err) => {
-                    alert("خطأ: " + err.message);
-                });
+            db.collection("rooms").doc(window.currentRoom).collection("messages").add({
+                user: cleanUserObj,
+                text: t,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            }).catch((err) => {
+                alert("خطأ: " + err.message);
             });
         },
         quoteUserText: (userName, textContent) => {
@@ -633,9 +569,9 @@
         
         renderMsg: (user, text) => {
             if (!user) return;
-            
             let div = document.createElement('div');
             div.className = 'msg-wrap';
+            
             let rankObj = window.chatRanksData[user.role] || { icon: "fas fa-user", color: "#fff", text: "عضو" };
             
             div.innerHTML = `
@@ -676,8 +612,8 @@
             } else {
                 document.getElementById('featureModalTitle').innerText = "🎛️ لوحة التحكم الصوتي";
                 document.getElementById('featureModalBody').innerHTML = `
-                    <div class="menu-item" onclick="ui.toggleMicVoiceState(${num}, false)"><i class="fas fa-microphone" style="color:#2ecc71;"></i> فتح المايك وبث الصوت الحقيقي</div>
-                    <div class="menu-item" onclick="ui.toggleMicVoiceState(${num}, true)"><i class="fas fa-microphone-slash" style="color:#e74c3c;"></i> كتم الصوت الشخصي</div>
+                    <div class="menu-item" onclick="ui.toggleMicVoiceState(${num}, false)"><i class="fas fa-microphone" style="color:#2ecc71;"></i> فتح المايك الشخصي</div>
+                    <div class="menu-item" onclick="ui.toggleMicVoiceState(${num}, true)"><i class="fas fa-microphone-slash" style="color:#e74c3c;"></i> كتم المايك الشخصي</div>
                     <div class="menu-item" onclick="ui.openYouTubeSearchEngine()"><i class="fab fa-youtube" style="color:red;"></i> تشغيل صوت يوتيوب للروم</div>
                     <div class="menu-item" onclick="ui.stopHiddenAudioPlayback()"><i class="fas fa-stop-circle" style="color:#f39c12;"></i> إيقاف البث الصوتي فوراً</div>
                     <div class="menu-item" onclick="ui.vacateMicSlot(${num})" style="color:#e74c3c; font-weight:bold;"><i class="fas fa-sign-out-alt"></i> نزول من المايك</div>
@@ -689,30 +625,17 @@
             document.getElementById('featureModal').style.display = 'none';
             if(!status) return;
             let num = window.selectedMicNum;
-            
-            navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
-                window.localAudioStream = stream;
-                db.collection("rooms").doc(window.currentRoom).collection("mics").doc(`mic_${num}`).set({
-                    micNum: num, userId: window.currentUser.uid, userName: window.currentUser.name,
-                    userImg: window.currentUser.img, isMuted: false
-                });
-            }).catch(() => {
-                alert("يرجى إعطاء صلاحية المايك للمتصفح أولاً لكي يظهر صوتك الحقيقي!");
+            db.collection("rooms").doc(window.currentRoom).collection("mics").doc(`mic_${num}`).set({
+                micNum: num, userId: window.currentUser.uid, userName: window.currentUser.name,
+                userImg: window.currentUser.img, isMuted: false
             });
         },
         toggleMicVoiceState: (num, shouldMute) => {
             db.collection("rooms").doc(window.currentRoom).collection("mics").doc(`mic_${num}`).update({ isMuted: shouldMute });
-            if(window.localAudioStream) {
-                window.localAudioStream.getAudioTracks().forEach(track => track.enabled = !shouldMute);
-            }
             document.getElementById('featureModal').style.display = 'none';
         },
         vacateMicSlot: (num) => {
             db.collection("rooms").doc(window.currentRoom).collection("mics").doc(`mic_${num}`).delete();
-            if(window.localAudioStream) {
-                window.localAudioStream.getTracks().forEach(track => track.stop());
-                window.localAudioStream = null;
-            }
             document.getElementById('featureModal').style.display = 'none';
         },
         
@@ -773,11 +696,26 @@
         
         toggleOnlineUsers: () => {
             let m = document.getElementById('onlineUsersHalfModal');
-            if(m.style.display === 'block') { 
-                m.style.display = 'none'; 
-            } else {
-                m.style.display = 'block';
-            }
+            if(m.style.display === 'block') { m.style.display = 'none'; return; }
+            db.collection("users").get().then((snap) => {
+                let list = []; snap.forEach(doc => list.push(doc.data()));
+                
+                list.sort((a, b) => {
+                    let orderA = window.rolesOrder[a.role] || 99;
+                    let orderB = window.rolesOrder[b.role] || 99;
+                    return orderA - orderB;
+                });
+
+                document.getElementById('onlineUsersListBody').innerHTML = list.map(u => {
+                    let rObj = window.chatRanksData[u.role] || { icon: "fas fa-user", color: "#fff" };
+                    return `
+                    <div class="menu-item" onclick="ui.viewProfileCard('${u.uid}')">
+                        <span style="color:${rObj.color};"><i class="${rObj.icon}" style="margin-left:5px;"></i> ${u.name}</span>
+                        <span style="font-size:11px; color:#aaa;">⭐</span>
+                    </div>
+                `}).join('');
+            });
+            m.style.display = 'block';
         },
 
         viewProfileCard: (uid) => {
@@ -797,15 +735,12 @@
                 let adminOptionsBtn = isAmOwner && !isMe ? 
                     `<button class="send-btn" style="width:100%; margin-top:10px; background:linear-gradient(to left, #cb2d3e, #ef473a); color:#fff;" onclick="ui.openAdminControls('${uid}')">⚙️ إدارة الحساب والإجراءات</button>` : '';
 
-                let rObj = window.chatRanksData[u.role] || { icon: "fas fa-user", color: "#fff", text: "عضو" };
-
                 document.getElementById('featureModalBody').innerHTML = `
                     <div class="profile-card-wrapper">
                         ${pencilHtml}
                         <img src="${u.cover || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=400'}" class="profile-card-cover" id="cardCoverImg">
                         <img src="${u.img || 'https://cdn-icons-png.flaticon.com/512/1042/1042291.png'}" class="profile-card-pfp" id="cardPfpImg">
-                        <h2 style="color:${rObj.color}; margin:5px 0 2px;">${u.name}</h2>
-                        <p style="margin:0 0 10px; font-size:13px; color:${rObj.color}; font-weight:bold;"><i class="${rObj.icon}"></i> ${rObj.text}</p>
+                        <h2 style="color:var(--gold); margin:5px 0 2px;">${u.name}</h2>
                         <p style="margin:0 0 10px; font-size:12px; color:#aaa;">${u.status || 'لا يوجد حالة'}</p>
                         
                         <div class="profile-action-bar">
@@ -939,11 +874,7 @@
 
         changeUserRole: (uid, newRole) => {
             db.collection("users").doc(uid).update({ role: newRole }).then(() => {
-                alert("تم تحديث رتبة العضو بنجاح وتثبيتها سحابياً!");
-                if (window.currentUser && window.currentUser.uid === uid) {
-                    window.currentUser.role = newRole;
-                    localStorage.setItem("hassouni_user_session", JSON.stringify(window.currentUser));
-                }
+                alert("تم تحديث رتبة العضو بنجاح!");
             });
         },
         toggleUserMute: (uid, state) => {
@@ -1005,7 +936,16 @@
 
         openRoomsManager: () => {
             document.getElementById('featureModalTitle').innerText = "الغرف المتوفرة";
+            
+            let createRoomBtn = (window.currentUser.role === 'owner') ? `
+                <div style="padding:10px; border-bottom:2px dashed var(--gold); text-align:right;">
+                    <input type="text" id="newRoomNameInp" class="form-control" placeholder="اسم الغرفة الجديدة...">
+                    <button class="send-btn" style="width:100%;" onclick="ui.createNewRoomCloud()">➕ إنشاء غرفة جديدة فوراً</button>
+                </div>
+            ` : '';
+
             document.getElementById('featureModalBody').innerHTML = `
+                ${createRoomBtn}
                 <div id="roomsContainerList">
                     ${window.roomsList.map(r => `<div class="menu-item" onclick="ui.changeActiveRoom('${r}')">${r} ${window.currentRoom === r ? '<span style="color: #FFD700; font-size: 1.2rem; margin-left: 5px;">🏆</span>' : ''}</div>`).join('')}
                 </div>
@@ -1018,8 +958,8 @@
             if(!rName) return;
             if(!window.roomsList.includes(rName)) {
                 window.roomsList.push(rName);
-                alert(`تم إنشاء غرفة [ ${rName} ] بنجاح من الصلاحية الملكية.`);
-                document.getElementById('featureModal').style.display = 'none';
+                alert(`تم إنشاء غرفة [ ${rName} ] بنجاح.`);
+                ui.openRoomsManager();
             }
         },
 
@@ -1032,9 +972,7 @@
         logoutBackToWelcome: () => {
             ui.updateUserOnlineStatus(false);
             localStorage.removeItem("hassouni_user_session");
-            setTimeout(() => {
-                window.location.reload();
-            }, 400);
+            window.location.reload();
         },
         openVIPList: (title) => alert(title)
     };
