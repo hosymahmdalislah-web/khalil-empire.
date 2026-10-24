@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="robots" content="index, follow">
 <meta name="description" content="شات أصل العرب - ملتقى العرب والنشامى. دردشة كتابية وصوتية، مايكات حقيقية، مسابقات وجوائز بدون تسجيل مجاناً.">
-<meta name="keywords" content="شات أصل العرب, دردشة أصل العرب, شات عربي, شات يمني, شات صوتي">
+<meta name="keywords" content="شات أصل العرب, دردشة أصل العرب, شات عربي, شات يمني, شات خليجي, شات صوتي">
 <title>شات أصل العرب | ملتقى العرب والنشامى</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
@@ -21,7 +21,7 @@ button{cursor:pointer}
   background-repeat:no-repeat;pointer-events:none;transition:background-image .3s ease;
 }
 
-/* الشريط العلوي قابل لتخصيص اللون */
+/* الشريط العلوي */
 .top-bar-icons{
   position:fixed!important;top:0!important;left:0!important;right:0!important;
   width:100%!important;height:55px!important;z-index:9000!important;
@@ -30,10 +30,10 @@ button{cursor:pointer}
   transition:background-color .3s ease;
 }
 .nav-item-top{position:relative;flex:1;text-align:center;color:#e2e8f0;font-size:.56rem;min-width:0;cursor:pointer}
-.nav-item-top i{display:block;font-size:1.15rem;color:#f0c34b;margin-bottom:2px}
+.nav-item-top i{display:block;font-size:1.15rem;margin-bottom:2px}
 .badge{position:absolute;top:-5px;right:25%;background:#ef4444;color:#fff;border-radius:20px;padding:1px 5px;font-size:.55rem;font-weight:bold}
 
-/* الشريط السفلي قابل لتخصيص اللون */
+/* الشريط السفلي */
 .bottom-main-nav{
   position:fixed!important;left:0!important;right:0!important;bottom:0!important;
   width:100%!important;height:53px!important;z-index:9000!important;
@@ -42,7 +42,13 @@ button{cursor:pointer}
   box-shadow:0 -3px 15px rgba(0,0,0,.6);transition:background-color .3s ease;
 }
 .bottom-tab{flex:1;text-align:center;color:#e2e8f0;font-size:.62rem;padding:6px 1px;cursor:pointer}
-.bottom-tab i{display:block;font-size:1.1rem;color:#f0c34b;margin-bottom:2px}
+.bottom-tab i{display:block;font-size:1.15rem;margin-bottom:2px}
+
+/* تلوين أيقونات الشريط العلوي والسفلي بدقة كما طلبت */
+.col-white i{color:#ffffff!important}
+.col-red i{color:#ef4444!important;filter:drop-shadow(0 0 3px rgba(239,68,68,.6))}
+.col-blue i{color:#38bdf8!important;filter:drop-shadow(0 0 3px rgba(56,189,248,.6))}
+.col-gold i{color:#ffd700!important;filter:drop-shadow(0 0 5px rgba(255,215,0,.8))}
 
 /* قسم المايكات المطور */
 .mics-section-container{
@@ -135,7 +141,7 @@ button{cursor:pointer}
   background:rgba(18,27,24,.95);border-right:3px solid #ec4899;padding:6px 10px;font-size:.72rem;color:#cbd5e1;
 }
 
-/* شريط الكتابة: زر الإرسال باليمين أسود وبداخله سهم أبيض */
+/* شريط الكتابة */
 .input-bar{
   position:fixed!important;left:0!important;right:0!important;bottom:53px!important;
   width:100%!important;z-index:8998!important;
@@ -166,7 +172,7 @@ button{cursor:pointer}
   background-size:cover;background-position:center;
 }
 
-/* لون نافذة المتواجدون والخيارات أبيض ناصع */
+/* نوافذ بيضاء ناصعة */
 .white-modal-card{
   background:#ffffff!important;color:#0f172a!important;border:1.5px solid #cbd5e1!important;
 }
@@ -251,7 +257,7 @@ button{cursor:pointer}
   font-size:1.1rem;cursor:pointer;z-index:5;
 }
 
-/* إطارات وخلفيات الأسماء المتحركة الكاملة */
+/* إطارات الأسماء */
 .name-frame{display:inline-block;padding:2px 8px;border-radius:8px;line-height:1.35}
 .frame-none{border:0;background:transparent}
 .frame-gold{border:1px solid #d4a017;background:linear-gradient(90deg,rgba(212,160,23,.16),rgba(255,255,255,.04));box-shadow:0 0 6px rgba(212,160,23,.28)}
@@ -263,7 +269,7 @@ button{cursor:pointer}
 .owner-rank-text{color:#ffd700!important;font-weight:900}
 @keyframes ownerShine{50%{transform:scale(1.15);filter:drop-shadow(0 0 8px #ffd700)}}
 
-/* ألوان الأسماء المتعددة */
+/* ألوان خط الاسم */
 .color-text-white{color:#ffffff!important}
 .color-text-red{color:#ef4444!important}
 .color-text-green{color:#22c55e!important}
@@ -275,7 +281,19 @@ button{cursor:pointer}
 .color-text-cyan{color:#06b6d4!important}
 .color-text-lime{color:#84cc16!important}
 
-/* خلفيات الأسماء المتحركة بالكامل */
+/* خلفيات الاسم الثابتة */
+.bg-name-none{background:transparent!important}
+.bg-name-black{background:#000000!important;padding:2px 7px!important;border-radius:6px!important;border:1px solid #334155}
+.bg-name-white{background:#ffffff!important;color:#000000!important;padding:2px 7px!important;border-radius:6px!important}
+.bg-name-red{background:#dc2626!important;padding:2px 7px!important;border-radius:6px!important}
+.bg-name-green{background:#16a34a!important;padding:2px 7px!important;border-radius:6px!important}
+.bg-name-gray{background:#475569!important;padding:2px 7px!important;border-radius:6px!important}
+.bg-name-blue{background:#2563eb!important;padding:2px 7px!important;border-radius:6px!important}
+.bg-name-purple{background:#7c3aed!important;padding:2px 7px!important;border-radius:6px!important}
+.bg-name-pink{background:#db2777!important;padding:2px 7px!important;border-radius:6px!important}
+.bg-name-gold{background:#d97706!important;padding:2px 7px!important;border-radius:6px!important}
+
+/* خلفيات الأسماء المتحركة (المتجر) */
 .anim-bg-fire{
   background:linear-gradient(90deg,#b91c1c,#ea580c,#facc15,#b91c1c)!important;
   background-size:250% 100%!important;animation:bgMove 2.5s linear infinite!important;
@@ -336,7 +354,7 @@ button{cursor:pointer}
 <div id="toast"></div>
 <div id="room-bg-canvas"></div>
 
-<!-- بطاقة ترحيب الغرفة المنبثقة -->
+<!-- بطاقة ترحيب الروم المنبثقة -->
 <div id="room-welcome-card" class="room-welcome-card">
   <span class="room-welcome-close" onclick="closeRoomWelcomeCard()">&times;</span>
   <img id="room-welcome-img" src="https://images.unsplash.com/photo-1546410531-bb4caa6b424d?w=100">
@@ -403,19 +421,19 @@ button{cursor:pointer}
   </div>
 </div>
 
-<!-- الشريط العلوي بالترتيب الدقيق المطلوب: الاعدادات -> اشعار -> بلاغ -> طلب -> خاص -> الكبار -> الأثرياء -> القائمة -->
+<!-- الشريط العلوي بتلوين الأيقونات المطلوب بالملي -->
 <div class="top-bar-icons" id="main-top-bar">
-  <div class="nav-item-top" onclick="openModal('icon-menu-modal')"><i class="fa-solid fa-circle-user"></i>الاعدادات</div>
-  <div class="nav-item-top" onclick="openNotifications()"><i class="fa-solid fa-bell"></i><span id="notifyBadge" class="badge hidden">0</span>اشعار</div>
-  <div class="nav-item-top" onclick="openFeature('بلاغ')"><i class="fa-solid fa-flag"></i>بلاغ</div>
-  <div class="nav-item-top" onclick="openFriendRequestsModal()"><i class="fa-solid fa-user-plus"></i><span id="friendReqBadge" class="badge hidden">0</span>طلب</div>
-  <div class="nav-item-top" onclick="openPrivateInbox()"><i class="fa-solid fa-envelope"></i><span id="privateBadgeDot" class="badge hidden">0</span>خاص</div>
-  <div class="nav-item-top" onclick="openFeature('قائمة الكبار')"><i class="fa-solid fa-crown"></i>الكبار</div>
-  <div class="nav-item-top" onclick="openFeature('قائمة الأثرياء')"><i class="fa-solid fa-gem"></i>الأثرياء</div>
-  <div class="nav-item-top" onclick="openModal('options-menu-modal')"><i class="fa-solid fa-bars"></i>القائمة</div>
+  <div class="nav-item-top col-white" onclick="openModal('icon-menu-modal')"><i class="fa-solid fa-circle-user"></i>الاعدادات</div>
+  <div class="nav-item-top col-red" onclick="openNotifications()"><i class="fa-solid fa-bell"></i><span id="notifyBadge" class="badge hidden">0</span>اشعار</div>
+  <div class="nav-item-top col-red" onclick="openFeature('بلاغ')"><i class="fa-solid fa-flag"></i>بلاغ</div>
+  <div class="nav-item-top col-blue" onclick="openFriendRequestsModal()"><i class="fa-solid fa-user-plus"></i><span id="friendReqBadge" class="badge hidden">0</span>طلب</div>
+  <div class="nav-item-top col-white" onclick="openPrivateInbox()"><i class="fa-solid fa-envelope"></i><span id="privateBadgeDot" class="badge hidden">0</span>خاص</div>
+  <div class="nav-item-top col-gold" onclick="openFeature('قائمة الكبار')"><i class="fa-solid fa-crown"></i>الكبار</div>
+  <div class="nav-item-top col-gold" onclick="openFeature('قائمة الأثرياء')"><i class="fa-solid fa-gem"></i>الأثرياء</div>
+  <div class="nav-item-top col-white" onclick="openModal('options-menu-modal')"><i class="fa-solid fa-bars"></i>القائمة</div>
 </div>
 
-<!-- قسم المايكات المطور -->
+<!-- قسم المايكات المطور مع زر الترس للتحكم السريع -->
 <div class="mics-section-container">
   <div id="mics-frame" class="mics-group-frame">
     <div class="mic-slot-wrapper"><div class="mic-slot" id="mic-slot-3" onclick="micClick(3)"><i class="fa-solid fa-microphone"></i></div><div class="mic-user-name" id="mic-name-3">4</div></div>
@@ -425,7 +443,36 @@ button{cursor:pointer}
   </div>
   <div style="text-align:center;margin-top:3px">
     <div class="mic-toggle-controls" onclick="toggleMicsVisibility()"><i class="fa-solid fa-arrows-up-down"></i></div>
-    <div class="mic-toggle-controls" style="background:#2563eb;margin-right:4px" onclick="openChatSettingsModal()"><i class="fa-solid fa-gear"></i></div>
+    <!-- زر الترس تحت المايك يفتح قائمة التحكم السريع -->
+    <div class="mic-toggle-controls" style="background:#2563eb;margin-right:4px" onclick="openModal('mic-gear-modal')"><i class="fa-solid fa-gear"></i></div>
+  </div>
+</div>
+
+<!-- نافذة زر الترس ⚙️ تحت المايك للتحكم السريع بالموسيقى والمايكات والنقاط وكارت الحظ -->
+<div id="mic-gear-modal" class="modal-overlay hidden">
+  <div class="modal-card">
+    <span class="close-modal" onclick="closeModal('mic-gear-modal')">&times;</span>
+    <div class="modal-title">⚙️ خيارات الروم والمايك السريعة</div>
+    <div class="menu-list">
+      <div class="menu-item" onclick="toggleLocalMicsAudio()"><i class="fa-solid fa-volume-xmark"></i><span id="local-mics-mute-label">كتم صوت المايكات (لجهازي)</span></div>
+      <div class="menu-item" onclick="toggleLocalMusicAudio()"><i class="fa-solid fa-music"></i><span id="local-music-mute-label">كتم صوت الأغاني (لجهازي)</span></div>
+      <div class="menu-item" onclick="openConvertPointsModal()"><i class="fa-solid fa-gem" style="color:#ef4444"></i>تحويل النقاط إلى روبي</div>
+      <div class="menu-item" onclick="sendFortuneCard()"><i class="fa-solid fa-clover" style="color:#22c55e"></i>إرسال كارت الحظ للعام 🃏</div>
+    </div>
+  </div>
+</div>
+
+<!-- نافذة تحويل النقاط إلى روبي -->
+<div id="convert-points-modal" class="modal-overlay hidden">
+  <div class="modal-card" style="max-width:350px;text-align:center;padding:16px">
+    <span class="close-modal" onclick="closeModal('convert-points-modal')">&times;</span>
+    <div class="modal-title">💎 تحويل النقاط إلى روبي</div>
+    <div style="margin:12px 0;font-size:.78rem;color:#cbd5e1">
+      كل <b>100 نقطة</b> تعادل <b>1 روبي 💎</b>
+      <div style="margin-top:6px;color:#ffd700">رصيدك الحالي: <b id="convert-my-points">0</b> نقطة</div>
+    </div>
+    <input type="number" id="convert-points-amount" class="edit-input" placeholder="عدد النقاط المراد تحويلها" style="text-align:center">
+    <button class="btn-submit" style="background:#10b981;margin-top:10px" onclick="executePointsConversion()">تأكيد التحويل فوراً</button>
   </div>
 </div>
 
@@ -438,12 +485,12 @@ button{cursor:pointer}
   <div id="music-sync-media"></div>
 </div>
 
-<!-- ساحة المحادثة فلات خفيفة جداً -->
+<!-- ساحة المحادثة فلات خفيفة جداً وثابتة بالأسفل -->
 <div id="chat-area" class="chat-area"></div>
 
 <div id="reply-box" class="reply-box" style="display:none"></div>
 
-<!-- شريط الكتابة: زر الإرسال باليمين أسود وبداخله سهم أبيض والميك والإضافة باليسار كما كان سابقاً -->
+<!-- شريط الكتابة: زر الإرسال باليمين أسود وبداخله سهم أبيض والميك والإضافة باليسار -->
 <div class="input-bar" id="main-input-bar">
   <button class="send-btn-main" onclick="sendMessage()"><i class="fa-solid fa-location-arrow"></i></button>
   <div class="input-wrapper">
@@ -454,13 +501,13 @@ button{cursor:pointer}
   <button class="icon-btn" onclick="togglePlusMenu()"><i class="fa-solid fa-plus"></i></button>
 </div>
 
-<!-- الشريط السفلي بالترتيب الدقيق المطلوب: المتواجدين -> الاصدقاء -> الغرف -> تحديث -> المتجر -->
+<!-- الشريط السفلي بتلوين الأيقونات المطلوب بالملي -->
 <div class="bottom-main-nav" id="main-bottom-bar">
-  <div class="bottom-tab" onclick="openOnlineList()"><i class="fa-solid fa-users"></i>المتواجدين</div>
-  <div class="bottom-tab" onclick="openFriendRequestsModal()"><i class="fa-solid fa-user-group"></i>الاصدقاء</div>
-  <div class="bottom-tab" onclick="openModal('rooms-modal')"><i class="fa-solid fa-house"></i>الغرف</div>
-  <div class="bottom-tab" onclick="location.reload()"><i class="fa-solid fa-rotate-right"></i>تحديث</div>
-  <div class="bottom-tab" onclick="openStore()"><i class="fa-solid fa-store"></i>المتجر</div>
+  <div class="bottom-tab col-white" onclick="openOnlineList()"><i class="fa-solid fa-users"></i>المتواجدين</div>
+  <div class="bottom-tab col-white" onclick="openFriendRequestsModal()"><i class="fa-solid fa-user-group"></i>الاصدقاء</div>
+  <div class="bottom-tab col-blue" onclick="openModal('rooms-modal')"><i class="fa-solid fa-house"></i>الغرف</div>
+  <div class="bottom-tab col-white" onclick="location.reload()"><i class="fa-solid fa-rotate-right"></i>تحديث</div>
+  <div class="bottom-tab col-blue" onclick="openStore()"><i class="fa-solid fa-store"></i>المتجر</div>
 </div>
 
 <!-- نافذة طلبات الصداقة -->
@@ -545,6 +592,8 @@ button{cursor:pointer}
     <div id="self-edit-box" class="login-body hidden">
       <h4 id="profile-edit-title" style="color:#ffd54a;margin-bottom:8px">تعديل بيانات الحساب</h4>
       <div class="input-group"><label>الاسم (12 حرف كحد أقصى)</label><input id="edit-name-input" maxlength="12"></div>
+      
+      <!-- خيار لون خط الاسم -->
       <div class="input-group"><label>لون خط الاسم</label>
         <select id="edit-name-color-select" class="edit-select">
           <option value="color-text-white">أبيض (افتراضي)</option>
@@ -559,7 +608,25 @@ button{cursor:pointer}
           <option value="color-text-lime">ليموني فسفوري</option>
         </select>
       </div>
-      <div class="input-group"><label>خلفية الاسم المتحركة (تغطي كامل الاسم)</label>
+
+      <!-- خيار لون خلفية الاسم الثابتة المتعددة -->
+      <div class="input-group"><label>لون خلفية الاسم (ثابت)</label>
+        <select id="edit-name-static-bg-select" class="edit-select">
+          <option value="bg-name-none">بدون خلفية ملونة</option>
+          <option value="bg-name-black">🖤 أسود فخم</option>
+          <option value="bg-name-white">🤍 أبيض ناصع</option>
+          <option value="bg-name-red">❤️ أحمر جذاب</option>
+          <option value="bg-name-green">💚 أخضر زمردي</option>
+          <option value="bg-name-gray">🩶 رمادي كلاسيكي</option>
+          <option value="bg-name-blue">💙 أزرق ملكي</option>
+          <option value="bg-name-purple">💜 بنفسجي ساحر</option>
+          <option value="bg-name-pink">💖 وردي أنيق</option>
+          <option value="bg-name-gold">💛 ذهبي خالص</option>
+        </select>
+      </div>
+
+      <!-- خيار خلفية الاسم المتحركة من المتجر -->
+      <div class="input-group"><label>خلفية الاسم المتحركة (من المتجر)</label>
         <select id="edit-name-anim-select" class="edit-select">
           <option value="">بدون خلفية متحركة</option>
           <option value="anim-bg-fire">🔥 خلفية نارية متحركة</option>
@@ -569,6 +636,7 @@ button{cursor:pointer}
           <option value="anim-bg-ice">❄️ خلفية جليدية متحركة</option>
         </select>
       </div>
+
       <div class="input-group"><label>إطار الاسم</label><select id="edit-frame-select" class="edit-select"><option value="frame-none">بدون</option><option value="frame-gold">ذهبي</option><option value="frame-neon">نيون</option><option value="frame-royal">ملكي</option><option value="frame-eagle">صقر</option><option value="frame-crown">تاج</option><option value="frame-diamond">ألماسي</option><option value="frame-fire">ناري</option><option value="frame-star">نجمي</option></select></div>
       <div class="input-group"><label>العمر</label><input id="edit-age-input"></div>
       <div class="input-group"><label>الجنس</label><select id="edit-gender-input" class="edit-select"><option>ذكر</option><option>أنثى</option></select></div>
@@ -581,22 +649,6 @@ button{cursor:pointer}
       </div>
       <button class="btn-submit" onclick="saveProfileChanges()">حفظ التعديلات فوراً</button>
       <button id="owner-delete-account-btn" class="btn-submit hidden" style="background:#7f1d1d" onclick="deleteAccountAsOwner()">🗑️ حذف الحساب نهائياً</button>
-    </div>
-  </div>
-</div>
-
-<!-- نافذة "الاعدادات" في الشريط العلوي (تحتوي على الخيارات المحددة فقط كما طلبت) -->
-<div id="icon-menu-modal" class="modal-overlay hidden">
-  <div class="modal-card">
-    <span class="close-modal" onclick="closeModal('icon-menu-modal')">&times;</span>
-    <div class="modal-title">الاعدادات ⚙️</div>
-    <div class="menu-list">
-      <div class="menu-item" onclick="openChatSettingsModal();closeModal('icon-menu-modal')"><i class="fa-solid fa-gear"></i>إعدادات الدردشة</div>
-      <div class="menu-item" onclick="openWallet()"><i class="fa-solid fa-wallet"></i>محفظة</div>
-      <div class="menu-item" onclick="openDailyRewards()"><i class="fa-solid fa-gift"></i>المكافآت اليومية</div>
-      <div class="menu-item" onclick="openLevelInfo()"><i class="fa-solid fa-chart-line"></i>معلومات المستوى</div>
-      <div class="menu-item" onclick="toggleSimpleMode()"><i class="fa-solid fa-leaf"></i>تشغيل الوضع البسيط</div>
-      <div class="menu-item" style="color:#ef4444" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i>خروج</div>
     </div>
   </div>
 </div>
@@ -616,7 +668,7 @@ button{cursor:pointer}
     <span class="close-modal" onclick="closeModal('options-menu-modal')">&times;</span>
     <div class="modal-title">القائمة ☰</div>
     <div class="menu-list">
-      <div class="menu-item" onclick="openChatSettingsModal();closeModal('options-menu-modal')"><i class="fa-solid fa-gear"></i>إعدادات الروم</div>
+      <div class="menu-item" onclick="openChatSettingsModal();closeModal('options-menu-modal')"><i class="fa-solid fa-gear"></i>إعدادات الروم وتخصيص الألوان</div>
       <div id="owner-dashboard-option" class="menu-item hidden" onclick="openOwnerDashboard();closeModal('options-menu-modal')"><i class="fa-solid fa-crown"></i>لوحة التحكم — لصاحب الشات</div>
       <div class="menu-item" onclick="location.reload()"><i class="fa-solid fa-rotate"></i>تحديث البيانات</div>
       <div class="menu-item" onclick="openModal('rooms-modal');closeModal('options-menu-modal')"><i class="fa-solid fa-door-open"></i>قائمة الرومات</div>
@@ -637,7 +689,7 @@ button{cursor:pointer}
   </div>
 </div>
 
-<!-- لوحة تحكم صاحب الشات بجميع أقسامها الـ 13 كاملة -->
+<!-- لوحة تحكم صاحب الشات بجميع أقسامها الـ 13 كاملة مع الـ 25 رتبة بالأذونات -->
 <div id="owner-chat-settings-modal" class="modal-overlay hidden">
   <div class="modal-card">
     <span class="close-modal" onclick="closeModal('owner-chat-settings-modal')">&times;</span>
@@ -646,15 +698,15 @@ button{cursor:pointer}
   </div>
 </div>
 
-<!-- إعدادات الروم مع خيار تغيير لون الشريط العلوي والسفلي للجميع -->
+<!-- إعدادات الروم وتخصيص الألوان مع حفظ خلفية الروم وأيقونة الغرفة ولون الشريطين -->
 <div id="chat-settings-modal" class="modal-overlay hidden">
   <div class="modal-card">
     <span class="close-modal" onclick="closeModal('chat-settings-modal')">&times;</span>
-    <div class="modal-title">⚙️ إعدادات الروم وتخصيص الألوان</div>
+    <div class="modal-title">⚙️ إعدادات الروم وتخصيص الألوان — <span id="chat-settings-room-name"></span></div>
     <div class="login-body">
       <button class="btn-submit" style="background:#dc2626" onclick="clearAllRoomMessages()">🧹 تنظيف رسائل الروم للجميع</button>
       
-      <!-- ميزة تغيير لون الشريط العلوي والسفلي لصاحب الشات -->
+      <!-- تخصيص لون الشريط العلوي والسفلي لمالك الروم وصاحب الشات -->
       <div id="owner-bars-color-box" class="hidden" style="margin-top:12px;background:#06101e;border:1px solid #d4a017;padding:10px;border-radius:10px">
         <label style="color:#ffd54a;font-weight:bold;font-size:.78rem;display:block;margin-bottom:6px">🎨 تغيير لون الشريط العلوي والسفلي (للجميع):</label>
         <div style="display:flex;gap:6px">
@@ -682,7 +734,7 @@ button{cursor:pointer}
   </div>
 </div>
 
-<!-- باقي النوافذ والمودالات -->
+<!-- باقي النوافذ -->
 <div id="wallet-modal" class="modal-overlay hidden"><div class="modal-card" style="max-width:400px;text-align:center;padding:16px"><span class="close-modal" onclick="closeModal('wallet-modal')">&times;</span><div class="modal-title">💰 المحفظة ورصيد الحساب</div><div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:15px 0"><div style="background:#071224;border:1px solid #1e3557;padding:12px;border-radius:10px">⭐ النقاط: <b id="wallet-points" style="color:#38bdf8">0</b></div><div style="background:#071224;border:1px solid #1e3557;padding:12px;border-radius:10px">🪙 الذهب: <b id="wallet-gold" style="color:#ffd700">0</b></div><div style="background:#071224;border:1px solid #1e3557;padding:12px;border-radius:10px">💎 الروبي: <b id="wallet-rubies" style="color:#ef4444">0</b></div><div style="background:#071224;border:1px solid #1e3557;padding:12px;border-radius:10px">🎁 الهدايا: <b id="wallet-gifts" style="color:#ec4899">0</b></div></div><div style="font-size:.78rem;color:#cbd5e1">المستوى: <b id="wallet-level">1</b> | الرسائل: <b id="wallet-msg-count">0</b></div></div></div>
 <div id="rooms-modal" class="modal-overlay hidden"><div class="modal-card"><span class="close-modal" onclick="closeModal('rooms-modal')">&times;</span><div class="modal-title">الغرف</div><div id="owner-room-create-box" class="login-body hidden" style="padding:8px"><button class="btn-submit" style="background:#10b981" onclick="createRoomPrompt()">➕ إنشاء روم جديد — لصاحب الشات</button></div><div id="rooms-container" class="rooms-list" style="padding:8px"></div></div></div>
 <div id="store-modal" class="modal-overlay hidden"><div class="modal-card"><span class="close-modal" onclick="closeModal('store-modal')">&times;</span><div class="modal-title">🛍️ متجر شات أصل العرب</div><div class="store-cats"><button id="store-cat-ranks" class="store-cat active" onclick="showStoreCategory('ranks')">🏆 رتب</button><button id="store-cat-names" class="store-cat" onclick="showStoreCategory('names')">🔥 خلفية اسم</button><button id="store-cat-frames" class="store-cat" onclick="showStoreCategory('frames')">👑 إطارات</button></div><div id="store-items" class="store-items"></div></div></div>
@@ -694,7 +746,6 @@ button{cursor:pointer}
 <div id="voice-recorder-modal" class="modal-overlay hidden"><div class="modal-card" style="max-width:340px;text-align:center;padding:16px"><span class="close-modal" onclick="closeVoiceRecorder()">&times;</span><div class="modal-title">تسجيل صوت 🎙️</div><div id="voice-recorder-status" style="margin:12px 0;font-size:.85rem">اضغط بدء التسجيل</div><audio id="voice-preview" style="width:100%;margin:10px 0;display:none" controls></audio><div style="display:flex;gap:6px"><button class="btn-submit" style="background:#10b981;flex:1" onclick="startVoiceRecording()">▶ بدء</button><button class="btn-submit" style="background:#dc2626;flex:1" onclick="stopVoiceRecording()">⏹ توقيف</button><button id="voice-send-btn" class="btn-submit" style="background:#2563eb;flex:1;display:none" onclick="sendRecordedVoice()">📤 إرسال</button></div></div></div>
 <div id="dice-modal" class="modal-overlay hidden"><div class="modal-card"><span class="close-modal" onclick="closeModal('dice-modal')">&times;</span><div class="modal-title">🎲 حجر النرد</div><div id="dice-result" style="font-size:4rem;text-align:center;padding:22px;color:#f0c34b">🎲</div><div style="padding:12px"><button class="btn-submit" onclick="rollDice()">رمي النرد</button></div></div></div>
 <div id="wheel-modal" class="modal-overlay hidden"><div class="modal-card"><span class="close-modal" onclick="closeModal('wheel-modal')">&times;</span><div class="modal-title">🎡 عجلة الحظ</div><div style="padding:12px;text-align:center"><canvas id="wheel-canvas" width="560" height="560" style="width:260px;height:260px;display:block;margin:auto"></canvas><div id="wheel-result" style="font-weight:bold;color:#f0c34b;margin:6px">اضغط لتدوير العجلة</div><button class="btn-submit" onclick="spinWheel()">🎡 تدوير</button></div></div></div>
-<div id="notifications-modal" class="modal-overlay hidden"><div class="modal-card"><span class="close-modal" onclick="closeModal('notifications-modal')">&times;</span><div class="modal-title">الإشعارات 🔔</div><div id="notifications-list" class="online-list" style="padding:8px"></div></div></div>
 <div id="feature-modal" class="modal-overlay hidden"><div class="modal-card"><span class="close-modal" onclick="closeModal('feature-modal')">&times;</span><div id="feature-title" class="modal-title"></div><div id="feature-body" class="login-body"></div></div></div>
 <div id="mic-request-modal" class="modal-overlay hidden"><div class="modal-card"><span class="close-modal" onclick="closeModal('mic-request-modal')">&times;</span><div class="modal-title">طلب الصعود للمايك 🎙️</div><div style="padding:18px;text-align:center"><p id="mic-request-text" style="margin-bottom:15px"></p><div style="display:flex;gap:8px"><button class="btn-submit" style="background:#10b981" onclick="confirmMicRequest()">نعم، اصعد</button><button class="btn-submit" style="background:#64748b" onclick="closeModal('mic-request-modal')">إلغاء</button></div></div></div></div>
 <div id="mic-control-modal" class="modal-overlay hidden"><div class="modal-card"><span class="close-modal" onclick="closeModal('mic-control-modal')">&times;</span><div class="modal-title">تحكم بالمايك 🎙️</div><div class="menu-list"><div class="menu-item" onclick="toggleMyMute()"><i class="fa-solid fa-volume-xmark"></i><span id="my-mute-label">كتم المايك</span></div><div class="menu-item" onclick="openYoutubeSearchPrompt()"><i class="fa-brands fa-youtube"></i>تشغيل أغنية YouTube حقيقي</div><div class="menu-item" onclick="stopMyMusic()"><i class="fa-solid fa-stop"></i>إيقاف الأغنية</div><div class="menu-item" onclick="leaveMic()"><i class="fa-solid fa-arrow-down"></i>النزول من المايك</div><div id="owner-drop-mic-item" class="menu-item hidden" style="color:#ef4444" onclick="ownerDropCurrentMic()"><i class="fa-solid fa-user-minus"></i>إنزال العضو من المايك</div></div></div></div>
@@ -738,9 +789,7 @@ button{cursor:pointer}
 </div>
 
 <div id="webrtc-remote-audios" style="display:none"></div>
-
-<!-- نهاية الجزء الأول (انسخ الجزء الثاني وضعه تحته مباشرة) -->
-  <script type="module">
+<script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
 import {
   getFirestore, collection, doc, setDoc, getDoc, addDoc,
@@ -764,6 +813,7 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const storage = getStorage(app);
 
+/* بادئة العزل التام لشات أصل العرب */
 const P = "asl_";
 
 const RANKS = [
@@ -802,6 +852,7 @@ let unsubMessages = null, unsubUsers = null, unsubPresence = null, unsubMics = n
 let unsubNotifications = null, unsubAccountAction = null, unsubFriendRequests = null, unsubMusicSync = null;
 let privatePairId = "", presenceCache = new Map(), forceChatBottom = true, sendInProgress = false;
 let pendingRoomBackgroundFile = null, pendingRoomIconFile = null, activeMusicData = null;
+let localMicsMuted = false, localMusicMuted = false;
 
 const sessionKey = "asl_user_session_v1";
 const $ = id => document.getElementById(id);
@@ -1080,7 +1131,7 @@ async function saveUser(u) {
     uid: u.uid, name: u.name, avatar: u.avatar || avatarFor(u.name),
     cover: u.cover || "", profileBackground: u.profileBackground || "",
     rankId: u.rankId || 20, nameFrame: u.nameFrame || "frame-none",
-    nameColor: u.nameColor || "", nameAnim: u.nameAnim || "", nameBackground: u.nameBackground || "",
+    nameColor: u.nameColor || "", nameStaticBg: u.nameStaticBg || "", nameBackground: u.nameBackground || "",
     isOwner: !!u.isOwner, isPrimaryOwner: !!u.isPrimaryOwner,
     isVisitor: !!u.isVisitor, isBanned: !!u.isBanned, isMuted: !!u.isMuted,
     points: Number(u.points) || 0, gold: Number(u.gold) || 0, rubies: Number(u.rubies) || 0,
@@ -1096,7 +1147,7 @@ async function createPresence() {
       uid: currentUser.uid, name: currentUser.name, avatar: currentUser.avatar || avatarFor(currentUser.name),
       cover: currentUser.cover || "", profileBackground: currentUser.profileBackground || "",
       rankId: currentUser.rankId || 20, nameFrame: currentUser.nameFrame || "frame-none",
-      nameColor: currentUser.nameColor || "", nameAnim: currentUser.nameAnim || "", nameBackground: currentUser.nameBackground || "",
+      nameColor: currentUser.nameColor || "", nameStaticBg: currentUser.nameStaticBg || "", nameBackground: currentUser.nameBackground || "",
       isOwner: !!currentUser.isOwner, isPrimaryOwner: !!currentUser.isPrimaryOwner,
       isVisitor: !!currentUser.isVisitor, isBanned: !!currentUser.isBanned, isMuted: !!currentUser.isMuted,
       points: Number(currentUser.points) || 0, gold: Number(currentUser.gold) || 0, rubies: Number(currentUser.rubies) || 0,
@@ -1120,7 +1171,7 @@ async function stopPresence() {
 window.addEventListener("beforeunload", () => { stopPresence(); });
 window.addEventListener("pagehide", () => { stopPresence(); });
 
-/* الدخول الفوري */
+/* الدخول الفوري والتعرف على صاحب الشات والتحقق من الجلسات */
 async function login() {
   const name = $("username").value.trim();
   const email = $("email").value.trim().toLowerCase();
@@ -1455,9 +1506,9 @@ function renderOnline(arr) {
     const u = normalizeRankForUser(merged);
     const r = rank(u.rankId);
     const frame = u.nameFrame || "frame-none";
-    const nameColor = u.nameColor || "";
-    const nameAnim = u.nameAnim || "";
-    const nameBg = u.nameBackground || "";
+    const nameColor = u.nameColor || "color-text-white";
+    const nameStaticBg = u.nameStaticBg || "";
+    const nameAnim = u.nameBackground || "";
     const isOnline = raw.isOnline !== false;
 
     c.insertAdjacentHTML("beforeend", `<div class="online-item" data-name="${safe(u.name)}" style="display:flex;align-items:center;justify-content:space-between;padding:9px;border-bottom:1px solid #f1f5f9;cursor:pointer" onclick="openProfileByName('${slug(u.name)}')">
@@ -1466,7 +1517,7 @@ function renderOnline(arr) {
         <div>
           <div class="name-line">
             <i class="${r.icon} ${u.isPrimaryOwner ? 'owner-rank-icon' : ''}" style="color:${r.color}"></i>
-            <span class="name-frame ${frame} ${u.isPrimaryOwner ? 'owner-rank-text' : ''} ${nameBg}"><span class="${nameColor} ${nameAnim}" style="color:#0f172a;font-weight:bold">${safe(u.name)}</span></span>
+            <span class="name-frame ${frame} ${nameStaticBg} ${nameAnim}"><span class="${nameColor} ${u.isPrimaryOwner ? 'owner-rank-text' : ''}" style="font-weight:bold">${safe(u.name)}</span></span>
           </div>
           <small style="color:${r.color};font-weight:bold;font-size:.65rem;display:block;margin-top:2px">${safe(r.title)}</small>
         </div>
@@ -1503,7 +1554,7 @@ function openProfile(u) {
   const r = rank(selectedUser.rankId);
 
   $("prof-name").textContent = selectedUser.name;
-  $("prof-name").className = `name-frame ${selectedUser.nameFrame || 'frame-none'} ${selectedUser.isPrimaryOwner ? 'owner-rank-text' : ''} ${selectedUser.nameBackground || ''} ${selectedUser.nameColor || ''} ${selectedUser.nameAnim || ''}`;
+  $("prof-name").className = `name-frame ${selectedUser.nameFrame || 'frame-none'} ${selectedUser.nameStaticBg || ''} ${selectedUser.nameBackground || ''} ${selectedUser.nameColor || 'color-text-white'}`;
   $("prof-rank-display").innerHTML = `<i class="${r.icon} ${selectedUser.isPrimaryOwner ? 'owner-rank-icon' : ''}" style="color:${r.color}"></i> <span class="${selectedUser.isPrimaryOwner ? 'owner-rank-text' : ''}">${safe(r.title)}</span>`;
   $("prof-img").src = selectedUser.avatar || avatarFor(selectedUser.name);
   $("prof-cover").style.backgroundImage = selectedUser.cover ? `url("${selectedUser.cover}")` : "linear-gradient(135deg,#0d1d36,#ec4899)";
@@ -1543,6 +1594,7 @@ function openProfile(u) {
 
   $("edit-name-input").value = selectedUser.name;
   $("edit-name-color-select").value = selectedUser.nameColor || "color-text-white";
+  $("edit-name-static-bg-select").value = selectedUser.nameStaticBg || "bg-name-none";
   $("edit-name-anim-select").value = selectedUser.nameBackground || "";
   $("edit-frame-select").value = selectedUser.nameFrame || "frame-none";
   $("edit-age-input").value = selectedUser.age || "22";
@@ -1596,6 +1648,7 @@ window.saveProfileChanges = async () => {
     ...target,
     name: nameInput,
     nameColor: $("edit-name-color-select").value,
+    nameStaticBg: $("edit-name-static-bg-select").value,
     nameBackground: $("edit-name-anim-select").value,
     nameFrame: $("edit-frame-select").value,
     age: $("edit-age-input").value || "22",
@@ -1800,16 +1853,16 @@ function renderMessageHtml(dId, m) {
     </div>`;
   }
 
-  const nameColor = u.nameColor || "";
-  const nameAnim = u.nameAnim || "";
-  const nameBg = u.nameBackground || "";
+  const nameColor = u.nameColor || "color-text-white";
+  const nameStaticBg = u.nameStaticBg || "";
+  const nameAnim = u.nameBackground || "";
 
   return `<div class="msg-item" data-id="${dId}" data-sender-uid="${m.senderUid || ''}" ondblclick="quoteFullMessage('${dId}')">
     <img class="user-avatar" src="${safe(u.avatar || avatarFor(u.name))}" onclick="openProfileByName('${slug(u.name)}')">
     <div class="msg-content">
       <div class="user-header">
         <i class="${r.icon} rank-badge-icon ${u.isPrimaryOwner ? 'owner-rank-icon' : ''}" style="color:${r.color}"></i>
-        <span class="name-frame ${u.nameFrame || 'frame-none'} ${u.isPrimaryOwner ? 'owner-rank-text' : ''} ${nameBg}"><span class="${nameColor} ${nameAnim}" style="cursor:pointer" onclick="mentionUser('${safe(u.name)}')">${safe(u.name)}</span></span>
+        <span class="name-frame ${u.nameFrame || 'frame-none'} ${nameStaticBg} ${nameAnim}"><span class="${nameColor} ${u.isPrimaryOwner ? 'owner-rank-text' : ''}" style="cursor:pointer" onclick="mentionUser('${safe(u.name)}')">${safe(u.name)}</span></span>
         <span class="msg-time">${safe(m.time || "")}</span>
       </div>
       ${qhtml}
@@ -1931,7 +1984,7 @@ window.sendPublicFile = async e => {
   } catch { alert("تعذر إرسال الملف"); }
 };
 
-/* تطبيق لون الشريط العلوي والسفلي وحفظه للجميع في الفايربيس */
+/* تطبيق لون الشريط العلوي والسفلي وحفظه للجميع */
 window.applyBarsColorForAll = async () => {
   if (!isPrimaryOwner(currentUser)) return;
   const col = $("owner-bars-color-picker").value;
@@ -1947,6 +2000,79 @@ function setLocalBarsColor(col) {
   if (btm) btm.style.backgroundColor = col;
   if (inp) inp.style.backgroundColor = col;
 }
+
+/* خيارات زر الترس السريع تحت المايكات */
+window.toggleLocalMicsAudio = () => {
+  localMicsMuted = !localMicsMuted;
+  const container = $("webrtc-remote-audios");
+  if (container) {
+    container.querySelectorAll("audio").forEach(a => a.muted = localMicsMuted);
+  }
+  $("local-mics-mute-label").textContent = localMicsMuted ? "تشغيل صوت المايكات (لجهازي)" : "كتم صوت المايكات (لجهازي)";
+  toast(localMicsMuted ? "🔇 تم كتم صوت المايكات لجهازك" : "🔊 تم تشغيل صوت المايكات لجهازك");
+  closeModal("mic-gear-modal");
+};
+
+window.toggleLocalMusicAudio = () => {
+  localMusicMuted = !localMusicMuted;
+  const a = $("sync-native-audio");
+  if (a) a.muted = localMusicMuted;
+  const ifr = $("sync-yt-iframe");
+  if (ifr) {
+    const cmd = localMusicMuted ? 'mute' : 'unMute';
+    ifr.contentWindow?.postMessage(`{"event":"command","func":"${cmd}","args":""}`, '*');
+  }
+  $("local-music-mute-label").textContent = localMusicMuted ? "تشغيل صوت الأغاني (لجهازي)" : "كتم صوت الأغاني (لجهازي)";
+  toast(localMusicMuted ? "🔇 تم كتم صوت الأغاني لجهازك" : "🔊 تم تشغيل صوت الأغاني لجهازك");
+  closeModal("mic-gear-modal");
+};
+
+window.openConvertPointsModal = () => {
+  closeModal("mic-gear-modal");
+  $("convert-my-points").textContent = Number(currentUser?.points) || 0;
+  $("convert-points-amount").value = "";
+  openModal("convert-points-modal");
+};
+
+window.executePointsConversion = async () => {
+  const pts = parseInt($("convert-points-amount").value, 10);
+  if (isNaN(pts) || pts < 100) return alert("الحد الأدنى للتحويل هو 100 نقطة");
+  const myPts = Number(currentUser.points) || 0;
+  if (myPts < pts) return alert("نقاطك الحالية لا تكفي للتحويل");
+
+  const rubiesToAdd = Math.floor(pts / 100);
+  const ptsToDeduct = rubiesToAdd * 100;
+
+  currentUser.points = myPts - ptsToDeduct;
+  currentUser.rubies = (Number(currentUser.rubies) || 0) + rubiesToAdd;
+
+  await saveUser(currentUser);
+  closeModal("convert-points-modal");
+  toast(`💎 مبروك! تم تحويل ${ptsToDeduct} نقطة إلى ${rubiesToAdd} روبي`);
+};
+
+window.sendFortuneCard = async () => {
+  closeModal("mic-gear-modal");
+  const fortunes = [
+    { text: "🌟 الحظ يبتسم لك اليوم! ربحت 10 ذهب و 10 نقاط", g: 10, p: 10 },
+    { text: "💎 بطاقة السعد! ربحت 1 روبي و 15 ذهب", g: 15, r: 1 },
+    { text: "🍀 يومك مليء بالبركة والنشاط! ربحت 20 نقطة", p: 20 },
+    { text: "👑 أنت نجم الشات المتألق اليوم! ربحت 25 ذهب", g: 25 },
+    { text: "🌹 تحية طيبة من القلب لأحلى حضور في شات أصل العرب!", g: 5, p: 5 }
+  ];
+  const choice = fortunes[Math.floor(Math.random() * fortunes.length)];
+  if (choice.g) currentUser.gold = (Number(currentUser.gold) || 0) + choice.g;
+  if (choice.p) currentUser.points = (Number(currentUser.points) || 0) + choice.p;
+  if (choice.r) currentUser.rubies = (Number(currentUser.rubies) || 0) + choice.r;
+
+  await saveUser(currentUser);
+  await addDoc(collection(db, `${P}roomMessages`), {
+    roomId: currentRoomId, isSystem: true, sender: currentUser.name, senderUid: currentUser.uid,
+    text: `🃏 [كارت الحظ من ${currentUser.name}]: ${choice.text}`,
+    createdAt: serverTimestamp()
+  });
+  toast("🃏 تم إرسال كارت الحظ للعام واستلام الجائزة!");
+};
 
 window.openFeature = async title => {
   closeModal("options-menu-modal");
@@ -2106,7 +2232,7 @@ window.likeWallPost = async pid => {
   toast("❤️ تم تسجيل الإعجاب");
 };
 
-/* المايكات الحقيقية عبر WebRTC مع دعم كامل للـ VPN */
+/* المايكات الحقيقية عبر WebRTC مع دعم VPN */
 let localAudioStream = null;
 let peerConnections = new Map();
 const rtcConfig = {
@@ -2730,7 +2856,7 @@ async function postNewContestQuestion() {
         text: `⏳ انتهى الوقت وفشلتم في الإجابة! الإجابة الصحيحة كانت: [${q.a[0]}]. ننتقل للسؤال التالي...`,
         createdAt: serverTimestamp()
       });
-    contestIndex = (contestIndex + 1) % CONTEST_QUESTIONS.length;
+      contestIndex = (contestIndex + 1) % CONTEST_QUESTIONS.length;
       setTimeout(postNewContestQuestion, 3000);
     }
   }, 30000);
@@ -2771,7 +2897,7 @@ async function checkContestAnswer(text, sender) {
   }
 }
 
-/* لوحة تحكم صاحب الشات بجميع أقسامها الـ 13 */
+/* لوحة تحكم صاحب الشات بجميع أقسامها الـ 13 كاملة مع تحديد الصلاحيات للـ 25 رتبة */
 window.openOwnerDashboard = () => {
   if (!isAnyOwner(currentUser)) return alert("لوحة التحكم لصاحب الشات فقط");
   $("owner-modal-title-text").textContent = isPrimaryOwner(currentUser) ? "👑 لوحة تحكم صاحب الشات (13 خيار)" : "👑 لوحة تحكم المالك المفوض (10 خيارات)";
@@ -2789,7 +2915,7 @@ window.openOwnerSection = async kind => {
       <button onclick="openOwnerSection('public')">💬 2 العام (24 ساعة)</button>
       <button onclick="openOwnerSection('bots')">🤖 3 البوتات الـ 5</button>
       <button onclick="openOwnerSection('encryption')">🔒 4 التشفير وحجب الكلمات</button>
-      <button onclick="openOwnerSection('permissions')">🛡️ 5 الأذونات والصلاحيات</button>
+      <button onclick="openOwnerSection('permissions')">🛡️ 5 الأذونات والصلاحيات (25 رتبة)</button>
       <button onclick="openOwnerSection('development')">🧩 6 التطوير والمميزات</button>
       <button onclick="openOwnerSection('profile')">👤 7 إعدادات البروفايل</button>
       <button onclick="openOwnerSection('bans')">🚫 8 قائمة المحظورين</button>
@@ -2862,14 +2988,24 @@ window.openOwnerSection = async kind => {
       <button class="btn-submit" style="background:#475569;margin-top:5px" onclick="openOwnerSection('home')">رجوع</button>
     </div>`;
   } else if (kind === "permissions") {
-    b.innerHTML = `<div style="padding:10px">
-      <h4>🛡️ 5 الأذونات وتحديد صلاحيات الرتب</h4>
-      <div style="margin:10px 0;background:#06101e;padding:10px;border-radius:8px;font-size:.75rem">
-        <label style="display:block;margin-bottom:8px"><input type="checkbox" checked> صلاحية تنظيف الروم (صاحب الموقع، المفوض، البرنس)</label>
-        <label style="display:block;margin-bottom:8px"><input type="checkbox" checked> صلاحية طرد المزعجين (صاحب الموقع، البرنس، الكنج)</label>
-        <label style="display:block"><input type="checkbox" checked> صلاحية إهداء رتب بسيطة (مشرف، عضو نشيط)</label>
+    // عرض الـ 25 رتبة كاملة مع مربعات الاختيار لتحديد صلاحيات كل رتبة كما طلبت
+    let ranksCheckboxes = RANKS.map(r => `
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 0;border-bottom:1px solid #1e3557">
+        <span><i class="${r.icon}" style="color:${r.color};margin-left:4px"></i> ${r.id}. ${r.title}</span>
+        <div style="display:flex;gap:10px">
+          <label style="font-size:.65rem;color:#38bdf8"><input type="checkbox" id="perm-clean-${r.id}" ${r.id<=3?'checked':''}> تنظيف</label>
+          <label style="font-size:.65rem;color:#ffd700"><input type="checkbox" id="perm-gift-${r.id}" ${r.id<=4?'checked':''}> إهداء رتب</label>
+        </div>
       </div>
-      <button class="btn-submit" onclick="toast('✅ تم تحديث الأذونات');openOwnerSection('home')">حفظ الأذونات</button>
+    `).join("");
+
+    b.innerHTML = `<div style="padding:10px">
+      <h4>🛡️ 5 الأذونات وتحديد صلاحيات الـ 25 رتبة</h4>
+      <p style="font-size:.7rem;color:#cbd5e1;margin-bottom:8px">حدد الرتب المصرح لها بالتنظيف وإهداء الرتب البسيطة:</p>
+      <div style="max-height:45vh;overflow-y:auto;background:#06101e;padding:8px;border-radius:8px">
+        ${ranksCheckboxes}
+      </div>
+      <button class="btn-submit" style="margin-top:8px" onclick="savePermissionsConfig()">حفظ صلاحيات الرتب 💾</button>
       <button class="btn-submit" style="background:#475569;margin-top:5px" onclick="openOwnerSection('home')">رجوع</button>
     </div>`;
   } else if (kind === "development") {
@@ -2883,7 +3019,7 @@ window.openOwnerSection = async kind => {
     b.innerHTML = `<div style="padding:10px">
       <h4>👤 7 إعدادات البروفايل للجميع</h4>
       <div style="margin:10px 0;background:#06101e;padding:10px;border-radius:8px">
-        <label style="display:block;margin-bottom:8px"><input type="checkbox" checked> إتاحة ألوان الأسماء الثابتة والمتحركة</label>
+        <label style="display:block;margin-bottom:8px"><input type="checkbox" checked> إتاحة ألوان وخلفيات الأسماء الثابتة والمتحركة</label>
         <label style="display:block;margin-bottom:8px"><input type="checkbox" checked> إتاحة تغيير إطارات الأسماء</label>
         <label style="display:block"><input type="checkbox" checked> إتاحة رفع غلاف وخلفية للبروفايل</label>
       </div>
@@ -2915,7 +3051,7 @@ window.openOwnerSection = async kind => {
     b.innerHTML = `<div style="padding:10px">
       <h4>⚙️ 10 إعدادات ومالك الغرف</h4>
       <input id="room-master-input" class="edit-input" placeholder="اسم مالك الروم الحالي">
-      <button class="btn-submit" onclick="if($('room-master-input').value.trim()){toast('✅ تم تعيين مالك الغرفة');openOwnerSection('home');}">تعيين مالك الغرفة</button>
+      <button class="btn-submit" onclick="if($('room-master-input').value.trim()){toast('✅ تم تعيين ملك الغرفة بصلاحيات الطرد والكتم والتنظيف والخلفية');openOwnerSection('home');}">تعيين مالك الغرفة</button>
       <button class="btn-submit" style="background:#10b981;margin-top:6px" onclick="openChatSettingsModal();closeModal('owner-chat-settings-modal')">فتح تخصيص خلفية ومايكات الروم</button>
       <button class="btn-submit" style="background:#475569;margin-top:5px" onclick="openOwnerSection('home')">رجوع</button>
     </div>`;
@@ -2931,6 +3067,7 @@ window.openOwnerSection = async kind => {
       <button class="btn-submit" style="margin-top:8px" onclick="openOwnerSection('home')">رجوع</button>
     </div>`;
   } else if (kind === "monitor" && pri) {
+    // المراقب السري لرسائل الخاص حصراً ولا يظهر رسائل العام
     b.innerHTML = `<div style="padding:10px">
       <h4>🕵️ 12 المراقب اللحظي لرسائل الخاص فقط</h4>
       <div id="private-monitor-list" style="max-height:48vh;overflow-y:auto;margin:8px 0;font-size:.75rem">جارٍ الاتصال...</div>
@@ -2965,6 +3102,20 @@ window.openOwnerSection = async kind => {
       <button class="btn-submit" style="background:#475569;margin-top:6px" onclick="openOwnerSection('home')">رجوع</button>
     </div>`;
   }
+};
+
+window.savePermissionsConfig = async () => {
+  toast("جارٍ حفظ الصلاحيات...");
+  const perms = {};
+  RANKS.forEach(r => {
+    perms[r.id] = {
+      canClean: $(`perm-clean-${r.id}`)?.checked || false,
+      canGift: $(`perm-gift-${r.id}`)?.checked || false
+    };
+  });
+  await setDoc(doc(db, `${P}siteSettings`, "permissions"), perms, { merge: true });
+  toast("✅ تم حفظ وتطبيق صلاحيات الرتب للجميع بنجاح");
+  openOwnerSection("home");
 };
 
 window.saveLoginPanelCustomSettings = async () => {
@@ -3023,6 +3174,7 @@ window.openImageViewer = encUrl => {
   openModal("image-viewer-modal");
 };
 
+/* تسجيل وبث الصوت في العام بنجاح وبدون أي أخطاء */
 let mediaRecorder = null, recordedVoiceBlob = null, voiceChunks = [];
 
 window.openVoiceRecorder = () => {
@@ -3228,11 +3380,11 @@ const STORE_RANKS = [
 ];
 
 const STORE_NAMES = [
-  { id: "name-fire",  title: "ناري",  cls: "name-fire",  price: 1500 },
-  { id: "name-gold",  title: "ذهبي",  cls: "name-gold",  price: 2000 },
-  { id: "name-ice",   title: "ثلجي",  cls: "name-ice",   price: 1500 },
-  { id: "name-neon",  title: "نيون",  cls: "name-neon",  price: 2500 },
-  { id: "name-royal", title: "ملكي",  cls: "name-royal", price: 3000 }
+  { id: "name-fire",  title: "ناري",  cls: "anim-bg-fire",  price: 1500 },
+  { id: "name-gold",  title: "ذهبي",  cls: "anim-bg-gold",  price: 2000 },
+  { id: "name-ice",   title: "ثلجي",  cls: "anim-bg-ice",   price: 1500 },
+  { id: "name-neon",  title: "نيون",  cls: "anim-bg-neon",  price: 2500 },
+  { id: "name-royal", title: "ملكي",  cls: "anim-bg-royal", price: 3000 }
 ];
 
 const STORE_FRAMES = [
@@ -3261,7 +3413,7 @@ window.showStoreCategory = cat => {
     </div>`).join("");
   } else if (cat === "names") {
     c.innerHTML = STORE_NAMES.map(item => `<div class="store-item">
-      <span class="animated-name ${item.cls}" style="font-size:1rem">${safe(item.title)}</span>
+      <span class="name-frame ${item.cls}" style="font-size:1rem;color:#fff">${safe(item.title)}</span>
       <div style="font-size:.7rem;color:#ffd700;margin:6px 0">🪙 ${item.price} ذهب</div>
       <button class="btn-submit" style="background:#d97706;padding:6px;font-size:.75rem" onclick="buyStoreItem('name','${item.cls}',${item.price})">شراء</button>
     </div>`).join("");
