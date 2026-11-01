@@ -580,9 +580,7 @@ button{cursor:pointer}
   <div class="bottom-tab col-blue" onclick="openStore()"><i class="fa-solid fa-store"></i>المتجر</div>
   <div id="visitor-reg-key-nav" class="bottom-tab col-gold hidden" onclick="openModal('register-modal')"><i class="fa-solid fa-key"></i>تسجيل VIP</div>
 </div>
-
-<!-- ================= نهاية الجزء الأول (1 من 4) ================= -->
-  <!-- نافذة طلبات وقائمة الأصدقاء -->
+<!-- نافذة طلبات وقائمة الأصدقاء -->
 <div id="friend-requests-modal" class="modal-overlay hidden">
   <div class="modal-card">
     <span class="close-modal" onclick="closeModal('friend-requests-modal')">&times;</span>
@@ -1361,7 +1359,6 @@ function updateVisitorKeyButton() {
     }
   }
 }
-<!-- ================= نهاية الجزء الثاني (2 من 4) ================= -->
   async function saveUser(u) {
   u = normalizeRankForUser(u);
   if (!u.uid) u.uid = "u_" + slug(u.name).replace(/%/g, '');
@@ -2698,7 +2695,6 @@ window.unmuteSyncAudio = async () => {
 };
 
 window.toggleMusicLocal = () => { $("music-sync-media").classList.toggle("hidden"); };
-// ================= نهاية الجزء الثالث (3 من 4) =================
   /* ==================== رسائل الشات العام والاقتباس الفخم بدون ارتداد ==================== */
 window.sendMessage = async () => {
   if (!currentUser || currentUser.isMuted) return alert("أنت مكتوم ولا يمكنك الكتابة حالياً");
