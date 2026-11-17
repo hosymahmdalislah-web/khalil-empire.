@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="google-site-verification" content="pEm-6j2p_TlFj-cK6q0b0iY7BiadfyG92P6-Flw0BSc">
+<meta name="google-site-verification" content="05JZjeLZYmolPlj1JcUT9nr3tg8zXIC-ARxVqBXYZ5k">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="robots" content="index, follow">
 <meta name="description" content="شات أصل العرب - دردشة عربية كتابية وصوتية، غرف عامة ومايكات حقيقية ومجتمع عربي.">
@@ -4656,21 +4657,31 @@ function listenMessages() {
 
     chatArea.querySelectorAll('[data-id^="pending-"]').forEach(el => el.remove());
 
+    // نبني فهرساً لعناصر الرسائل مرة واحدة بدلاً من البحث داخل DOM لكل رسالة؛
+    // هذا يقلل عمليات البحث المتكررة عند وصول دفعات الرسائل والتفاعلات.
     const activeIds = new Set(docs.map(x => x.id));
+    const existingById = new Map();
     Array.from(chatArea.children).forEach(el => {
       const id = el.getAttribute("data-id");
-      if (id && !activeIds.has(id)) el.remove();
+      if (!id) return;
+      if (!activeIds.has(id)) {
+        el.remove();
+      } else {
+        existingById.set(id, el);
+      }
     });
 
     const newHtmls = [];
     docs.forEach(x => {
-      const existing = wasEmpty ? null : chatArea.querySelector(`[data-id="${CSS.escape(x.id)}"]`);
+      const existing = wasEmpty ? null : existingById.get(x.id);
       if (!existing) {
         newHtmls.push(renderMessageHtml(x.id, x));
       } else {
         const reactionValues = Object.values(x.reactionsBy || {});
-        const reactionSummary = reactionValues.length ? [...new Set(reactionValues)].map(emoji => `${emoji} ${reactionValues.filter(v => v === emoji).length}`).join(" · ") : "";
-        const rEl = existing.querySelector(`[data-reaction-for="${CSS.escape(x.id)}"]`);
+        const reactionCounts = new Map();
+        reactionValues.forEach(emoji => reactionCounts.set(emoji, (reactionCounts.get(emoji) || 0) + 1));
+        const reactionSummary = [...reactionCounts].map(([emoji, count]) => `${emoji} ${count}`).join(" · ");
+        const rEl = existing.querySelector(".message-reaction-line");
         if (rEl && rEl.textContent !== reactionSummary) {
           rEl.textContent = reactionSummary;
           rEl.classList.toggle("has-reaction", Boolean(reactionSummary));
