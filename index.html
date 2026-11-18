@@ -136,7 +136,7 @@ button{cursor:pointer}
 }
 .music-sync-panel.show{display:flex;flex-wrap:nowrap;max-height:58px;overflow:hidden}
 .music-sync-panel .music-local-toggle{flex:0 0 27px;width:27px;height:27px;border:1px solid #d4a017;border-radius:7px;background:#172033;color:#ffe08a;font-size:1rem;font-weight:900;cursor:pointer}
-.music-sync-panel.is-collapsed{left:8px;right:auto;width:36px;height:36px;min-height:36px;padding:4px;justify-content:center}
+.music-sync-panel.is-collapsed{right:8px;left:auto;width:36px;height:36px;min-height:36px;padding:4px;justify-content:center}
 .music-sync-panel.is-collapsed>*:not(#music-local-toggle){display:none!important}
 .music-sync-panel.is-collapsed #music-local-toggle{display:flex!important;align-items:center;justify-content:center}
 .chat-area.music-panel-visible{padding-top:154px!important}
@@ -1604,7 +1604,7 @@ html,body{background:#07070a!important;color:#fff}
       <div class="input-group"><label>البلد</label><input id="edit-country-input"></div>
       <div class="input-group"><label>الحالة التي تظهر تحت الصورة والغلاف</label><input id="edit-status-input" maxlength="100" placeholder="اكتب حالتك الحالية..."></div>
       <div class="input-group"><label>النبذة / المعلومات</label><textarea id="edit-info-input" class="edit-input" rows="2" placeholder="اكتب معلوماتك هنا"></textarea></div>
-      <div class="input-group"><label>🎵 موسيقى البروفايل (تعمل عند فتح ملفك)</label><input id="edit-profile-music-input" type="file" accept="audio/*"></div>
+      <div class="input-group"><label>🎵 موسيقى البروفايل (تعمل عند فتح ملفك)</label><input id="edit-profile-music-input" type="file" accept="audio/*" onchange="preUploadProfileMusic(event)"><div id="edit-profile-music-status" style="font-size:.7rem;color:#38bdf8;margin-top:4px;display:none"></div></div>
       <div class="input-group"><label>البريد الإلكتروني</label><input id="edit-email-input" type="email"></div>
       <div class="input-group"><label>كلمة المرور الجديدة</label><input id="edit-password-input" type="password" placeholder="اتركها فارغة إذا لا تريد تغييرها"></div>
       <div style="margin-top:6px">
@@ -1792,17 +1792,17 @@ html,body{background:#07070a!important;color:#fff}
 </div>
 
 <!-- المحادثة الخاصة المطورة -->
-<div id="private-chat-modal" class="modal-overlay hidden">
+<div id="private-chat-modal" class="modal-overlay hidden" onclick="if(event.target===this)closeModal('private-chat-modal')">
   <div class="modal-card" id="private-card-container">
     <span class="close-modal" onclick="closeModal('private-chat-modal')">&times;</span>
-    <div class="modal-title" style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px">
-      <div style="display:flex;align-items:center;gap:8px">
-        <img id="private-target-avatar" style="width:32px;height:32px;border-radius:50%;border:1.5px solid #d4a017;object-fit:cover">
-        <span id="private-target-name" style="font-weight:bold;color:#ffd700"></span>
+    <div class="modal-title" style="display:flex;align-items:center;justify-content:space-between;padding:7px 12px">
+      <div style="display:flex;align-items:center;gap:7px">
+        <img id="private-target-avatar" style="width:28px;height:28px;border-radius:50%;border:1.5px solid #d4a017;object-fit:cover">
+        <span id="private-target-name" style="font-weight:bold;color:#ffd700;font-size:.84rem"></span>
       </div>
-      <button class="icon-btn" style="color:#ffd700;font-size:1.15rem;margin-left:25px" onclick="openPrivateSettingsMenu()" title="خيارات الخاص"><i class="fa-solid fa-gear"></i></button>
+      <button class="icon-btn" style="color:#ffd700;font-size:1.05rem;margin-left:26px" onclick="openPrivateSettingsMenu()" title="خيارات الخاص"><i class="fa-solid fa-gear"></i></button>
     </div>
-    <div style="height:65vh;max-height:500px;display:flex;flex-direction:column;position:relative">
+    <div class="private-chat-body-wrap" style="flex:1 1 0;min-height:0;display:flex;flex-direction:column;position:relative">
       <div id="private-messages-box" style="flex:1;overflow-y:auto;padding:10px;background:#050c18;display:flex;flex-direction:column;gap:7px;background-size:cover;background-position:center"></div>
       <div id="private-reply-box" style="display:none;background:#1e293b;border-right:3px solid #ec4899;padding:6px 10px;font-size:.72rem;color:#cbd5e1"></div>
       <div class="input-bar" style="position:static!important">
@@ -1833,7 +1833,7 @@ html,body{background:#07070a!important;color:#fff}
 
 <div id="private-inbox-modal" class="modal-overlay hidden"><div class="modal-card"><span class="close-modal" onclick="closeModal('private-inbox-modal')">&times;</span><div class="modal-title">المحادثات الخاصة</div><div id="private-inbox" class="online-list" style="padding:8px"></div></div></div>
 <div id="video-viewer-modal" class="modal-overlay hidden"><div style="width:min(96vw,800px);background:#000;border:1px solid #d4a017;border-radius:14px;padding:8px;position:relative"><span class="close-modal" onclick="closeModal('video-viewer-modal')">&times;</span><div id="video-viewer-content" style="padding-top:20px"></div></div></div>
-<div id="image-viewer-modal" class="modal-overlay hidden"><div style="text-align:center;position:relative;max-width:96vw"><span class="close-modal" style="position:absolute;top:-42px;right:0;z-index:5;width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:#111827;color:#fff;border:1px solid #d4a017;font-size:28px" onclick="closeModal('image-viewer-modal')">&times;</span><img id="image-viewer-img" style="max-width:92vw;max-height:80vh;border-radius:12px;object-fit:contain;background:#000;border:2px solid #d4a017"></div></div>
+<div id="image-viewer-modal" class="modal-overlay hidden" onclick="if(event.target===this)closeModal('image-viewer-modal')"><div style="text-align:center;position:relative;max-width:96vw;max-height:90vh;display:flex;align-items:center;justify-content:center"><span class="close-modal" style="position:absolute;top:8px;left:8px;z-index:5;width:34px;height:34px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:rgba(15,23,42,.88);color:#fff;border:1.5px solid #d4a017;font-size:24px" onclick="closeModal('image-viewer-modal')">&times;</span><img id="image-viewer-img" style="max-width:94vw;max-height:86vh;border-radius:12px;object-fit:contain;background:#000;border:2px solid #d4a017;box-shadow:0 12px 35px rgba(0,0,0,.85)"></div></div>
 
 <div id="voice-recorder-modal" class="modal-overlay hidden"><div class="modal-card" style="max-width:340px;text-align:center;padding:16px"><span class="close-modal" onclick="closeVoiceRecorder()">&times;</span><div class="modal-title">تسجيل صوت 🎙️</div><div id="voice-recorder-status" style="margin:12px 0;font-size:.85rem">اضغط بدء التسجيل</div><audio id="voice-preview" style="width:100%;margin:10px 0;display:none" controls></audio><div style="display:flex;gap:6px"><button class="btn-submit" style="background:#10b981;flex:1" onclick="startVoiceRecording()">▶ بدء</button><button class="btn-submit" style="background:#dc2626;flex:1" onclick="stopVoiceRecording()">⏹ توقيف</button><button id="voice-send-btn" class="btn-submit" style="background:#2563eb;flex:1;display:none" onclick="sendRecordedVoice()">📤 إرسال</button></div></div></div>
 <div id="dice-modal" class="modal-overlay hidden"><div class="modal-card"><span class="close-modal" onclick="closeModal('dice-modal')">&times;</span><div class="modal-title">🎲 حجر النرد</div><div id="dice-result" style="font-size:4rem;text-align:center;padding:22px;color:#f0c34b">🎲</div><div style="padding:12px"><button class="btn-submit" onclick="rollDice()">رمي النرد</button></div></div></div>
@@ -2050,9 +2050,12 @@ html,body{background:#07070a!important;color:#fff}
   if (cachedRoom) window.__aslApplyRoomFast(activeRoom, cachedRoom);
 
   window.__aslPrefetched = { roomId: activeRoom, roomSettings: cachedRoom, siteSettings: cachedSite, presence: null, messages: null };
+  window.__aslRestMsgsByRoom = window.__aslRestMsgsByRoom || {};
+  window.__aslRoomSettingsMem = window.__aslRoomSettingsMem || {};
+  if (cachedRoom) window.__aslRoomSettingsMem[activeRoom] = cachedRoom;
 
   // 2. جلب متوازٍ فائق الخفة عبر Firestore REST بالتوازي مع تحميل SDK
-  const fastFetch = (url, opts, ms = 7000) => {
+  const fastFetch = (url, opts, ms = 7500) => {
     const ctrl = typeof AbortController !== "undefined" ? new AbortController() : null;
     const timer = ctrl ? setTimeout(() => ctrl.abort(), ms) : null;
     return fetch(url, { ...(opts || {}), signal: ctrl?.signal })
@@ -2061,23 +2064,10 @@ html,body{background:#07070a!important;color:#fff}
       .finally(() => { if (timer) clearTimeout(timer); });
   };
 
-  window.__aslTriggerPrefetch = roomId => {
-    const rId = roomId || "main";
-    window.__aslPrefetched.roomId = rId;
+  const msgSortMs = m => (m?.createdAt?.toMillis ? m.createdAt.toMillis() : Number(m?.createdAtMs || 0));
 
-    // أ) إعدادات الروم والخلفية (~6KB فقط)
-    fastFetch(`${FS_BASE}/asatir_roomSettings/${encodeURIComponent(rId)}`).then(res => {
-      const d = docToObj(res);
-      if (!d) return;
-      try { lsSet("asatir_cache_roomSettings_" + rId, JSON.stringify({ bgUrl: d.bgUrl || "", bgDim: d.bgDim ?? 25, micsCount: d.micsCount ?? 6, contestBotEnabled: d.contestBotEnabled })); } catch {}
-      if (window.__aslLiveRoomId !== rId && window.__aslPrefetched.roomId === rId) {
-        window.__aslPrefetched.roomSettings = d;
-        window.__aslApplyRoomFast(rId, d);
-      }
-    });
-
-    // ب) المتواجدون الأونلاين بدون cover و profileBackground (~15KB بدلاً من 325KB)
-    fastFetch(`${FS_BASE}:runQuery`, {
+  window.__aslFetchPresenceRest = () => {
+    return fastFetch(`${FS_BASE}:runQuery`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -2096,14 +2086,35 @@ html,body{background:#07070a!important;color:#fff}
         }
       })
     }).then(arr => {
-      if (!Array.isArray(arr)) return;
+      if (!Array.isArray(arr)) return null;
       const list = arr.map(x => docToObj(x.document)).filter(Boolean);
       window.__aslPrefetched.presence = list;
       if (typeof window.__aslOnPrefetchedPresence === "function") window.__aslOnPrefetchedPresence(list);
+      return list;
     });
+  };
 
-    // ج) الرسائل العامة بدون profileBackground و avatar المكررين (~30KB بدلاً من 1.5MB)
-    fastFetch(`${FS_BASE}:runQuery`, {
+  window.__aslFetchRoomSettingsRest = (roomId, applyNow = true) => {
+    const rId = roomId || "main";
+    return fastFetch(`${FS_BASE}/asatir_roomSettings/${encodeURIComponent(rId)}`).then(res => {
+      const d = docToObj(res);
+      if (!d) return null;
+      window.__aslRoomSettingsMem[rId] = d;
+      const cMs = d.messagesClearedAt?.toMillis ? d.messagesClearedAt.toMillis() : Number(d.messagesClearedAtClient || 0); if (cMs) { d.messagesClearedAtMs = cMs; window.__aslClearedAtByRoom = window.__aslClearedAtByRoom || {}; window.__aslClearedAtByRoom[rId] = Math.max(Number(window.__aslClearedAtByRoom[rId] || 0), cMs); } try { lsSet("asatir_cache_roomSettings_" + rId, JSON.stringify({ bgUrl: d.bgUrl || "", bgDim: d.bgDim ?? 25, micsCount: d.micsCount ?? 6, contestBotEnabled: d.contestBotEnabled, messagesClearedAtMs: cMs })); } catch {}
+      if (cMs > 0 && typeof window.__aslOnRoomClearedAt === "function") {
+        window.__aslOnRoomClearedAt(rId, cMs);
+      }
+      if (applyNow && window.__aslLiveRoomId !== rId && window.__aslPrefetched.roomId === rId) {
+        window.__aslPrefetched.roomSettings = d;
+        window.__aslApplyRoomFast(rId, d);
+      }
+      return d;
+    });
+  };
+
+  window.__aslFetchRoomMessagesRest = (roomId, applyNow = true) => {
+    const rId = roomId || "main";
+    return fastFetch(`${FS_BASE}:runQuery`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -2118,16 +2129,36 @@ html,body{background:#07070a!important;color:#fff}
               "reactionsBy","isSystem","isContestWinner","createdAt"
             ].map(fieldPath => ({ fieldPath }))
           },
-          limit: 60
+          limit: 200
         }
       })
     }).then(arr => {
-      if (!Array.isArray(arr) || window.__aslPrefetched.roomId !== rId) return;
-      const list = arr.map(x => docToObj(x.document)).filter(Boolean);
-      window.__aslPrefetched.messages = list;
-      window.__aslPrefetched.messagesRoomId = rId;
-      if (typeof window.__aslOnPrefetchedMessages === "function") window.__aslOnPrefetchedMessages(rId, list);
+      if (!Array.isArray(arr)) return null;
+      const sorted = arr.map(x => docToObj(x.document)).filter(Boolean)
+        .sort((a, b) => msgSortMs(a) - msgSortMs(b))
+        .slice(-55);
+      window.__aslRestMsgsByRoom[rId] = sorted;
+      if (applyNow && window.__aslPrefetched.roomId === rId) {
+        window.__aslPrefetched.messages = sorted;
+        window.__aslPrefetched.messagesRoomId = rId;
+        if (typeof window.__aslOnPrefetchedMessages === "function") window.__aslOnPrefetchedMessages(rId, sorted);
+      }
+      return sorted;
     });
+  };
+
+  window.__aslPrewarmRoom = roomId => {
+    const rId = roomId || "main";
+    if (!window.__aslRoomSettingsMem[rId]) window.__aslFetchRoomSettingsRest(rId, false);
+    if (!window.__aslRestMsgsByRoom[rId]) window.__aslFetchRoomMessagesRest(rId, false);
+  };
+
+  window.__aslTriggerPrefetch = roomId => {
+    const rId = roomId || "main";
+    window.__aslPrefetched.roomId = rId;
+    window.__aslFetchRoomSettingsRest(rId, true);
+    window.__aslFetchPresenceRest();
+    window.__aslFetchRoomMessagesRest(rId, true);
   };
 
   // د) جلب إعدادات الواجهة الخفيفة فقط (بدون 160KB صور الدخول إن كان العضو مسجلاً)
@@ -2191,7 +2222,13 @@ let _storageModPromise = null;
 async function getLazyStorageApi() {
   if (!_storageModPromise) {
     _storageModPromise = import("https://www.gstatic.com/firebasejs/12.19.0/firebase-storage.js")
-      .then(mod => ({ storage: mod.getStorage(app), storageRef: mod.ref, uploadBytes: mod.uploadBytes, getDownloadURL: mod.getDownloadURL }));
+      .then(mod => ({
+        storage: mod.getStorage(app),
+        storageRef: mod.ref,
+        uploadBytes: mod.uploadBytes,
+        uploadBytesResumable: mod.uploadBytesResumable,
+        getDownloadURL: mod.getDownloadURL
+      }));
   }
   return _storageModPromise;
 }
@@ -2501,22 +2538,49 @@ async function fastCompressImage(fileOrCanvas, maxDim = 500, quality = 0.55) {
   });
 }
 
-async function uploadToStorage(file, folder) {
+function readFileAsDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const rd = new FileReader();
+    rd.onload = () => resolve(String(rd.result || ""));
+    rd.onerror = reject;
+    rd.readAsDataURL(file);
+  });
+}
+
+async function uploadToStorage(file, folder, onProgress = null) {
   if (!file) throw new Error("NO_FILE");
   try {
     if (String(file.type || "").startsWith("image/")) {
       return await fastCompressImage(file, 520, 0.52);
     }
-    const { storage, storageRef, uploadBytes, getDownloadURL } = await getLazyStorageApi();
+    // مقاطع الصوت الصغيرة (<= 320KB) تُحفظ لحظياً بدون انتظار الشبكة
+    if (String(file.type || "").startsWith("audio/") && file.size <= 320 * 1024) {
+      if (onProgress) onProgress(100);
+      return await readFileAsDataUrl(file);
+    }
+    const { storage, storageRef, uploadBytes, uploadBytesResumable, getDownloadURL } = await getLazyStorageApi();
     const name = String(file.name || "file").replace(/[^a-zA-Z0-9._-]/g, "_");
     const r = storageRef(storage, `${P}${folder}/${Date.now()}_${name}`);
-    await uploadBytes(r, file, { contentType: file.type || "application/octet-stream" });
+    const meta = { contentType: file.type || "application/octet-stream", cacheControl: "public,max-age=31536000" };
+    if (uploadBytesResumable) {
+      await new Promise((resolve, reject) => {
+        const task = uploadBytesResumable(r, file, meta);
+        task.on("state_changed", snap => {
+          if (onProgress && snap.totalBytes > 0) {
+            onProgress(Math.min(99, Math.round((snap.bytesTransferred / snap.totalBytes) * 100)));
+          }
+        }, reject, resolve);
+      });
+    } else {
+      await uploadBytes(r, file, meta);
+    }
+    if (onProgress) onProgress(100);
     return await getDownloadURL(r);
-  } catch {
+  } catch (err) {
     if (String(file.type || "").startsWith("image/")) {
       return await fastCompressImage(file, 380, 0.45);
     }
-    throw new Error("FAIL_UPLOAD");
+    throw err || new Error("FAIL_UPLOAD");
   }
 }
 
@@ -2689,6 +2753,8 @@ async function createPresence() {
     isOnline: true, roomId, roomName: currentRoomName,
     rtcSessionId: MY_RTC_SESSION_ID, lastSeen: serverTimestamp()
   };
+  presenceCache.set(String(u.uid), { ...presenceData, lastSeen: { seconds: Math.floor(Date.now() / 1000) } });
+  schedulePresenceUIUpdate();
   // أرسل حضور العضو فوراً؛ لا تنتظر getDocs أو حذف مايك قديم.
   setDoc(doc(db, `${P}presence`, u.uid), presenceData, { merge: true })
     .catch(e => console.warn("Presence write failed:", e));
@@ -3249,8 +3315,14 @@ function applyPresenceBatch(arr, fromLive = false) {
   schedulePresenceUIUpdate();
 }
 window.__aslOnPrefetchedPresence = list => {
-  if (window.__aslLivePresenceActive) return;
-  applyPresenceBatch(list, false);
+  if (!Array.isArray(list)) return;
+  if (!window.__aslServerPresenceSynced) {
+    const liveIds = new Set(list.map(p => String(p.uid || p.id || "")).filter(Boolean));
+    for (const k of Array.from(presenceCache.keys())) {
+      if (k !== String(currentUser?.uid || "") && !liveIds.has(k)) presenceCache.delete(k);
+    }
+  }
+  applyPresenceBatch(list, !window.__aslServerPresenceSynced);
 };
 
 function cachePresenceSnapshotSoon() {
@@ -3276,22 +3348,39 @@ function cachePresenceSnapshotSoon() {
 
 function listenPresence() {
   if (unsubPresence) unsubPresence();
-  window.__aslLivePresenceActive = false;
+  window.__aslServerPresenceSynced = false;
+  clearInterval(window._aslPresenceRestFallbackTimer);
+  let restPollCount = 0;
+  window._aslPresenceRestFallbackTimer = setInterval(() => {
+    if (window.__aslServerPresenceSynced || restPollCount >= 4) {
+      clearInterval(window._aslPresenceRestFallbackTimer);
+      return;
+    }
+    restPollCount++;
+    window.__aslFetchPresenceRest?.();
+  }, 3000);
+
   // لا نسحب سجلات الحضور القديمة وغير المتصلة؛ نتابع المتصلين فقط.
   unsubPresence = onSnapshot(query(collection(db, `${P}presence`), where("isOnline", "==", true)), snap => {
-    const isInitialLive = !window.__aslLivePresenceActive;
-    window.__aslLivePresenceActive = true;
+    const isFromServer = !snap.metadata?.fromCache;
     let roomOnlineChanged = false;
-    if (isInitialLive) {
+    if (isFromServer) {
+      window.__aslServerPresenceSynced = true;
+      clearInterval(window._aslPresenceRestFallbackTimer);
       const liveIds = new Set(snap.docs.map(d => d.id));
       for (const k of Array.from(presenceCache.keys())) {
-        if (!liveIds.has(k)) presenceCache.delete(k);
+        if (!liveIds.has(k)) {
+          presenceCache.delete(k);
+          roomOnlineChanged = true;
+        }
       }
     }
     snap.docChanges().forEach(ch => {
       if (ch.type === "removed") {
-        presenceCache.delete(ch.doc.id);
-        roomOnlineChanged = true;
+        if (isFromServer) {
+          presenceCache.delete(ch.doc.id);
+          roomOnlineChanged = true;
+        }
       } else {
         const p = ch.doc.data();
         if (p && !isPhantomAccount(p)) {
@@ -3304,13 +3393,12 @@ function listenPresence() {
       }
     });
     schedulePresenceUIUpdate();
-    cachePresenceSnapshotSoon();
+    if (isFromServer || presenceCache.size > 1) cachePresenceSnapshotSoon();
     if (localAudioStream && roomOnlineChanged) {
       syncSpeakerConnections();
     }
   }, err => {
     console.warn("Presence listener:", err);
-    if (navigator.onLine) toast("تأخر تحديث المتواجدين، جارٍ إعادة الاتصال...");
   });
 }
 
@@ -3407,13 +3495,20 @@ window.openArenaPanel = () => {
 };
 window.closeArenaPanel = () => $("arena-side-panel")?.classList.add("hidden");
 
-window.openProfileByName = async encoded => {
+window.openProfileByName = encoded => {
   const name = decodeURIComponent(encoded);
-  let u = users.get(name) || await getUserByName(name);
-  if (!u) presenceCache.forEach(x => { if (x.name === name) u = x; });
+  let u = users.get(name);
+  if (!u) presenceCache.forEach(x => { if (x && x.name === name) u = x; });
   if (!u && window._contestBotProfile && window._contestBotProfile.name === name) u = window._contestBotProfile;
-  u = u || { name, uid: "guest_" + name, rankId: 20, isVisitor: true, gender: "ذكر", avatar: avatarFor(name) };
-  openProfile(normalizeRankForUser(u));
+  const stub = u || { name, uid: "guest_" + name, rankId: 20, isVisitor: true, gender: "ذكر", avatar: avatarFor(name) };
+  openProfile(normalizeRankForUser(stub));
+  if (!users.has(name) && (!window._contestBotProfile || window._contestBotProfile.name !== name)) {
+    getUserByName(name).then(full => {
+      if (full && selectedUser?.name === name && !$("profile-modal")?.classList.contains("hidden")) {
+        openProfile(normalizeRankForUser(full));
+      }
+    }).catch(() => {});
+  }
 };
 
 function openProfile(u) {
@@ -3508,11 +3603,48 @@ function openProfile(u) {
   $("edit-info-input").value = selectedUser.info || "";
   $("edit-status-input").value = selectedUser.statusText || "";
   $("edit-profile-music-input").value = "";
+  window._preuploadedMusicTask = null;
+  if ($("edit-profile-music-status")) { $("edit-profile-music-status").style.display = "none"; $("edit-profile-music-status").textContent = ""; }
   $("edit-email-input").value = selectedUser.email || "";
 
   openModal("profile-modal");
 }
 window.openProfile = openProfile;
+
+window.preUploadProfileMusic = e => {
+  const f = e?.target?.files?.[0];
+  const st = $("edit-profile-music-status");
+  if (!f) {
+    window._preuploadedMusicTask = null;
+    if (st) st.style.display = "none";
+    return;
+  }
+  if (!f.type.startsWith("audio/")) {
+    alert("اختر ملفاً صوتياً صالحاً");
+    e.target.value = "";
+    window._preuploadedMusicTask = null;
+    if (st) st.style.display = "none";
+    return;
+  }
+  if (st) {
+    st.style.display = "block";
+    st.style.color = "#38bdf8";
+    st.textContent = "⚡ جارٍ رفع الموسيقى بالخلفية... 0%";
+  }
+  const promise = uploadToStorage(f, "profile-music", pct => {
+    if (st && window._preuploadedMusicTask?.file === f) {
+      st.style.color = pct >= 100 ? "#4ade80" : "#38bdf8";
+      st.textContent = pct >= 100 ? "✅ تم رفع الموسيقى! اضغط حفظ التعديلات الآن" : `⚡ جارٍ الرفع السريع... ${pct}%`;
+    }
+  }).catch(err => {
+    if (st && window._preuploadedMusicTask?.file === f) {
+      st.style.color = "#f87171";
+      st.textContent = "⚠️ تعذر الرفع التلقائي، سيعاد المحاولة عند الحفظ";
+    }
+    throw err;
+  });
+  window._preuploadedMusicTask = { file: f, promise };
+};
 
 window.toggleEditProfileBox = () => {
   if (currentUser?.isVisitor && !isPrimaryOwner(currentUser)) {
@@ -3522,6 +3654,7 @@ window.toggleEditProfileBox = () => {
   $("profile-info-list")?.classList.toggle("is-editing", !hidden);
   $("cover-change-btn-overlay")?.classList.toggle("hidden", hidden);
   $("avatar-change-btn-overlay")?.classList.toggle("hidden", hidden);
+  if (!hidden) getLazyStorageApi().catch(() => {});
 };
 
 window.copyMyProfileLink = () => {
@@ -3563,8 +3696,17 @@ window.saveProfileChanges = async () => {
   const musicFile = $("edit-profile-music-input")?.files?.[0];
   if (musicFile) {
     if (!musicFile.type.startsWith("audio/")) return alert("اختر ملفاً صوتياً صالحاً");
-    toast("جارٍ رفع موسيقى البروفايل...");
-    profileMusicUrl = await uploadToStorage(musicFile, "profile-music");
+    if (window._preuploadedMusicTask?.file === musicFile && window._preuploadedMusicTask?.promise) {
+      try {
+        profileMusicUrl = await window._preuploadedMusicTask.promise;
+      } catch {
+        toast("جارٍ رفع موسيقى البروفايل...");
+        profileMusicUrl = await uploadToStorage(musicFile, "profile-music");
+      }
+    } else {
+      toast("جارٍ رفع موسيقى البروفايل...");
+      profileMusicUrl = await uploadToStorage(musicFile, "profile-music");
+    }
   }
 
   const updated = {
@@ -4000,6 +4142,7 @@ function createPeerConnection(remoteUid, remoteSessionId = "") {
       aud = document.createElement("audio");
       aud.id = `remote-audio-${remoteUid}`;
       aud.autoplay = true;
+      aud.setAttribute("autoplay", "");
       aud.playsInline = true;
       aud.setAttribute("playsinline", "");
       aud.setAttribute("webkit-playsinline", "");
@@ -4118,7 +4261,7 @@ function scheduleListenerRecovery() {
         requestOfferFromSpeaker(uid, sp.rtcSessionId || "", false);
       }
     });
-  }, 1100);
+  }, 250);
 
   if (!listenerWatchdogInterval) {
     listenerWatchdogInterval = setInterval(() => {
@@ -4165,15 +4308,17 @@ function syncSpeakerConnections() {
 
 function listenWebRTCAudioMesh() {
   if (!currentUser?.uid) return;
+  if (window._unsubRtcSignals && window._aslRtcUid === String(currentUser.uid)) return;
   if (window._unsubRtcSignals) { window._unsubRtcSignals(); window._unsubRtcSignals = null; }
-  const listeningRoomId = String(currentRoomId);
+  window._aslRtcUid = String(currentUser.uid);
   const q = query(rtcSignalsRef(), where("targetUid", "==", String(currentUser.uid)));
   window._unsubRtcSignals = onSnapshot(q, snap => {
+    const activeRoom = String(currentRoomId);
     snap.docChanges().forEach(ch => {
       if (ch.type !== "added") return;
       const signalRef = ch.doc.ref;
       const data = ch.doc.data();
-      if (!data || data.roomId !== listeningRoomId || !data.senderUid) {
+      if (!data || data.roomId !== activeRoom || !data.senderUid) {
         deleteDoc(signalRef).catch(() => {});
         return;
       }
@@ -4259,21 +4404,37 @@ function listenWebRTCAudioMesh() {
   });
 }
 
+let activeMicSlotsBySlot = new Map();
+function paintMicSlotUI(i, m) {
+  const el = $("mic-slot-" + i);
+  const nameEl = $("mic-name-" + i);
+  if (m && m.uid) {
+    if (el) {
+      el.classList.add("occupied");
+      el.classList.toggle("muted", Boolean(m.muted));
+      el.style.backgroundImage = `url("${m.avatar || avatarFor(m.name)}")`;
+    }
+    if (nameEl) nameEl.textContent = m.name || String(i + 1);
+  } else {
+    if (el) { el.classList.remove("occupied", "muted"); el.style.backgroundImage = ""; }
+    if (nameEl) nameEl.textContent = String(i + 1);
+  }
+}
+
 function listenMics() {
   if (unsubMics) unsubMics();
+  activeMicSlotsBySlot = new Map();
+  for (let i = 0; i < 8; i++) paintMicSlotUI(i, null);
   unsubMics = onSnapshot(collection(db, `${P}rooms`, currentRoomId, "micSlots"), snap => {
     const nextSpeakers = new Map();
-    for (let i = 0; i < 8; i++) {
-      const slot = $("mic-slot-" + i);
-      if (slot) { slot.classList.remove("occupied", "muted"); slot.style.backgroundImage = ""; }
-      const nameEl = $("mic-name-" + i);
-      if (nameEl) nameEl.textContent = String(i + 1);
-    }
+    const nextBySlot = new Map();
+    for (let i = 0; i < 8; i++) paintMicSlotUI(i, null);
     let mySlotFound = false;
     snap.forEach(d => {
       const m = d.data(), i = Number(d.id);
       if (i < 0 || i > 7 || !m.uid) return;
       const uid = String(m.uid);
+      nextBySlot.set(i, { ...m, uid });
       nextSpeakers.set(uid, {
         name: m.name || "",
         avatar: m.avatar || "",
@@ -4281,15 +4442,9 @@ function listenMics() {
         muted: Boolean(m.muted)
       });
       if (uid === String(currentUser?.uid)) { mySlotFound = true; currentMicSlot = i; }
-      const el = $("mic-slot-" + i);
-      if (el) {
-        el.classList.add("occupied");
-        if (m.muted) el.classList.add("muted");
-        el.style.backgroundImage = `url("${m.avatar || avatarFor(m.name)}")`;
-      }
-      const nameEl = $("mic-name-" + i);
-      if (nameEl) nameEl.textContent = m.name || String(i + 1);
+      paintMicSlotUI(i, m);
     });
+    activeMicSlotsBySlot = nextBySlot;
 
     for (const [uid] of rtcPeerConnections.entries()) {
       const isOnlineInRoom = Array.from(presenceCache.values()).some(p => String(p.uid) === uid && p.isOnline !== false);
@@ -4315,24 +4470,24 @@ function listenMics() {
   });
 }
 
-window.micClick = async i => {
-  const s = await getDoc(micDoc(i));
-  if (!s.exists()) {
+window.micClick = i => {
+  const slotIdx = Number(i);
+  const m = activeMicSlotsBySlot.get(slotIdx);
+  if (!m || !m.uid) {
     if (currentMicSlot !== null && localAudioStream) return alert("أنت بالفعل على المايك! انزل منه أولاً للصعود إلى مايك آخر.");
-    currentMicSlot = i;
-    $("mic-request-text").textContent = `هل تريد الصعود للمايك رقم ${i + 1} وبث صوتك للجميع؟`;
+    currentMicSlot = slotIdx;
+    $("mic-request-text").textContent = `هل تريد الصعود للمايك رقم ${slotIdx + 1} وبث صوتك للجميع؟`;
     openModal("mic-request-modal");
     return;
   }
-  const m = s.data();
   if (String(m.uid) === String(currentUser.uid)) {
-    currentMicSlot = i;
+    currentMicSlot = slotIdx;
     $("owner-drop-mic-item").classList.add("hidden");
     $("my-mute-label").textContent = m.muted ? "فتح كتم المايك" : "كتم المايك";
     openModal("mic-control-modal");
   } else if (canManageUser(m)) {
-    currentMicSlot = i;
-    selectedMicOwnerSlot = i;
+    currentMicSlot = slotIdx;
+    selectedMicOwnerSlot = slotIdx;
     $("owner-drop-mic-item").classList.remove("hidden");
     openModal("mic-control-modal");
   } else {
@@ -4349,7 +4504,7 @@ window.confirmMicRequest = async () => {
     if (!window.isSecureContext || !navigator.mediaDevices?.getUserMedia) {
       throw Object.assign(new Error("الميكروفون يحتاج رابط HTTPS ومتصفحاً يدعم getUserMedia"), { name: "SecureContextRequired" });
     }
-    await window.retryRemoteAudio();
+    window.retryRemoteAudio();
     localAudioStream = await navigator.mediaDevices.getUserMedia({
       audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
       video: false
@@ -4360,18 +4515,27 @@ window.confirmMicRequest = async () => {
     });
     setupMicVoiceDetection(localAudioStream, slot);
 
-    await setDoc(micDoc(slot), {
+    const micPayload = {
       uid: String(currentUser.uid), name: currentUser.name,
-      avatar: currentUser.avatar || avatarFor(currentUser.name),
+      avatar: String(currentUser.avatar || "").length > 16000 ? avatarFor(currentUser.name) : (currentUser.avatar || avatarFor(currentUser.name)),
       muted: false, rtcSessionId: MY_RTC_SESSION_ID,
       joinedAt: serverTimestamp(), roomId: currentRoomId
-    });
-
-    window._micJoinPending = false;
-    syncSpeakerConnections();
+    };
+    activeMicSlotsBySlot.set(slot, micPayload);
+    paintMicSlotUI(slot, micPayload);
     toast("🎙️ تم تشغيل المايك وبث صوتك لجميع المتواجدين في الغرفة!");
+
+    setDoc(micDoc(slot), micPayload).then(() => {
+      window._micJoinPending = false;
+      syncSpeakerConnections();
+    }).catch(e => {
+      window._micJoinPending = false;
+      console.warn("Mic slot write failed", e);
+    });
   } catch (e) {
     window._micJoinPending = false;
+    activeMicSlotsBySlot.delete(slot);
+    paintMicSlotUI(slot, null);
     if (localAudioStream) localAudioStream.getTracks().forEach(t => t.stop());
     localAudioStream = null;
     currentMicSlot = null;
@@ -4379,21 +4543,30 @@ window.confirmMicRequest = async () => {
   }
 };
 
-window.toggleMyMute = async () => {
+window.toggleMyMute = () => {
   if (currentMicSlot === null) return;
-  const r = micDoc(currentMicSlot), s = await getDoc(r);
-  if (!s.exists() || String(s.data().uid) !== String(currentUser.uid)) return;
-  const next = !s.data().muted;
-  await setDoc(r, { muted: next }, { merge: true });
+  const slot = currentMicSlot;
+  const cur = activeMicSlotsBySlot.get(slot);
+  if (!cur || String(cur.uid) !== String(currentUser.uid)) return;
+  const next = !Boolean(cur.muted);
+  cur.muted = next;
+  paintMicSlotUI(slot, cur);
   if (localAudioStream) localAudioStream.getAudioTracks().forEach(t => t.enabled = !next);
   $("my-mute-label").textContent = next ? "فتح كتم المايك" : "كتم المايك";
+  closeModal("mic-control-modal");
+  setDoc(micDoc(slot), { muted: next }, { merge: true }).catch(() => {});
 };
 
-window.leaveMic = async () => {
+window.leaveMic = () => {
   window._micJoinPending = false;
   const slot = currentMicSlot;
   currentMicSlot = null;
-  if (slot !== null) await deleteDoc(micDoc(slot)).catch(() => {});
+  closeModal("mic-control-modal");
+  if (slot !== null) {
+    activeMicSlotsBySlot.delete(slot);
+    paintMicSlotUI(slot, null);
+    deleteDoc(micDoc(slot)).catch(() => {});
+  }
   if (localAudioStream) {
     localAudioStream.getTracks().forEach(t => t.stop());
     localAudioStream = null;
@@ -4411,16 +4584,18 @@ window.leaveMic = async () => {
       closePeerConnection(uid);
     }
   }
-  closeModal("mic-control-modal");
   toast("تم النزول من المايك");
 };
 
-window.ownerDropCurrentMic = async () => {
+window.ownerDropCurrentMic = () => {
   if (selectedMicOwnerSlot === null) return;
-  await deleteDoc(micDoc(selectedMicOwnerSlot)).catch(() => {});
+  const slot = selectedMicOwnerSlot;
   selectedMicOwnerSlot = null;
+  activeMicSlotsBySlot.delete(slot);
+  paintMicSlotUI(slot, null);
   closeModal("mic-control-modal");
   toast("تم إنزال العضو من المايك");
+  deleteDoc(micDoc(slot)).catch(() => {});
 };
 
 window.toggleMicsVisibility = () => {
@@ -4442,9 +4617,16 @@ window.retryRemoteAudio = async () => {
   updateAudioUnlockBanner();
 };
 
-["click", "touchend", "pointerdown", "touchstart"].forEach(ev => {
+let _lastAudioRetryTs = 0;
+["pointerdown", "click"].forEach(ev => {
   document.addEventListener(ev, () => {
-    if (currentUser) window.retryRemoteAudio();
+    if (!currentUser) return;
+    const now = Date.now();
+    if (now - _lastAudioRetryTs < 1500) return;
+    const box = $("webrtc-remote-audios");
+    if (!box || !box.childElementCount) return;
+    _lastAudioRetryTs = now;
+    window.retryRemoteAudio();
   }, { passive: true });
 });
 
@@ -4845,7 +5027,7 @@ function renderMessageHtml(dId, m) {
   }
 
   let media = "";
-  if (m.imageUrl) media = `<div><img class="msg-drawing-thumb" loading="lazy" decoding="async" src="${safe(m.imageUrl)}" onclick="openImageViewer('${slug(m.imageUrl)}')"></div>`;
+  if (m.imageUrl) media = `<div class="msg-media-box"><img class="msg-drawing-thumb" loading="lazy" decoding="async" src="${safe(m.imageUrl)}" onload="var c=document.getElementById('chat-area');if(c&&(c.scrollHeight-c.scrollTop-c.clientHeight<260))c.scrollTop=c.scrollHeight;" onclick="openImageViewer('${slug(m.imageUrl)}')"></div>`;
   if (m.videoUrl) media = `<div class="video-message-media video-small-card" onclick="openVideoViewer('${slug(m.videoUrl)}','file')"><video class="video-thumb-preview" src="${safe(m.videoUrl)}#t=0.5" preload="metadata" muted playsinline></video><span class="video-thumb-overlay">▶</span></div>`;
   if (m.audioUrl) media = `<div style="margin-top:4px">🎙️ <audio src="${safe(m.audioUrl)}" controls preload="metadata" style="width:200px;height:32px"></audio></div>`;
   if (m.videoLink) {
@@ -4956,14 +5138,62 @@ window.reportChatMessage = async (id) => {
   } catch (e) { console.error(e); toast('تعذر إرسال البلاغ'); }
 };
 
+window.__aslLiveMsgsByRoom = window.__aslLiveMsgsByRoom || new Map();
+
+window.__aslPendingOrderMap = window.__aslPendingOrderMap || new Map();
+function msgMillis(m) {
+  if (!m) return 0;
+  if (m.createdAt?.toMillis) return m.createdAt.toMillis();
+  if (m.createdAt?.seconds) return m.createdAt.seconds * 1000;
+  if (m.createdAtMs) return Number(m.createdAtMs);
+  if (m.id) {
+    if (!window.__aslPendingOrderMap.has(m.id)) window.__aslPendingOrderMap.set(m.id, Date.now());
+    return window.__aslPendingOrderMap.get(m.id);
+  }
+  return Date.now();
+}
+
+window.__aslClearedAtByRoom = window.__aslClearedAtByRoom || {};
+window.__aslClearedIdsByRoom = window.__aslClearedIdsByRoom || {};
+function getRoomClearedAtMs(roomId) {
+  const mem = Number(window.__aslClearedAtByRoom[roomId] || 0);
+  const pre = Number(window.__aslRoomSettingsMem?.[roomId]?.messagesClearedAtMs || 0);
+  const cached = Number(window.__aslLsJson?.("asatir_cache_roomSettings_" + roomId)?.messagesClearedAtMs || 0);
+  return Math.max(mem, pre, cached);
+}
+function getMergedMsgsForRoom(roomId) {
+  const byId = new Map();
+  const clearedAt = getRoomClearedAtMs(roomId);
+  const clearedIds = window.__aslClearedIdsByRoom[roomId];
+  const accept = m => {
+    if (!m || !m.id) return false;
+    if (clearedIds && clearedIds.has(m.id)) return false;
+    if (clearedAt > 0 && (m.createdAt || m.createdAtMs)) {
+      const ts = msgMillis(m);
+      if (ts > 0 && ts <= clearedAt) return false;
+    }
+    return true;
+  };
+  const restArr = window.__aslRestMsgsByRoom?.[roomId];
+  if (Array.isArray(restArr)) {
+    restArr.forEach(m => { if (accept(m)) byId.set(m.id, m); });
+  }
+  const liveMap = window.__aslLiveMsgsByRoom.get(roomId);
+  if (liveMap) {
+    liveMap.forEach((m, id) => { if (accept(m)) byId.set(id, m); });
+  }
+  return Array.from(byId.values())
+    .sort((a, b) => msgMillis(a) - msgMillis(b))
+    .slice(-60);
+}
+
 function renderMessagesList(docs, isPreview = false) {
   const chatArea = $("chat-area");
   if (!chatArea) return;
-  $("asl-chat-loading")?.remove();
 
-  const sorted = [...docs].sort((a, b) => (a.createdAt?.toMillis ? a.createdAt.toMillis() : Number(a.createdAtMs || 0)) - (b.createdAt?.toMillis ? b.createdAt.toMillis() : Number(b.createdAtMs || 0)));
+  const sorted = [...docs].sort((a, b) => msgMillis(a) - msgMillis(b));
   if (!sorted.length) {
-    if (!isPreview && !chatArea.children.length) {
+    if (!isPreview && window.__aslServerMsgsSynced && !chatArea.children.length) {
       chatArea.innerHTML = `<div id="asl-chat-empty" style="text-align:center;padding:24px 12px;color:#cbd5e1;font-size:.82rem;opacity:.8">لا توجد رسائل بعد في هذه الغرفة — ابدأ المحادثة الآن ✨</div>`;
     }
     return;
@@ -4971,6 +5201,7 @@ function renderMessagesList(docs, isPreview = false) {
   $("asl-chat-empty")?.remove();
 
   if (isPreview) {
+    if (chatArea.children.length && !chatArea.querySelector('[data-preview="1"]')) return;
     chatArea.innerHTML = sorted.map(x => renderMessageHtml(x.id, x)).join("");
     chatArea.querySelectorAll(".msg-item,.system-msg-item,.contest-winner-msg").forEach(el => el.setAttribute("data-preview", "1"));
     chatArea.scrollTop = chatArea.scrollHeight;
@@ -4985,7 +5216,7 @@ function renderMessagesList(docs, isPreview = false) {
   }
 
   const wasEmpty = chatArea.children.length === 0;
-  const nearBottom = wasEmpty || (chatArea.scrollHeight - chatArea.scrollTop - chatArea.clientHeight < 140);
+  const nearBottom = wasEmpty || (chatArea.scrollHeight - chatArea.scrollTop - chatArea.clientHeight < 160);
 
   chatArea.querySelectorAll('[data-id^="pending-"]').forEach(el => el.remove());
   const activeIds = new Set(sorted.map(x => x.id));
@@ -5027,7 +5258,7 @@ function cacheMessagesSoon(roomId, docs) {
   window._aslMsgSaveTimer = setTimeout(() => {
     try {
       const tail = [...docs]
-        .sort((a, b) => (a.createdAt?.toMillis ? a.createdAt.toMillis() : 0) - (b.createdAt?.toMillis ? b.createdAt.toMillis() : 0))
+        .sort((a, b) => msgMillis(a) - msgMillis(b))
         .slice(-22)
         .map(m => ({
           id: m.id, roomId: m.roomId, sender: m.sender, senderUid: m.senderUid,
@@ -5045,7 +5276,7 @@ function cacheMessagesSoon(roomId, docs) {
             nameStaticBg: m.reply.nameStaticBg, nameBackground: m.reply.nameBackground,
             nameFrame: m.reply.nameFrame, rankId: m.reply.rankId
           } : null,
-          createdAtMs: m.createdAt?.toMillis ? m.createdAt.toMillis() : 0
+          createdAtMs: msgMillis(m)
         }));
       localStorage.setItem("asatir_cache_messages_" + roomId, JSON.stringify(tail));
     } catch {}
@@ -5054,7 +5285,10 @@ function cacheMessagesSoon(roomId, docs) {
 
 function hydrateRoomFromFastCache(roomId) {
   const pre = window.__aslPrefetched;
-  if (pre?.roomSettings && pre.roomId === roomId) {
+  const memSettings = window.__aslRoomSettingsMem?.[roomId];
+  if (memSettings) {
+    window.__aslApplyRoomFast?.(roomId, memSettings);
+  } else if (pre?.roomSettings && pre.roomId === roomId) {
     window.__aslApplyRoomFast?.(roomId, pre.roomSettings);
   } else {
     const cachedRoom = window.__aslLsJson?.("asatir_cache_roomSettings_" + roomId);
@@ -5063,7 +5297,7 @@ function hydrateRoomFromFastCache(roomId) {
 
   if (Array.isArray(pre?.presence) && pre.presence.length) {
     applyPresenceBatch(pre.presence, false);
-  } else {
+  } else if (!presenceCache.size) {
     const cachedPresence = window.__aslLsJson?.("asatir_cache_presence");
     if (Array.isArray(cachedPresence) && cachedPresence.length) {
       applyPresenceBatch(cachedPresence, false);
@@ -5072,51 +5306,79 @@ function hydrateRoomFromFastCache(roomId) {
 
   const area = $("chat-area");
   if (!area) return;
-  if (Array.isArray(pre?.messages) && pre.messagesRoomId === roomId && pre.messages.length) {
-    renderMessagesList(pre.messages, true);
+  const merged = getMergedMsgsForRoom(roomId);
+  if (merged.length) {
+    renderMessagesList(merged, false);
     return;
   }
-  const cachedMsgs = window.__aslLsJson?.("asatir_cache_messages_" + roomId);
-  if (Array.isArray(cachedMsgs) && cachedMsgs.length) {
+  const clearedAt = getRoomClearedAtMs(roomId);
+  const clearedIds = window.__aslClearedIdsByRoom?.[roomId];
+  const cachedMsgs = (window.__aslLsJson?.("asatir_cache_messages_" + roomId) || [])
+    .filter(m => m && m.id && (!clearedIds || !clearedIds.has(m.id)) && (!clearedAt || !m.createdAtMs || Number(m.createdAtMs) > clearedAt));
+  if (cachedMsgs.length) {
     renderMessagesList(cachedMsgs, true);
-  } else if (!area.children.length) {
-    area.innerHTML = `<div id="asl-chat-loading" style="text-align:center;padding:24px 12px;color:#f3c65f;font-size:.82rem;opacity:.9">⏳ جارٍ تحميل الرسائل...</div>`;
   }
 }
 
+window.__aslOnRoomClearedAt = (rId, cMs) => {
+  if (rId !== currentRoomId) return;
+  window.__aslClearedAtByRoom[rId] = Math.max(Number(window.__aslClearedAtByRoom[rId] || 0), Number(cMs || 0));
+  const afterClear = getMergedMsgsForRoom(rId);
+  renderMessagesList(afterClear, !window.__aslServerMsgsSynced);
+  cacheMessagesSoon(rId, afterClear);
+};
+
 window.__aslOnPrefetchedMessages = (rId, list) => {
-  if (rId !== currentRoomId || window.__aslLiveMessagesRoom === rId) return;
-  renderMessagesList(list, true);
+  if (rId !== currentRoomId) return;
+  const merged = getMergedMsgsForRoom(rId);
+  renderMessagesList(merged, !window.__aslServerMsgsSynced);
 };
 
 function listenMessages() {
-  if (unsubMessages) unsubMessages();
-  const roomForSub = currentRoomId;
-  window.__aslLiveMessagesRoom = null;
-  const q = query(collection(db, `${P}roomMessages`), where("roomId", "==", roomForSub), limit(60));
+  // اشتراك واحد عام بترتيب createdAt التنازلي: يلتقط أحدث الرسائل فوراً دون فهرس مركب ودون إعادة اتصال عند تغيير الغرفة
+  if (unsubMessages) {
+    const merged = getMergedMsgsForRoom(currentRoomId);
+    if (merged.length) renderMessagesList(merged, false);
+    return;
+  }
+  window.__aslServerMsgsSynced = false;
+  const q = query(collection(db, `${P}roomMessages`), orderBy("createdAt", "desc"), limit(100));
 
   unsubMessages = onSnapshot(q, snap => {
-    if (roomForSub !== currentRoomId) return;
-    const isInitial = window.__aslLiveMessagesRoom !== roomForSub;
-    window.__aslLiveMessagesRoom = roomForSub;
+    const isFromServer = !snap.metadata?.fromCache;
+    if (isFromServer) window.__aslServerMsgsSynced = true;
 
-    if (!isInitial) {
-      snap.docChanges().forEach(ch => {
-        if (ch.type === "added") {
-          const m = ch.doc.data();
+    snap.docChanges().forEach(ch => {
+      const m = ch.doc.data();
+      const rId = String(m?.roomId || "main");
+      if (!window.__aslLiveMsgsByRoom.has(rId)) window.__aslLiveMsgsByRoom.set(rId, new Map());
+      const rMap = window.__aslLiveMsgsByRoom.get(rId);
+      if (ch.type === "removed") {
+        if (isFromServer) {
+          rMap.delete(ch.doc.id);
+          if (Array.isArray(window.__aslRestMsgsByRoom?.[rId])) {
+            window.__aslRestMsgsByRoom[rId] = window.__aslRestMsgsByRoom[rId].filter(x => x.id !== ch.doc.id);
+          }
+        }
+      } else {
+        const existed = rMap.has(ch.doc.id);
+        rMap.set(ch.doc.id, { id: ch.doc.id, ...m });
+        if (ch.type === "added" && !existed && window.__aslInitialMsgsObserved && rId === currentRoomId) {
           if (m.reply && m.reply.sender === currentUser?.name && m.sender !== currentUser?.name) {
             playNotificationSound("quote");
           }
         }
-      });
-    }
+      }
+    });
+    if (isFromServer || snap.docs.length > 0) window.__aslInitialMsgsObserved = true;
 
-    const docs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    renderMessagesList(docs, false);
-    cacheMessagesSoon(roomForSub, docs);
+    const merged = getMergedMsgsForRoom(currentRoomId);
+    if (merged.length || isFromServer) {
+      renderMessagesList(merged, !isFromServer && !window.__aslRestMsgsByRoom?.[currentRoomId]?.length);
+    }
+    if (merged.length || isFromServer) cacheMessagesSoon(currentRoomId, merged);
   }, err => {
     console.warn("Messages listener:", err);
-    if (navigator.onLine) toast("تعذر تحديث الرسائل مؤقتاً، جارٍ إعادة الاتصال...");
   });
 }
 
@@ -5127,9 +5389,13 @@ window.mentionUser = name => {
 };
 
 window.quoteFullMessage = async id => {
-  const s = await getDoc(doc(db, `${P}roomMessages`, id));
-  if (!s.exists()) return;
-  const m = s.data();
+  let m = window.__aslLiveMsgsByRoom?.get(currentRoomId)?.get(id)
+    || (window.__aslRestMsgsByRoom?.[currentRoomId] || []).find(x => x.id === id);
+  if (!m) {
+    const s = await getDoc(doc(db, `${P}roomMessages`, id));
+    if (!s.exists()) return;
+    m = s.data();
+  }
   document.querySelector(`[data-actions-for="${CSS.escape(id)}"]`)?.setAttribute('hidden','');
   replyTo = {
     id,
@@ -5431,6 +5697,11 @@ window.sendPublicFile = async e => {
       text: isVideo ? "🎬 فيديو" : isAudio ? "🎙️ صوت" : "🖼 صورة",
       nameFont: currentUser.nameFont || "font-cairo",
       nameColor: currentUser.nameColor || "color-text-white",
+      nameFrame: currentUser.nameFrame || "frame-none",
+      nameStaticBg: currentUser.nameStaticBg || "",
+      nameBackground: currentUser.nameBackground || "",
+      chatFont: currentUser.chatFont || "font-cairo",
+      chatColor: currentUser.chatColor || "msg-color-white",
       rankId: currentUser.rankId || 20,
       time: nowTime(), createdAt: serverTimestamp()
     };
@@ -5569,14 +5840,15 @@ const CONTEST_QUESTIONS = [
 
 let contestTimer = null;
 let contestStateData = null;
+let _contestPostingLock = false;
 
 function getDefaultContestBotProfile() {
   return {
     uid: CONTEST_BOT_UID,
     name: "بوت المسابقات",
     avatar: DEFAULT_BOT_AVATAR,
-    cover: DEFAULT_LION_BG,
-    profileBackground: DEFAULT_LION_BG,
+    cover: "",
+    profileBackground: "",
     avatarFrame: "av-frame-6",
     rankId: 15,
     nameFrame: "frame-gold",
@@ -5597,6 +5869,17 @@ function getDefaultContestBotProfile() {
   };
 }
 
+function getContestLeaderDelayMs() {
+  if (!currentUser?.uid) return 1500;
+  if (isPrimaryOwner(currentUser)) return 0;
+  const roomMembers = Array.from(presenceCache.values())
+    .filter(p => p && !p.isContestBot && p.uid && p.isOnline !== false && (p.roomId === currentRoomId || !p.roomId))
+    .map(p => String(p.uid))
+    .sort();
+  const idx = roomMembers.indexOf(String(currentUser.uid));
+  return idx <= 0 ? 150 : Math.min(2600, 700 + idx * 450);
+}
+
 async function ensureContestBotProfile() {
   const botRef = doc(db, `${P}siteSettings`, "contestBotProfile");
   let bot = window._contestBotProfile;
@@ -5608,19 +5891,26 @@ async function ensureContestBotProfile() {
   }
   if (!bot) {
     bot = getDefaultContestBotProfile();
-    await setDoc(botRef, bot, { merge: true }).catch(() => {});
-    await setDoc(doc(db, `${P}usersByName`, bot.name), bot, { merge: true }).catch(() => {});
+    setDoc(botRef, bot, { merge: true }).catch(() => {});
+    setDoc(doc(db, `${P}usersByName`, bot.name), bot, { merge: true }).catch(() => {});
   }
   window._contestBotProfile = bot;
   users.set(bot.name, bot);
-  // تسجيل البوت كمتصل داخل غرفة المسابقات ليظهر في المتواجدين ويمكن تعديل بروفايله
-  await setDoc(doc(db, `${P}presence`, CONTEST_BOT_UID), {
-    ...bot,
-    isOnline: true,
-    roomId: currentRoomId,
-    roomName: currentRoomName,
-    lastSeen: serverTimestamp()
-  }, { merge: true }).catch(() => {});
+  if (window._contestBotPresenceRoom !== currentRoomId) {
+    window._contestBotPresenceRoom = currentRoomId;
+    const botPresence = {
+      uid: CONTEST_BOT_UID, name: bot.name, avatar: bot.avatar || DEFAULT_BOT_AVATAR,
+      cover: "", profileBackground: "", avatarFrame: bot.avatarFrame || "av-frame-6",
+      rankId: bot.rankId || 15, nameFrame: bot.nameFrame || "frame-gold",
+      nameColor: bot.nameColor || "color-text-gold", nameStaticBg: bot.nameStaticBg || "bg-name-black",
+      nameBackground: bot.nameBackground || "", nameFont: bot.nameFont || "font-cairo",
+      chatFont: bot.chatFont || "font-cairo", chatColor: bot.chatColor || "msg-color-gold",
+      isContestBot: true, isOnline: true, roomId: currentRoomId, roomName: currentRoomName,
+      lastSeen: serverTimestamp()
+    };
+    presenceCache.set(CONTEST_BOT_UID, botPresence);
+    setDoc(doc(db, `${P}presence`, CONTEST_BOT_UID), botPresence, { merge: true }).catch(() => {});
+  }
   return bot;
 }
 
@@ -5629,70 +5919,106 @@ function stopContestBot() {
   clearTimeout(contestTimer);
   contestTimer = null;
   contestStateData = null;
+  window._contestBotPresenceRoom = null;
   $("contest-live-banner")?.classList.add("hidden");
   if (presenceCache.has(CONTEST_BOT_UID)) {
     setDoc(doc(db, `${P}presence`, CONTEST_BOT_UID), { isOnline: false }, { merge: true }).catch(() => {});
   }
 }
 
+const _contestObservedAt = new Map();
+const normContestText = s => String(s || "")
+  .trim()
+  .toLowerCase()
+  .replace(/[أإآ]/g, "ا")
+  .replace(/ة/g, "ه")
+  .replace(/ى/g, "ي")
+  .replace(/[ً-ٰٟ]/g, "");
+
 async function listenContestBot() {
   if (unsubContestState) { unsubContestState(); unsubContestState = null; }
   clearTimeout(contestTimer);
   if (!isContestRoom()) return;
 
-  await ensureContestBotProfile();
-
-  const stateRef = doc(db, `${P}rooms`, currentRoomId, "contest", "state");
-  unsubContestState = onSnapshot(stateRef, async snap => {
-    if (!isContestRoom()) { stopContestBot(); return; }
+  ensureContestBotProfile();
+  const roomForSub = currentRoomId;
+  const stateRef = doc(db, `${P}rooms`, roomForSub, "contest", "state");
+  unsubContestState = onSnapshot(stateRef, snap => {
+    if (!isContestRoom() || roomForSub !== currentRoomId) { stopContestBot(); return; }
+    const isFromCache = Boolean(snap.metadata?.fromCache);
     const data = snap.exists() ? snap.data() : null;
     const now = Date.now();
 
-    if (!data || !data.active || (now - (Number(data.askedAt) || 0) > 28000)) {
+    if (data && data.active) {
+      contestStateData = data;
+      const botName = window._contestBotProfile?.name || "بوت المسابقات";
+      const banner = $("contest-live-banner");
+      if (banner) {
+        banner.classList.remove("hidden");
+        banner.innerHTML = `🏆 <b>${safe(botName)} (${(Number(data.index) % CONTEST_QUESTIONS.length) + 1}/20):</b> ${safe(data.question)} <small style="display:block;margin-top:2px;color:#cbd5e1">أجب في الشات واربح 20 روبي و 20 ذهب و 20 نقطة!</small>`;
+      }
+    }
+
+    // لا نطلق سؤالاً جديداً من الكاش المحلي قبل وصول حالة السيرفر الفعلية
+    if (isFromCache) return;
+
+    clearTimeout(contestTimer);
+    if (!data || !data.active) {
       const nextIdx = data ? ((Number(data.index) || 0) + 1) % CONTEST_QUESTIONS.length : 0;
-      await postNewContestQuestion(nextIdx, data && data.active && !data.answered ? data : null);
+      contestTimer = setTimeout(() => {
+        if (!isContestRoom() || roomForSub !== currentRoomId) return;
+        postNewContestQuestion(nextIdx, null, roomForSub);
+      }, getContestLeaderDelayMs());
       return;
     }
 
-    contestStateData = data;
-    const botName = window._contestBotProfile?.name || "بوت المسابقات";
-    const banner = $("contest-live-banner");
-    if (banner) {
-      banner.classList.remove("hidden");
-      banner.innerHTML = `🏆 <b>${safe(botName)} (${(Number(data.index) % CONTEST_QUESTIONS.length) + 1}/20):</b> ${safe(data.question)} <small style="display:block;margin-top:2px;color:#cbd5e1">أجب في الشات واربح 20 روبي و 20 ذهب و 20 نقطة!</small>`;
-    }
+    const qKey = `${roomForSub}:${data.index}:${data.askedAt || 0}`;
+    if (!_contestObservedAt.has(qKey)) _contestObservedAt.set(qKey, now);
+    const observedMs = _contestObservedAt.get(qKey);
 
-    clearTimeout(contestTimer);
-    const remaining = Math.max(1200, 25000 - (now - Number(data.askedAt || now)));
-    contestTimer = setTimeout(async () => {
-      if (!isContestRoom()) return;
-      const freshSnap = await getDoc(stateRef);
-      const fresh = freshSnap.exists() ? freshSnap.data() : null;
-      if (fresh && fresh.active && !fresh.answered && fresh.askedAt === data.askedAt) {
-        const nextIdx = ((Number(fresh.index) || 0) + 1) % CONTEST_QUESTIONS.length;
-        await postNewContestQuestion(nextIdx, fresh);
-      }
-    }, remaining);
+    if (!data.answered) {
+      // سؤال متوقف منذ أكثر من 3 دقائق من آخر جلسة يُبدل سريعاً دون ضرب الساعات المتقاربة
+      const serverStale = (now - Number(data.askedAt || now)) > 180000;
+      const elapsedLocal = now - observedMs;
+      const waitMs = serverStale ? 400 : Math.max(1500, 25000 - elapsedLocal);
+      contestTimer = setTimeout(() => {
+        if (!isContestRoom() || roomForSub !== currentRoomId) return;
+        postNewContestQuestion(((Number(data.index) || 0) + 1) % CONTEST_QUESTIONS.length, data, roomForSub);
+      }, waitMs + getContestLeaderDelayMs());
+    } else {
+      // إذا أجاب عضو وتأخر إعلان السؤال التالي لأي سبب، يتولى القائد متابعة الجولة بسلاسة
+      const aKey = `${qKey}:ans`;
+      if (!_contestObservedAt.has(aKey)) _contestObservedAt.set(aKey, now);
+      const ansWait = Math.max(1800, 3200 - (now - _contestObservedAt.get(aKey))) + getContestLeaderDelayMs();
+      contestTimer = setTimeout(() => {
+        if (!isContestRoom() || roomForSub !== currentRoomId) return;
+        postNewContestQuestion(((Number(data.index) || 0) + 1) % CONTEST_QUESTIONS.length, null, roomForSub);
+      }, ansWait);
+    }
   }, err => {
     console.error("Contest bot error:", err);
   });
 }
 
-async function postNewContestQuestion(index, timedOutPrev = null) {
-  if (!isContestRoom()) return;
-  const bot = window._contestBotProfile || await ensureContestBotProfile();
-  const stateRef = doc(db, `${P}rooms`, currentRoomId, "contest", "state");
-  const idx = Number(index) % CONTEST_QUESTIONS.length;
-  const q = CONTEST_QUESTIONS[idx];
-  const askedAt = Date.now();
-
-  let wonLock = false;
+async function postNewContestQuestion(index, timedOutPrev = null, targetRoomId = currentRoomId) {
+  if (!isContestRoom() || targetRoomId !== currentRoomId || _contestPostingLock) return;
+  _contestPostingLock = true;
   try {
+    const bot = window._contestBotProfile || getDefaultContestBotProfile();
+    const stateRef = doc(db, `${P}rooms`, targetRoomId, "contest", "state");
+    const idx = Number(index) % CONTEST_QUESTIONS.length;
+    const q = CONTEST_QUESTIONS[idx];
+    const askedAt = Date.now();
+
+    let wonLock = false;
     await runTransaction(db, async tx => {
       const s = await tx.get(stateRef);
       const cur = s.exists() ? s.data() : null;
-      if (cur && cur.active && !cur.answered && (Date.now() - Number(cur.askedAt || 0) < 23000)) {
-        return;
+      if (timedOutPrev) {
+        if (!cur || !cur.active || cur.answered) return;
+        if (Number(cur.index) !== Number(timedOutPrev.index) || Number(cur.askedAt || 0) !== Number(timedOutPrev.askedAt || 0)) return;
+      } else {
+        if (cur && cur.active && !cur.answered) return;
       }
       tx.set(stateRef, {
         index: idx,
@@ -5704,50 +6030,53 @@ async function postNewContestQuestion(index, timedOutPrev = null) {
         askedBy: bot.name
       });
       wonLock = true;
-    });
-  } catch (e) { console.warn("Contest tx failed", e); }
+    }).catch(e => { console.warn("Contest tx failed", e); });
 
-  if (!wonLock) return;
+    if (!wonLock || targetRoomId !== currentRoomId) return;
 
-  const botMsgBase = {
-    roomId: currentRoomId,
-    isSystem: false,
-    sender: bot.name,
-    senderUid: CONTEST_BOT_UID,
-    avatar: bot.avatar || DEFAULT_BOT_AVATAR,
-    avatarFrame: bot.avatarFrame || "av-frame-6",
-    nameFont: bot.nameFont || "font-cairo",
-    nameColor: bot.nameColor || "color-text-gold",
-    nameStaticBg: bot.nameStaticBg || "bg-name-black",
-    nameBackground: bot.nameBackground || "",
-    nameFrame: bot.nameFrame || "frame-gold",
-    chatFont: bot.chatFont || "font-cairo",
-    chatColor: bot.chatColor || "msg-color-gold",
-    rankId: bot.rankId || 15,
-    time: nowTime(),
-    createdAt: serverTimestamp()
-  };
+    const botMsgBase = {
+      roomId: targetRoomId,
+      isSystem: false,
+      sender: bot.name,
+      senderUid: CONTEST_BOT_UID,
+      avatar: String(bot.avatar || "").length > 10000 ? DEFAULT_BOT_AVATAR : (bot.avatar || DEFAULT_BOT_AVATAR),
+      avatarFrame: bot.avatarFrame || "av-frame-6",
+      nameFont: bot.nameFont || "font-cairo",
+      nameColor: bot.nameColor || "color-text-gold",
+      nameStaticBg: bot.nameStaticBg || "bg-name-black",
+      nameBackground: bot.nameBackground || "",
+      nameFrame: bot.nameFrame || "frame-gold",
+      chatFont: bot.chatFont || "font-cairo",
+      chatColor: bot.chatColor || "msg-color-gold",
+      rankId: bot.rankId || 15,
+      time: nowTime(),
+      createdAt: serverTimestamp()
+    };
 
-  if (timedOutPrev && timedOutPrev.answers?.length) {
+    if (timedOutPrev && timedOutPrev.answers?.length) {
+      await addDoc(collection(db, `${P}roomMessages`), {
+        ...botMsgBase,
+        text: `⏳ انتهى الوقت! الإجابة الصحيحة كانت: [${timedOutPrev.answers[0]}].`
+      }).catch(() => {});
+    }
+
     await addDoc(collection(db, `${P}roomMessages`), {
       ...botMsgBase,
-      text: `⏳ انتهى الوقت! الإجابة الصحيحة كانت: [${timedOutPrev.answers[0]}].`
+      text: `🏆 سؤال المسابقة (${idx + 1}/20): ${q.q} — أجب واربح 20 روبي و 20 ذهب و 20 نقطة!`
     }).catch(() => {});
+  } finally {
+    _contestPostingLock = false;
   }
-
-  await addDoc(collection(db, `${P}roomMessages`), {
-    ...botMsgBase,
-    text: `🏆 سؤال المسابقة (${idx + 1}/20): ${q.q} — أجب واربح 20 روبي و 20 ذهب و 20 نقطة!`
-  }).catch(() => {});
 }
 
 async function checkContestAnswer(text, sender) {
   if (!isContestRoom() || !contestStateData || contestStateData.answered) return;
   const q = CONTEST_QUESTIONS[Number(contestStateData.index) % CONTEST_QUESTIONS.length];
-  const clean = text.trim().toLowerCase();
+  const clean = normContestText(text);
 
-  if (q.a.some(ans => clean.includes(ans.toLowerCase()))) {
-    const stateRef = doc(db, `${P}rooms`, currentRoomId, "contest", "state");
+  if (q.a.some(ans => clean.includes(normContestText(ans)))) {
+    const roomAtWin = currentRoomId;
+    const stateRef = doc(db, `${P}rooms`, roomAtWin, "contest", "state");
     let claimed = false;
     try {
       await runTransaction(db, async tx => {
@@ -5759,32 +6088,31 @@ async function checkContestAnswer(text, sender) {
     } catch {}
     if (!claimed) return;
 
+    contestStateData.answered = true;
     clearTimeout(contestTimer);
     const botName = window._contestBotProfile?.name || "بوت المسابقات";
-    await addDoc(collection(db, `${P}roomMessages`), {
-      roomId: currentRoomId, isSystem: true, isContestWinner: true, sender: botName,
+    addDoc(collection(db, `${P}roomMessages`), {
+      roomId: roomAtWin, isSystem: true, isContestWinner: true, sender: botName,
       text: `🎉 أحسنت يا [${sender}]! رد [${botName}]: إجابتك [${q.a[0]}] صحيحة، تم منحك 20 روبي و 20 ذهب و 20 نقطة! 🎁`,
       createdAt: serverTimestamp()
-    });
+    }).catch(() => {});
 
-    try {
-      const snap = await getDoc(doc(db, `${P}usersByName`, sender));
-      if (snap.exists()) {
-        const uData = snap.data();
-        const p = (Number(uData.points) || 0) + 20;
-        const g = (Number(uData.gold) || 0) + 20;
-        const r = (Number(uData.rubies) || 0) + 20;
-        await setDoc(doc(db, `${P}usersByName`, sender), { points: p, gold: g, rubies: r }, { merge: true });
-        if (currentUser && currentUser.name === sender) {
-          currentUser.points = p; currentUser.gold = g; currentUser.rubies = r;
-          localStorage.setItem(sessionKey, JSON.stringify(currentUser));
-        }
+    getDoc(doc(db, `${P}usersByName`, sender)).then(snap => {
+      if (!snap.exists()) return;
+      const uData = snap.data();
+      const p = (Number(uData.points) || 0) + 20;
+      const g = (Number(uData.gold) || 0) + 20;
+      const r = (Number(uData.rubies) || 0) + 20;
+      setDoc(doc(db, `${P}usersByName`, sender), { points: p, gold: g, rubies: r }, { merge: true }).catch(() => {});
+      if (currentUser && currentUser.name === sender) {
+        currentUser.points = p; currentUser.gold = g; currentUser.rubies = r;
+        try { localStorage.setItem(sessionKey, JSON.stringify(currentUser)); } catch {}
       }
-    } catch {}
+    }).catch(() => {});
 
     const nextIdx = (Number(contestStateData.index) + 1) % CONTEST_QUESTIONS.length;
     setTimeout(() => {
-      if (isContestRoom()) postNewContestQuestion(nextIdx, null);
+      if (isContestRoom() && currentRoomId === roomAtWin) postNewContestQuestion(nextIdx, null, roomAtWin);
     }, 2000);
   }
 }
@@ -6351,6 +6679,12 @@ function listenRooms() {
     window._roomsCache = list;
     renderRoomsFromPresence();
     $("owner-room-create-box")?.classList.toggle("hidden", !isAnyOwner(currentUser));
+    if (!window._aslRoomsPrewarmed) {
+      window._aslRoomsPrewarmed = true;
+      list.filter(r => r.id !== currentRoomId).slice(0, 5).forEach((r, idx) => {
+        setTimeout(() => window.__aslPrewarmRoom?.(r.id), 400 + idx * 220);
+      });
+    }
   });
 }
 
@@ -6402,9 +6736,14 @@ window.selectRoom = async (name, id = "main") => {
   }
 
   const areaEl = $("chat-area");
-  if (areaEl) areaEl.innerHTML = "";
+  const hasQuickMsgs = getMergedMsgsForRoom(id).length > 0 || Boolean(window.__aslLsJson?.("asatir_cache_messages_" + id)?.length);
+  if (areaEl && !hasQuickMsgs) areaEl.innerHTML = "";
+  else if (areaEl) areaEl.querySelectorAll(".msg-item,.system-msg-item,.contest-winner-msg").forEach(el => el.setAttribute("data-preview", "1"));
+
+  window.__aslPrefetched.roomId = id;
   hydrateRoomFromFastCache(id);
-  window.__aslTriggerPrefetch?.(id);
+  window.__aslFetchRoomSettingsRest?.(id, true);
+  window.__aslFetchRoomMessagesRest?.(id, true);
 
   listenRoomSettings();
   listenMics();
@@ -6425,9 +6764,19 @@ function listenRoomSettings() {
     if (roomForSub !== currentRoomId) return;
     window.__aslLiveRoomId = roomForSub;
     const d = snap.data() || {};
+    const clearedMs = d.messagesClearedAt?.toMillis ? d.messagesClearedAt.toMillis() : (d.messagesClearedAt?.seconds ? d.messagesClearedAt.seconds * 1000 : Number(d.messagesClearedAtClient || 0));
+    if (clearedMs > Number(window.__aslClearedAtByRoom?.[roomForSub] || 0)) {
+      window.__aslClearedAtByRoom[roomForSub] = clearedMs;
+      if (roomForSub === currentRoomId) {
+        const afterClear = getMergedMsgsForRoom(roomForSub);
+        renderMessagesList(afterClear, false);
+        cacheMessagesSoon(roomForSub, afterClear);
+      }
+    }
     try {
       localStorage.setItem("asatir_cache_roomSettings_" + roomForSub, JSON.stringify({
-        bgUrl: d.bgUrl || "", bgDim: d.bgDim ?? 25, micsCount: d.micsCount ?? 6, contestBotEnabled: d.contestBotEnabled
+        bgUrl: d.bgUrl || "", bgDim: d.bgDim ?? 25, micsCount: d.micsCount ?? 6,
+        contestBotEnabled: d.contestBotEnabled, messagesClearedAtMs: clearedMs
       }));
     } catch {}
     const bg = $("room-bg-canvas");
@@ -6570,14 +6919,65 @@ window.saveRoomIcon = async () => {
 window.clearAllRoomMessages = async () => {
   if (!canManageRoomSettings()) return;
   if (!confirm(`تنظيف جميع رسائل ${currentRoomName} للجميع؟`)) return;
+  const rId = currentRoomId;
+  const clearedAtMs = Date.now() - 250;
+
+  // 1) مسح فوري 0ms في الشاشة والذاكرة والتخزين المحلي لكل رسالة حالية
+  const curIds = new Set();
+  (window.__aslRestMsgsByRoom?.[rId] || []).forEach(m => m?.id && curIds.add(m.id));
+  window.__aslLiveMsgsByRoom?.get(rId)?.forEach((_, id) => curIds.add(id));
+  window.__aslClearedIdsByRoom[rId] = curIds;
+  window.__aslClearedAtByRoom[rId] = Math.max(Number(window.__aslClearedAtByRoom[rId] || 0), clearedAtMs);
+  if (window.__aslRestMsgsByRoom) window.__aslRestMsgsByRoom[rId] = [];
+  window.__aslLiveMsgsByRoom?.set(rId, new Map());
+  try { localStorage.removeItem("asatir_cache_messages_" + rId); } catch {}
   try {
-    const snap = await getDocs(query(collection(db, `${P}roomMessages`), where("roomId", "==", currentRoomId), limit(500)));
-    const batch = writeBatch(db);
-    snap.forEach(d => batch.delete(d.ref));
-    await batch.commit();
-    $("chat-area").innerHTML = "";
-    toast("🧹 تم تنظيف جميع رسائل الروم فوراً");
-  } catch (e) { alert("تعذر التنظيف: " + e.message); }
+    const rs = window.__aslLsJson?.("asatir_cache_roomSettings_" + rId) || {};
+    rs.messagesClearedAtMs = window.__aslClearedAtByRoom[rId];
+    localStorage.setItem("asatir_cache_roomSettings_" + rId, JSON.stringify(rs));
+  } catch {}
+  if ($("chat-area")) $("chat-area").innerHTML = "";
+  closeModal("chat-settings-modal");
+  closeModal("owner-chat-settings-modal");
+  toast("🧹 تم تنظيف جميع رسائل الروم فوراً للجميع");
+
+  try {
+    // 2) تثبيت طابع التنظيف على السيرفر حتى لا تظهر الرسائل القديمة عند التحديث أبداً لأي عضو
+    setDoc(doc(db, `${P}roomSettings`, rId), { messagesClearedAt: serverTimestamp(), messagesClearedAtClient: clearedAtMs }, { merge: true }).catch(() => {});
+
+    // 3) حذف فعلي لجميع رسائل الغرفة على السيرفر (بما فيها الرسائل غير المخبأة محلياً)
+    let serverIds = [];
+    try {
+      const res = await fetch("https://firestore.googleapis.com/v1/projects/hassouni-chat-51234/databases/(default)/documents:runQuery", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          structuredQuery: {
+            from: [{ collectionId: "asatir_roomMessages" }],
+            where: { fieldFilter: { field: { fieldPath: "roomId" }, op: "EQUAL", value: { stringValue: rId } } },
+            select: { fields: [{ fieldPath: "roomId" }] }
+          }
+        })
+      });
+      if (res.ok) {
+        const arr = await res.json();
+        serverIds = arr.map(x => x?.document?.name?.split("/").pop()).filter(Boolean);
+      }
+    } catch {}
+
+    if (!serverIds.length) {
+      const snap = await getDocs(query(collection(db, `${P}roomMessages`), where("roomId", "==", rId), limit(500)));
+      serverIds = snap.docs.map(d => d.id);
+    }
+
+    for (let i = 0; i < serverIds.length; i += 400) {
+      const batch = writeBatch(db);
+      serverIds.slice(i, i + 400).forEach(id => batch.delete(doc(db, `${P}roomMessages`, id)));
+      await batch.commit();
+    }
+  } catch (e) {
+    console.warn("Clear room cleanup warning:", e);
+  }
 };
 
 window.selectChatTheme = col => {
@@ -6886,7 +7286,7 @@ window.sendDrawingToPublic = async () => {
       roomId: currentRoomId, sender: currentUser.name, senderUid: currentUser.uid,
       avatar: currentUser.avatar || avatarFor(currentUser.name),
       avatarFrame: currentUser.avatarFrame || "",
-      text: "🎨 رسم جديد", imageUrl: dataUrl, nameFont: currentUser.nameFont || "font-cairo", nameColor: currentUser.nameColor || "color-text-white", nameFrame: currentUser.nameFrame || "frame-none", nameStaticBg: currentUser.nameStaticBg || "", nameBackground: currentUser.nameBackground || "", rankId: currentUser.rankId || 20, time: nowTime(), createdAt: serverTimestamp()
+      text: "🎨 رسم جديد", imageUrl: dataUrl, nameFont: currentUser.nameFont || "font-cairo", nameColor: currentUser.nameColor || "color-text-white", nameFrame: currentUser.nameFrame || "frame-none", nameStaticBg: currentUser.nameStaticBg || "", nameBackground: currentUser.nameBackground || "", chatFont: currentUser.chatFont || "font-cairo", chatColor: currentUser.chatColor || "msg-color-white", rankId: currentUser.rankId || 20, time: nowTime(), createdAt: serverTimestamp()
     });
     closeModal("drawing-modal");
     toast("✅ تم إرسال الرسم فوراً للعام");
@@ -7644,7 +8044,7 @@ boot();
 .king-cheetah-guard{filter:sepia(1) saturate(8) hue-rotate(350deg) brightness(1.22) drop-shadow(0 0 3px #ffe08a) drop-shadow(0 0 7px #d49a18)!important}
 /* شريط الأغنية أسفل الميكات، والسهم يبقى وحده عند الطي */
 .music-sync-panel{top:108px!important;z-index:8990!important}
-.music-sync-panel.is-collapsed{width:36px!important;right:auto!important;left:8px!important}
+.music-sync-panel.is-collapsed{width:36px!important;left:auto!important;right:8px!important}
 .music-sync-panel.is-collapsed>*:not(#music-local-toggle){display:none!important}
 .music-sync-panel.is-collapsed #music-local-toggle{display:flex!important}
 .chat-area.music-panel-visible{padding-top:154px!important}
@@ -7658,6 +8058,7 @@ boot();
 <style id="asl-performance-and-layout-fixes">
 /* تخفيف الحمل البصري على الهواتف */
 .msg-item,.online-item,.room-card-v11,.plus-grid-tile,.modal-card{transition:none!important}
+button,.mic-slot,.mic-slot-wrapper,.bottom-tab,.top-btn,.bar-btn,.nav-btn,.top-icon-btn,.plus-grid-tile,.online-item,.room-card-v11,.menu-item,.avatar-wrap,[onclick]{touch-action:manipulation!important;-webkit-tap-highlight-color:transparent}
 .owner-rank-icon,.king-rank-icon,.prince-rank-icon,.owner-wolf-guard,.prince-cheetah-guard,
 .avatar-wrap[class*="av-frame-"]::after,.animated-emoji-grid button span{animation:none!important}
 #room-bg-canvas{filter:none!important;transform:none!important;will-change:auto!important}
@@ -7671,6 +8072,57 @@ boot();
 #games-menu-modal .modal-card,#plus-menu-modal .modal-card{width:min(48vw,180px)!important;min-width:158px!important;padding:0!important}
 #games-menu-modal .plus-grid-compact{gap:3px!important;padding:5px!important}
 #games-menu-modal .plus-grid-tile{min-height:43px!important}
+
+/* ===== تحسينات: الغرف أصغر + ثبات الاسم فوق الصورة + صورة أصغر فوق شريط الكتابة + الخاص نصف شاشة ===== */
+#rooms-modal .modal-card{
+  width:min(68vw,272px)!important;min-width:205px!important;max-height:58vh!important;
+}
+#rooms-modal .modal-title{padding:7px 10px!important;font-size:.78rem!important}
+#rooms-container{padding:5px 6px!important}
+#rooms-modal .room-card-v11{
+  grid-template-columns:38px 1fr!important;gap:7px!important;
+  padding:5px 7px!important;margin:4px 0!important;min-height:48px!important;border-radius:9px!important;
+}
+#rooms-modal .room-card-v11 .room-thumb{width:36px!important;height:36px!important;border-radius:7px!important}
+#rooms-modal .room-card-v11 .room-title{font-size:.76rem!important;line-height:1.2!important}
+#rooms-modal .room-card-v11 .room-desc{font-size:.6rem!important;margin-top:1px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#rooms-modal .room-card-v11 .room-meta{font-size:.58rem!important;margin-top:2px!important}
+
+/* ثبات الاسم في سطره الأصلي فوق الصورة وعدم نزول الصورة تحت شريط الكتابة */
+.chat-area{bottom:98px!important;padding-bottom:16px!important}
+.msg-item .msg-content{display:flex!important;flex-direction:column!important;align-items:stretch!important}
+.msg-item .msg-content>.user-header{order:1!important;width:100%!important}
+.msg-item .msg-content>.quote-preview{order:2!important}
+.msg-item .msg-content>.msg-media-box,
+.msg-item .msg-content>.video-message-media,
+.msg-item .msg-content>div:has(>.msg-drawing-thumb){
+  order:3!important;align-self:flex-start!important;margin-top:4px!important;display:block!important;
+}
+.msg-item .msg-content>.message-reaction-line{order:4!important}
+.msg-drawing-thumb{
+  max-width:min(88px,27vw)!important;max-height:66px!important;
+  width:auto!important;height:auto!important;object-fit:cover!important;
+  border-radius:8px!important;margin:2px 0 0!important;cursor:zoom-in!important;
+}
+
+/* المحادثة الخاصة بنصف الشاشة السفلي مع إبقاء الشات العام ظاهراً بالأعلى */
+#private-chat-modal{
+  background:rgba(0,0,0,.16)!important;
+  align-items:flex-end!important;justify-content:center!important;
+  padding:0 6px 54px!important;
+}
+#private-chat-modal #private-card-container{
+  height:46dvh!important;max-height:46dvh!important;min-height:245px!important;
+  width:min(98vw,440px)!important;margin:0!important;
+  display:flex!important;flex-direction:column!important;overflow:hidden!important;
+  border-radius:16px 16px 12px 12px!important;
+  box-shadow:0 -8px 28px rgba(0,0,0,.78)!important;
+}
+#private-chat-modal #private-card-container .close-modal{top:5px!important;left:6px!important;width:25px!important;height:25px!important;font-size:1rem!important}
+#private-chat-modal #private-messages-box{padding:8px!important;gap:5px!important;flex:1 1 0!important;min-height:0!important}
+#private-chat-modal #private-card-container .input-bar{
+  position:static!important;width:calc(100% - 10px)!important;margin:4px auto 6px!important;flex:none!important;
+}
 </style>
 <script id="asl-fast-panel-switch-fixes">
 /* فتح لوحة المتواجدين أو الغرف يغلق اللوحة الأخرى مباشرة */
