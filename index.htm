@@ -1174,7 +1174,13 @@ html,body{background:#07070a!important;color:#fff}
 
 <div id="toast"></div>
 <button id="audio-unlock-banner" onclick="retryRemoteAudio()" aria-label="تفعيل صوت المايكات">🔊 اضغط هنا لسماع صوت المايك</button>
-<button id="direct-call-end" onclick="endDirectCall()" style="position:fixed;right:12px;top:145px;z-index:99999;display:none;border:1px solid #f4c35c;background:#5b1010;color:#fff;border-radius:22px;padding:8px 12px" aria-label="إنهاء المكالمة">إنهاء المكالمة</button>
+<div id="direct-call-bar" class="direct-call-bar hidden" role="region" aria-label="أدوات المكالمة الصوتية">
+  <span id="direct-call-peer" class="direct-call-peer">📞 مكالمة</span>
+  <button id="direct-call-mute-btn" type="button" onclick="toggleDirectCallMute()" class="dc-btn dc-mute"><i class="fa-solid fa-microphone"></i> <span>كتم المايك</span></button>
+  <button id="direct-call-boost-btn" type="button" onclick="toggleDirectCallBoost()" class="dc-btn dc-boost"><i class="fa-solid fa-volume-high"></i> <span>رفع الصوت</span></button>
+  <button id="direct-call-end" type="button" onclick="endDirectCall()" class="dc-btn dc-end" aria-label="إنهاء المكالمة"><i class="fa-solid fa-phone-slash"></i> <span>إنهاء</span></button>
+</div>
+<div id="wall-live-notify" class="wall-live-notify hidden" onclick="openFeature('حائط النشر')"></div>
 <div id="room-bg-canvas"></div>
 
 <!-- بطاقة ترحيب الروم المنبثقة (مخفية افتراضياً ولا تظهر لصاحب الشات) -->
@@ -1253,7 +1259,7 @@ html,body{background:#07070a!important;color:#fff}
   <div id="top-private-nav" class="nav-item-top" onclick="openPrivateInbox()"><i class="fa-solid fa-envelope"></i><span id="privateBadgeDot" class="badge hidden">0</span>الرسائل</div>
   <div class="nav-item-top col-gold" onclick="openFeature('قائمة الأثرياء')"><i class="fa-solid fa-crown"></i>الأثرياء</div>
   <div class="nav-item-top col-gold" onclick="openDiamondDisplayList()"><i class="fa-solid fa-gem"></i>الكبار</div>
-  <div class="nav-item-top" onclick="openModal('options-menu-modal')"><i class="fa-solid fa-bars"></i>القائمة</div>
+  <div class="nav-item-top" onclick="openModal('options-menu-modal')"><i class="fa-solid fa-bars"></i><span id="menuWallBadge" class="badge hidden">منشور</span>القائمة</div>
 </div>
 
 <!-- تم حذف شريط اسم الغرفة؛ المايكات أصبحت مباشرة أسفل الشريط العلوي -->
@@ -1474,23 +1480,6 @@ html,body{background:#07070a!important;color:#fff}
       <button class="btn-submit" style="background:#071224;border:1px solid #1e3557;font-size:.68rem;padding:8px 2px" onclick="sendInteraction('gift')"><i class="fa-solid fa-gift"></i> هدية</button>
       <button id="prof-friend-btn" class="btn-submit" style="background:#10b981;border:1px solid #059669;font-size:.68rem;padding:8px 2px" onclick="sendFriendRequest()"><i class="fa-solid fa-user-plus"></i> صداقة</button>
     </div>
-    <div id="owner-gift-rank-box" class="owner-box hidden" style="margin:10px;padding:10px;border-radius:10px;background:#1a1303;border:1px solid #d4a017">
-      <b style="font-size:.8rem;color:#ffd54a">لوحة إدارة العضو</b>
-      <label style="font-size:.7rem;color:#cbd5e1;display:block;margin-top:5px">الرتبة المسموح بإهدائها أو سحبها:</label>
-      <select id="owner-rank-select" class="edit-select"></select>
-      <button class="btn-submit" style="background:#d97706" onclick="giveRankToUser()">تطبيق الرتبة وإعلانها</button>
-      <div style="display:flex;gap:4px;margin-top:6px">
-        <input id="owner-gift-gold" type="number" placeholder="ذهب" style="width:33%;padding:5px;background:#071224;border:1px solid #d4a017;color:#fff;border-radius:6px;font-size:.75rem">
-        <input id="owner-gift-points" type="number" placeholder="نقاط" style="width:33%;padding:5px;background:#071224;border:1px solid #d4a017;color:#fff;border-radius:6px;font-size:.75rem">
-        <input id="owner-gift-rubies" type="number" placeholder="روبي" style="width:33%;padding:5px;background:#071224;border:1px solid #d4a017;color:#fff;border-radius:6px;font-size:.75rem">
-      </div>
-      <button class="btn-submit" style="background:#10b981;font-size:.75rem" onclick="ownerGiftResources()">🎁 إهداء الرصيد</button>
-      <div id="owner-mod-actions-wrap" style="display:flex;gap:5px;margin-top:6px">
-        <button class="btn-submit" style="background:#2563eb;font-size:.7rem" onclick="ownerAction('mute')">كتم</button>
-        <button class="btn-submit" style="background:#f97316;font-size:.7rem" onclick="ownerAction('kick')">طرد</button>
-        <button id="owner-ban-btn" class="btn-submit" style="background:#dc2626;font-size:.7rem" onclick="ownerAction('ban')">حظر</button>
-      </div>
-    </div>
     <div id="profile-info-list" class="profile-info-list" style="padding:10px 14px;font-size:.78rem">
       <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed #334a6d"><span>العمر</span><strong id="prof-age"></strong></div>
       <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed #334a6d"><span>الجنس</span><strong id="prof-gender"></strong></div>
@@ -1611,7 +1600,31 @@ html,body{background:#07070a!important;color:#fff}
         <label style="display:block;background:#1e3557;padding:8px;border-radius:7px;text-align:center;font-size:.7rem;margin-bottom:6px">🌌 خلفية البروفايل<input type="file" accept="image/*" style="display:none" onchange="uploadProfileBackground(event)"></label>
       </div>
       <button class="btn-submit" onclick="saveProfileChanges()">حفظ التعديلات فوراً</button>
-      <button id="owner-delete-account-btn" class="btn-submit hidden" style="background:#7f1d1d" onclick="deleteAccountAsOwner()">🗑️ حذف الحساب نهائياً</button>
+    </div>
+
+    <!-- زر الإجراءات الصغير أسفل البروفايل يفتح لوحة إدارة العضو كاملة عند الضغط -->
+    <div id="prof-admin-actions-bar" class="hidden" style="text-align:center;padding:2px 10px 10px">
+      <button id="prof-admin-actions-toggle-btn" type="button" class="prof-actions-mini-btn" onclick="toggleProfileAdminActions()">
+        <i class="fa-solid fa-sliders"></i> <span>الإجراءات ▾</span>
+      </button>
+    </div>
+    <div id="owner-gift-rank-box" class="owner-box hidden" style="margin:0 10px 12px;padding:10px;border-radius:10px;background:#1a1303;border:1px solid #d4a017">
+      <b style="font-size:.8rem;color:#ffd54a">لوحة إدارة العضو</b>
+      <label style="font-size:.7rem;color:#cbd5e1;display:block;margin-top:5px">الرتبة المسموح بإهدائها أو سحبها:</label>
+      <select id="owner-rank-select" class="edit-select"></select>
+      <button class="btn-submit" style="background:#d97706" onclick="giveRankToUser()">تطبيق الرتبة وإعلانها</button>
+      <div style="display:flex;gap:4px;margin-top:6px">
+        <input id="owner-gift-gold" type="number" placeholder="ذهب" style="width:33%;padding:5px;background:#071224;border:1px solid #d4a017;color:#fff;border-radius:6px;font-size:.75rem">
+        <input id="owner-gift-points" type="number" placeholder="نقاط" style="width:33%;padding:5px;background:#071224;border:1px solid #d4a017;color:#fff;border-radius:6px;font-size:.75rem">
+        <input id="owner-gift-rubies" type="number" placeholder="روبي" style="width:33%;padding:5px;background:#071224;border:1px solid #d4a017;color:#fff;border-radius:6px;font-size:.75rem">
+      </div>
+      <button class="btn-submit" style="background:#10b981;font-size:.75rem" onclick="ownerGiftResources()">🎁 إهداء الرصيد</button>
+      <div id="owner-mod-actions-wrap" style="display:flex;gap:5px;margin-top:6px">
+        <button class="btn-submit" style="background:#2563eb;font-size:.7rem" onclick="ownerAction('mute')">كتم</button>
+        <button class="btn-submit" style="background:#f97316;font-size:.7rem" onclick="ownerAction('kick')">طرد</button>
+        <button id="owner-ban-btn" class="btn-submit" style="background:#dc2626;font-size:.7rem" onclick="ownerAction('ban')">حظر</button>
+      </div>
+      <button id="owner-delete-account-btn" class="btn-submit hidden" style="background:#7f1d1d;margin-top:6px;font-size:.72rem" onclick="deleteAccountAsOwner()">🗑️ حذف الحساب نهائياً</button>
     </div>
   </div>
 </div>
@@ -1661,7 +1674,7 @@ html,body{background:#07070a!important;color:#fff}
       <div class="menu-item" onclick="location.reload()"><i class="fa-solid fa-rotate"></i>تحديث البيانات</div>
       <div class="menu-item" onclick="openModal('rooms-modal');closeModal('options-menu-modal')"><i class="fa-solid fa-door-open"></i>قائمة الرومات</div>
       <div class="menu-item" onclick="openFeature('حائط الأصدقاء')"><i class="fa-solid fa-user-group"></i>حائط الأصدقاء</div>
-      <div class="menu-item" onclick="openFeature('حائط النشر')"><i class="fa-solid fa-bullhorn"></i>حائط النشر</div>
+      <div id="menu-wall-post-row" class="menu-item" style="display:flex;align-items:center;justify-content:space-between;gap:6px" onclick="openFeature('حائط النشر')"><span><i class="fa-solid fa-bullhorn"></i>حائط النشر</span><span id="wall-menu-badge" class="wall-new-pill hidden">منشور جديد 🔔</span></div>
       <div class="menu-item" onclick="openFeature('تفاعل الاعضاء')"><i class="fa-solid fa-heart"></i>تفاعل الاعضاء (بريمو وما تحت)</div>
       <div class="menu-item" onclick="openFeature('تفاعل الادارة')"><i class="fa-solid fa-user-shield"></i>تفاعل الادارة</div>
       <div class="menu-item" onclick="openFeature('تفاعل الرومات')"><i class="fa-solid fa-door-open"></i>تفاعل الرومات</div>
@@ -1767,7 +1780,7 @@ html,body{background:#07070a!important;color:#fff}
 <!-- المحفظة والغرف والمتجر والرسم -->
 <div id="wallet-modal" class="modal-overlay hidden"><div class="modal-card" style="max-width:400px;text-align:center;padding:16px"><span class="close-modal" onclick="closeModal('wallet-modal')">&times;</span><div class="modal-title">💰 المحفظة ورصيد الحساب</div><div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:15px 0"><div style="background:#071224;border:1px solid #1e3557;padding:12px;border-radius:10px">⭐ النقاط: <b id="wallet-points" style="color:#38bdf8">0</b></div><div style="background:#071224;border:1px solid #1e3557;padding:12px;border-radius:10px">🪙 الذهب: <b id="wallet-gold" style="color:#ffd700">0</b></div><div style="background:#071224;border:1px solid #1e3557;padding:12px;border-radius:10px">💎 الروبي: <b id="wallet-rubies" style="color:#ef4444">0</b></div><div style="background:#071224;border:1px solid #1e3557;padding:12px;border-radius:10px">🎁 الهدايا: <b id="wallet-gifts" style="color:#ec4899">0</b></div></div><div style="font-size:.78rem;color:#cbd5e1">المستوى: <b id="wallet-level">1</b> | الرسائل: <b id="wallet-msg-count">0</b></div></div></div>
 <div id="treasure-modal" class="modal-overlay hidden" onclick="if(event.target===this)closeModal('treasure-modal')"><div class="modal-card" style="max-width:360px;text-align:center;padding:14px"><span class="close-modal" onclick="closeModal('treasure-modal')">&times;</span><div class="modal-title">👑 صندوق الكنز والمكافآت</div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:10px 0"><div style="background:#071224;border:1px solid var(--chat-accent);padding:8px 4px;border-radius:9px;font-size:.72rem">🪙 ذهب<div style="color:#ffd700;font-weight:900;margin-top:2px" id="tr-gold">0</div></div><div style="background:#071224;border:1px solid var(--chat-accent);padding:8px 4px;border-radius:9px;font-size:.72rem">⭐ نقاط<div style="color:#38bdf8;font-weight:900;margin-top:2px" id="tr-points">0</div></div><div style="background:#071224;border:1px solid var(--chat-accent);padding:8px 4px;border-radius:9px;font-size:.72rem">💎 روبي<div style="color:#ef4444;font-weight:900;margin-top:2px" id="tr-rubies">0</div></div></div><div style="display:flex;flex-direction:column;gap:7px"><button class="btn-submit" onclick="closeModal('treasure-modal');openDailyRewards()">🎁 استلام كنز اليوم (100 ذهب + 50 نقطة)</button><button class="btn-submit" onclick="closeModal('treasure-modal');openWheelFromPlus()">🎡 تدوير عجلة الحظ</button><button class="btn-submit" onclick="closeModal('treasure-modal');openMiniGame('cyber')">⚡ تحدي الليزر والنيازك</button><button class="btn-guest-direct" style="margin-top:0" onclick="closeModal('treasure-modal');openWallet()">💰 عرض المحفظة الكاملة</button></div></div></div>
-<div id="rooms-modal" class="modal-overlay hidden"><div class="modal-card"><span class="close-modal" onclick="closeModal('rooms-modal')">&times;</span><div class="modal-title">الغرف</div><div id="owner-room-create-box" class="login-body hidden" style="padding:8px"><button class="btn-submit" style="background:#10b981" onclick="createRoomPrompt()">➕ إنشاء روم جديد — لصاحب الشات</button></div><div id="rooms-container" class="rooms-list" style="padding:8px"></div></div></div>
+<div id="rooms-modal" class="modal-overlay hidden" onclick="if(event.target===this)closeModal('rooms-modal')"><div class="modal-card"><span class="close-modal" onclick="closeModal('rooms-modal')">&times;</span><div class="modal-title">الغرف</div><div id="rooms-container" class="rooms-list" style="padding:8px"></div><div id="owner-room-create-box" class="login-body hidden" style="padding:6px 8px"><button class="btn-submit room-create-mini-btn" onclick="createRoomPrompt()">➕ إنشاء روم جديد</button></div></div></div>
 <div id="store-modal" class="modal-overlay hidden"><div class="modal-card"><span class="close-modal" onclick="closeModal('store-modal')">&times;</span><div class="modal-title">🛍️ متجر شات أصل العرب</div><div class="store-cats"><button id="store-cat-ranks" class="store-cat active" onclick="showStoreCategory('ranks')">🏆 رتب</button><button id="store-cat-names" class="store-cat" onclick="showStoreCategory('names')">🔥 خلفية اسم</button><button id="store-cat-frames" class="store-cat" onclick="showStoreCategory('frames')">✨ إطار اسم</button><button id="store-cat-avatarframes" class="store-cat" onclick="showStoreCategory('avatarframes')">👑 إطار</button></div><div id="store-items" class="store-items"></div></div></div>
 <div id="drawing-modal" class="modal-overlay hidden"><div class="modal-card"><span class="close-modal" onclick="closeModal('drawing-modal')">&times;</span><div class="modal-title">لوحة الرسم السريعة 🎨</div><div style="padding:10px"><div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;align-items:center"><button class="btn-submit" style="flex:1;padding:6px;background:#1e3557;margin:0" onclick="setDrawTool('pen')">✏️ قلم</button><button class="btn-submit" style="flex:1;padding:6px;background:#1e3557;margin:0" onclick="setDrawTool('eraser')">🧽 ممحاة</button><button class="btn-submit" style="flex:1;padding:6px;background:#dc2626;margin:0" onclick="clearDrawing()">🗑 مسح</button><input type="color" id="draw-color-picker" value="#000000" style="width:36px;height:32px;padding:0;border:0;background:transparent;cursor:pointer" onchange="setDrawColor(this.value)"><input type="range" id="draw-size-slider" min="1" max="25" value="4" style="width:70px"></div><canvas id="drawing-canvas" style="display:block;width:100%;height:300px;background:#fff;border-radius:8px;touch-action:none"></canvas><button class="btn-submit" style="background:#10b981;margin-top:8px" onclick="sendDrawingToPublic()">📤 إرسال الرسم فوراً للعام</button></div></div></div>
 
@@ -1858,29 +1871,18 @@ html,body{background:#07070a!important;color:#fff}
 </div>
 <div id="emoji-panel" class="modal-overlay hidden" onclick="if(event.target===this)closeModal('emoji-panel')">
   <div class="modal-card animated-emoji-panel">
-    <div class="modal-title">الإيموجي والعبارات المتحركة</div>
-    <div class="animated-emoji-grid">
-      <button onclick="insertEmoji('أحلى وأسهلن 😍')"><span>😍</span><small>أحلى</small></button>
-      <button onclick="insertEmoji('السلام عليكم 🌹')"><span>👋</span><small>السلام عليكم</small></button>
-      <button onclick="insertEmoji('وعليكم السلام ❤️')"><span>❤️</span><small>وعليكم السلام</small></button>
-      <button onclick="insertEmoji('مساء الخير 🌙')"><span>🌙</span><small>مساء الخير</small></button>
-      <button onclick="insertEmoji('صباح الخير ☀️')"><span>☀️</span><small>صباح الخير</small></button>
-      <button onclick="insertEmoji('بررررب 👋')"><span>🏃</span><small>بررررب</small></button>
-      <button onclick="insertEmoji('هههههههه 😂')"><span>😂</span><small>ضحك</small></button>
-      <button onclick="insertEmoji('مت من الضحك 🤣')"><span>🤣</span><small>قهقهة</small></button>
-      <button onclick="insertEmoji('أبكي 😭')"><span>😭</span><small>بكاء</small></button>
-      <button onclick="insertEmoji('أحبك ❤️')"><span>🥰</span><small>أحبك</small></button>
-      <button onclick="insertEmoji('قبلة 😘')"><span>😘</span><small>قبلة</small></button>
-      <button onclick="insertEmoji('أركض 🏃')"><span>🏃‍♂️</span><small>أركض</small></button>
-      <button onclick="insertEmoji('أشرب قهوة ☕')"><span>☕</span><small>قهوة</small></button>
-      <button onclick="insertEmoji('تصفيق 👏')"><span>👏</span><small>تصفيق</small></button>
-      <button onclick="insertEmoji('واو 😲')"><span>😲</span><small>واو</small></button>
-      <button onclick="insertEmoji('زعلان 😔')"><span>😔</span><small>زعلان</small></button>
-      <button onclick="insertEmoji('غاضب 😡')"><span>😡</span><small>غاضب</small></button>
-      <button onclick="insertEmoji('يا سلام 🎉')"><span>🎉</span><small>احتفال</small></button>
-      <button onclick="insertEmoji('ورد لك 🌹')"><span>🌹</span><small>وردة</small></button>
-      <button onclick="insertEmoji('مع السلامة 👋')"><span>👋</span><small>مع السلامة</small></button>
+    <span class="close-modal" onclick="closeModal('emoji-panel')">&times;</span>
+    <div class="modal-title">✨ الإيموجي والعبارات المتحركة</div>
+    <div class="emoji-greetings-bar">
+      <button type="button" class="greet-mini-btn" onclick="insertEmoji('السلام عليكم 🌹')"><span class="greet-rose">🌹</span><span>السلام عليكم</span></button>
+      <button type="button" class="greet-mini-btn" onclick="insertEmoji('وعليكم السلام 💐')"><span class="greet-rose">💐</span><span>وعليكم السلام</span></button>
     </div>
+    <div class="emoji-tabs-bar">
+      <button type="button" id="emoji-tab-icons" class="emoji-tab-btn active" onclick="switchEmojiTab('icons')">✨ إيموجي (50)</button>
+      <button type="button" id="emoji-tab-phrases" class="emoji-tab-btn" onclick="switchEmojiTab('phrases')">💌 عبارات متحركة (50)</button>
+    </div>
+    <div id="animated-emoji-grid" class="animated-emoji-grid"></div>
+    <div id="animated-phrases-grid" class="animated-phrases-grid hidden"></div>
   </div>
 </div>
 
@@ -2596,11 +2598,24 @@ window.openModal = id => {
     $("owner-room-create-box")?.classList.toggle("hidden", !isAnyOwner(currentUser));
   }
   if (id === "chat-settings-modal" && currentUser) {
-    $("owner-bars-color-box")?.classList.toggle("hidden", !isPrimaryOwner(currentUser));
+    $("owner-bars-color-box")?.classList.toggle("hidden", !isAnyOwner(currentUser));
+  }
+  if (id === "emoji-panel" && typeof window.ensureAnimatedEmojiGrid === "function") {
+    window.ensureAnimatedEmojiGrid();
   }
 };
 window.closeModal = id => { $(id)?.classList.add("hidden"); };
-window.toggleEmojiPanel = () => { $("emoji-panel")?.classList.toggle("hidden"); };
+window.toggleEmojiPanel = () => {
+  const panel = $("emoji-panel");
+  if (!panel) return;
+  const willOpen = panel.classList.contains("hidden");
+  if (willOpen) {
+    if (typeof window.ensureAnimatedEmojiGrid === "function") window.ensureAnimatedEmojiGrid();
+    openModal("emoji-panel");
+  } else {
+    closeModal("emoji-panel");
+  }
+};
 window.insertEmoji = e => {
   const i = $("msg-input"); if (!i) return;
   i.value += (i.value ? " " : "") + e; i.focus();
@@ -2924,6 +2939,78 @@ let unsubDirectCallSignals = null;
 let directCallPc = null;
 let directCallStream = null;
 let directCallHandled = new Set();
+let directCallMuted = false;
+let directCallBoosted = false;
+let directCallAudioCtx = null;
+let directCallGainNode = null;
+let directCallSrcNode = null;
+
+function showDirectCallBar(peerName) {
+  const bar = document.getElementById("direct-call-bar");
+  const peer = document.getElementById("direct-call-peer");
+  if (peer) peer.textContent = "📞 " + (peerName || "مكالمة");
+  directCallMuted = false;
+  directCallBoosted = false;
+  updateDirectCallButtonsUI();
+  if (bar) bar.classList.remove("hidden");
+}
+function updateDirectCallButtonsUI() {
+  const mBtn = document.getElementById("direct-call-mute-btn");
+  if (mBtn) {
+    mBtn.classList.toggle("is-active", directCallMuted);
+    mBtn.innerHTML = directCallMuted
+      ? '<i class="fa-solid fa-microphone-slash"></i> <span>فك الكتم</span>'
+      : '<i class="fa-solid fa-microphone"></i> <span>كتم المايك</span>';
+  }
+  const bBtn = document.getElementById("direct-call-boost-btn");
+  if (bBtn) {
+    bBtn.classList.toggle("is-active", directCallBoosted);
+    bBtn.innerHTML = directCallBoosted
+      ? '<i class="fa-solid fa-volume-high"></i> <span>صوت عالٍ ✓</span>'
+      : '<i class="fa-solid fa-volume-high"></i> <span>رفع الصوت</span>';
+  }
+}
+window.toggleDirectCallMute = () => {
+  if (!directCallStream) return;
+  directCallMuted = !directCallMuted;
+  directCallStream.getAudioTracks().forEach(t => { t.enabled = !directCallMuted; });
+  updateDirectCallButtonsUI();
+  toast(directCallMuted ? "🔇 تم كتم المايك في المكالمة" : "🎙️ تم تشغيل المايك في المكالمة");
+};
+window.toggleDirectCallBoost = async () => {
+  const a = document.getElementById("direct-call-audio");
+  directCallBoosted = !directCallBoosted;
+  if (a && a.srcObject) {
+    try {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (AC) {
+        if (!directCallAudioCtx) {
+          directCallAudioCtx = new AC();
+          directCallSrcNode = directCallAudioCtx.createMediaStreamSource(a.srcObject);
+          directCallGainNode = directCallAudioCtx.createGain();
+          directCallSrcNode.connect(directCallGainNode);
+          directCallGainNode.connect(directCallAudioCtx.destination);
+        }
+        if (directCallAudioCtx.state === "suspended") await directCallAudioCtx.resume().catch(() => {});
+        if (directCallBoosted) {
+          a.muted = true;
+          directCallGainNode.gain.value = 2.4;
+        } else {
+          a.muted = false;
+          directCallGainNode.gain.value = 0;
+        }
+      } else {
+        a.muted = false;
+        a.volume = 1;
+      }
+    } catch {
+      a.muted = false;
+      a.volume = 1;
+    }
+  }
+  updateDirectCallButtonsUI();
+  toast(directCallBoosted ? "🔊 تم رفع مستوى صوت المكالمة" : "🔉 عاد الصوت للمستوى الطبيعي");
+};
 function directCallAudioNode(){
   let a=document.getElementById('direct-call-audio');
   if(!a){a=document.createElement('audio');a.id='direct-call-audio';a.autoplay=true;a.playsInline=true;a.setAttribute('playsinline','');a.style.cssText='position:fixed;left:-9999px;width:1px;height:1px;opacity:0;pointer-events:none';document.body.appendChild(a);}
@@ -2945,7 +3032,8 @@ async function startVoiceCallFromProfile(){
     directCallStream.getTracks().forEach(t=>pc.addTrack(t,directCallStream));
     pc.ontrack=e=>{const a=directCallAudioNode();a.srcObject=e.streams?.[0]||new MediaStream([e.track]);a.play().catch(()=>toast('اضغط الشاشة لتفعيل صوت المكالمة'));};
     pc.onicecandidate=e=>{if(e.candidate)addDoc(collection(db,`${P}voiceCallSignals`),{callId:callRef.id,fromUid:currentUser.uid,toUid:target.uid,candidate:e.candidate.toJSON(),createdAt:serverTimestamp()}).catch(console.error);};
-    activeDirectCall={id:callRef.id,ref:callRef,role:'caller',targetUid:String(target.uid),targetName:target.name};document.getElementById('direct-call-end').style.display='block';
+    activeDirectCall={id:callRef.id,ref:callRef,role:'caller',targetUid:String(target.uid),targetName:target.name};
+    showDirectCallBar(target.name);
     const offer=await pc.createOffer();
     const tunedOffer={type:offer.type,sdp:tuneVoiceSdp(offer.sdp)};
     await pc.setLocalDescription(tunedOffer);
@@ -2979,7 +3067,8 @@ async function acceptDirectCall(callRef,callData){
     const tunedAnswer={type:answer.type,sdp:tuneVoiceSdp(answer.sdp)};
     await pc.setLocalDescription(tunedAnswer);
     await updateDoc(callRef,{status:'accepted',answer:tunedAnswer,acceptedAt:serverTimestamp()});
-    activeDirectCall={id:callRef.id,ref:callRef,role:'receiver',targetUid:String(callData.callerUid),targetName:callData.callerName};document.getElementById('direct-call-end').style.display='block';
+    activeDirectCall={id:callRef.id,ref:callRef,role:'receiver',targetUid:String(callData.callerUid),targetName:callData.callerName};
+    showDirectCallBar(callData.callerName);
     listenDirectCallSignals(callRef.id,String(currentUser.uid),pc);
     toast(`أنت تتحدث الآن مع ${callData.callerName}`);
   }catch(e){console.error(e);try{await updateDoc(callRef,{status:'rejected'});}catch(_){}endDirectCall(false);showVoiceError(e);}
@@ -2997,13 +3086,16 @@ function listenDirectCalls(){
   }));
 }
 async function endDirectCall(updateRemote=true){
-  const c=activeDirectCall;activeDirectCall=null;const endBtn=document.getElementById('direct-call-end');if(endBtn)endBtn.style.display='none';
+  const c=activeDirectCall;activeDirectCall=null;
+  document.getElementById('direct-call-bar')?.classList.add('hidden');
+  directCallMuted=false;directCallBoosted=false;
+  if(directCallAudioCtx){try{directCallAudioCtx.close();}catch(_){}directCallAudioCtx=null;directCallGainNode=null;directCallSrcNode=null;}
   if(c?.unsub)try{c.unsub();}catch(_){}
   if(updateRemote&&c?.ref)try{await updateDoc(c.ref,{status:'ended',endedAt:serverTimestamp()});}catch(_){}
   if(unsubDirectCallSignals){unsubDirectCallSignals();unsubDirectCallSignals=null;}
   if(directCallPc){try{directCallPc.close();}catch(_){}directCallPc=null;}
   if(directCallStream){directCallStream.getTracks().forEach(t=>t.stop());directCallStream=null;}
-  const a=document.getElementById('direct-call-audio');if(a){a.pause();a.srcObject=null;}
+  const a=document.getElementById('direct-call-audio');if(a){a.pause();a.muted=false;a.srcObject=null;}
 }
 window.endDirectCall=()=>endDirectCall(true);
 
@@ -3051,6 +3143,7 @@ async function startApp() {
     listenNotifications();
     listenFriendRequests();
     listenPrivateBadge();
+    if (typeof window.listenWallPostAlerts === "function") window.listenWallPostAlerts();
     if (isContestRoom()) listenContestBot();
     announceRoomJoin();
     if (isAnyOwner(currentUser)) listenUsers();
@@ -3573,7 +3666,11 @@ function openProfile(u) {
   $("cover-edit-pencil-btn").classList.toggle("hidden", !canEditThisProfile);
 
   const canManage = canManageUser(selectedUser) && !self;
-  $("owner-gift-rank-box").classList.toggle("hidden", !canManage);
+  // إخفاء لوحة الإدارة عند فتح البروفايل وإظهار زر "الإجراءات" الصغير بالأسفل ليفتحها كاملة عند الضغط
+  $("owner-gift-rank-box")?.classList.add("hidden");
+  $("prof-admin-actions-bar")?.classList.toggle("hidden", !canManage);
+  const admToggleBtn = $("prof-admin-actions-toggle-btn");
+  if (admToggleBtn) admToggleBtn.innerHTML = '<i class="fa-solid fa-sliders"></i> <span>الإجراءات ▾</span>';
   $("owner-delete-account-btn")?.classList.toggle("hidden", !(isPrimaryOwner(currentUser) && !self));
 
   if (canManage) {
@@ -5064,7 +5161,7 @@ function renderMessageHtml(dId, m) {
             <i class="${r.icon} rank-badge-icon ${Number(u.rankId) === 1 ? 'owner-rank-icon' : Number(u.rankId) === 2 ? 'prince-rank-icon' : Number(u.rankId) === 3 ? 'king-rank-icon' : ''}" style="color:${r.color}"></i>
             <span class="name-frame ${nameFrame} ${nameStaticBg} ${nameAnim}"><span class="${nameColor} ${nameFont} ${Number(u.rankId) === 1 ? 'owner-rank-text' : ''}" style="cursor:pointer" onclick="mentionUser('${safe(u.name)}')">${safe(u.name)}</span></span>
           </span>
-          <span class="msg-text-plain inline-message-text ${chatFont} ${chatColor}">${safe(m.text || "")}</span>
+          <span class="msg-text-plain inline-message-text ${chatFont} ${chatColor}">${typeof window.formatRichChatText === "function" ? window.formatRichChatText(m.text || "") : safe(m.text || "")}</span>
         </div>
         <span class="msg-time-wrap">
           ${isOwnerMessage ? renderWolfGuardHtml() : Number(u.rankId) === 3 ? '<span class="king-cheetah-guard" title="فهد الكنج" aria-hidden="true">🐆</span>' : Number(u.rankId) === 2 ? renderPrinceCheetahHtml(true) : ""}
@@ -5481,7 +5578,7 @@ function listenPrivate() {
       box.insertAdjacentHTML("beforeend", `
         <div style="align-self:${isMe ? 'flex-start' : 'flex-end'};background:${isMe ? '#1e293b' : '#0a192f'};border:1px solid #1e3557;padding:7px 11px;border-radius:12px;font-size:.8rem;max-width:80%" ondblclick="quotePrivateMsg('${safe(m.sender)}','${safe(m.text)}')">
           ${qhtml}
-          <div>${safe(m.text || "")}</div>
+          <div>${typeof window.formatRichChatText === "function" ? window.formatRichChatText(m.text || "") : safe(m.text || "")}</div>
           ${media}
           <small style="color:#94a3b8;font-size:.6rem;display:block;margin-top:3px;text-align:left">${safe(m.time || "")}</small>
         </div>
@@ -6468,6 +6565,7 @@ window.unbanUser = async (name, uid) => {
 window.openFeature = async title => {
   closeModal("options-menu-modal");
   if (title === "حائط النشر" || title === "حائط الأصدقاء") {
+    if (typeof window.markWallPostsSeen === "function") window.markWallPostsSeen();
     $("wall-modal-title").textContent = title;
     $("wall-post-creator")?.classList.toggle("hidden", !isHighAdmin(currentUser));
     openModal("wall-modal");
@@ -6584,12 +6682,62 @@ window.openFeature = async title => {
   openModal("feature-modal");
 };
 
+let unsubWallPostAlerts = null;
+let latestWallPostId = "";
+let wallAlertHideTimer = null;
+window.markWallPostsSeen = () => {
+  if (latestWallPostId) {
+    try { localStorage.setItem("asatir_seen_wall_post_id", latestWallPostId); } catch {}
+  }
+  $("wall-menu-badge")?.classList.add("hidden");
+  $("menuWallBadge")?.classList.add("hidden");
+  $("wall-live-notify")?.classList.add("hidden");
+};
+window.listenWallPostAlerts = () => {
+  if (unsubWallPostAlerts) { try { unsubWallPostAlerts(); } catch {} unsubWallPostAlerts = null; }
+  let firstSnap = true;
+  unsubWallPostAlerts = onSnapshot(query(collection(db, `${P}wallPosts`), orderBy("createdAt", "desc"), limit(1)), snap => {
+    if (snap.empty) { firstSnap = false; return; }
+    const d = snap.docs[0];
+    const p = d.data() || {};
+    latestWallPostId = d.id;
+    let seenId = "";
+    try { seenId = localStorage.getItem("asatir_seen_wall_post_id") || ""; } catch {}
+    const isWallOpen = !$("wall-modal")?.classList.contains("hidden");
+    if (isWallOpen) {
+      window.markWallPostsSeen();
+      firstSnap = false;
+      return;
+    }
+    const isNewLive = !firstSnap && d.id !== seenId;
+    if (d.id !== seenId) {
+      $("wall-menu-badge")?.classList.remove("hidden");
+      $("menuWallBadge")?.classList.remove("hidden");
+    }
+    if (isNewLive) {
+      const box = $("wall-live-notify");
+      if (box) {
+        const preview = String(p.text || "صورة جديدة").slice(0, 42);
+        box.innerHTML = `<i class="fa-solid fa-bullhorn"></i> <span><b>منشور جديد</b> من ${safe(p.author || "الإدارة")}: ${safe(preview)}</span> <small style="color:#fde68a;font-weight:bold">عرض ❯</small>`;
+        box.classList.remove("hidden");
+        clearTimeout(wallAlertHideTimer);
+        wallAlertHideTimer = setTimeout(() => box.classList.add("hidden"), 6500);
+      }
+    }
+    firstSnap = false;
+  }, () => {});
+};
+
 async function loadWallPosts() {
   const c = $("wall-posts-container"); if (!c) return;
   c.innerHTML = "جارٍ تحميل المنشورات...";
   onSnapshot(query(collection(db, `${P}wallPosts`), orderBy("createdAt", "desc"), limit(20)), snap => {
     c.innerHTML = "";
     if (snap.empty) { c.innerHTML = "<div style='text-align:center;padding:20px;color:#94a3b8'>لا توجد منشورات بعد.</div>"; return; }
+    if (snap.docs[0]?.id) {
+      latestWallPostId = snap.docs[0].id;
+      window.markWallPostsSeen();
+    }
     snap.forEach(d => {
       const p = d.data(), pid = d.id;
       let media = p.imageUrl ? `<img class="post-img" src="${safe(p.imageUrl)}" onclick="openImageViewer('${slug(p.imageUrl)}')">` : "";
@@ -6615,12 +6763,13 @@ window.submitWallPost = async () => {
   toast("جارٍ النشر...");
   let imageUrl = "";
   if (file) imageUrl = await uploadToStorage(file, "wall-images");
-  await addDoc(collection(db, `${P}wallPosts`), {
+  const ref = await addDoc(collection(db, `${P}wallPosts`), {
     author: currentUser.name, avatar: currentUser.avatar || avatarFor(currentUser.name),
     text, imageUrl, likes: 0, time: nowTime(), createdAt: serverTimestamp()
   });
+  if (ref?.id) latestWallPostId = ref.id;
   $("wall-new-post-text").value = ""; $("wall-new-post-file").value = "";
-  toast("📢 تم النشر على الحائط");
+  toast("📢 تم نشر المنشور وإشعار الجميع!");
 };
 
 window.likeWallPost = async pid => {
@@ -6986,7 +7135,7 @@ window.selectChatTheme = col => {
   setLocalBarsColor(col);
 };
 window.applyBarsColorForAll = async () => {
-  if (!isPrimaryOwner(currentUser)) return;
+  if (!isAnyOwner(currentUser)) return;
   const col = $("owner-bars-color-picker").value || "#d4a017";
   await setDoc(doc(db, `${P}siteSettings`, "main"), { barsColor: col, chatAccent: col }, { merge: true });
   setLocalBarsColor(col);
@@ -8042,13 +8191,25 @@ boot();
 /* فهد البرنس يظهر بجوار الوقت فقط؛ فهد الكنج ذهبي */
 .msg-item .message-identity .prince-cheetah-guard{display:none!important}
 .king-cheetah-guard{filter:sepia(1) saturate(8) hue-rotate(350deg) brightness(1.22) drop-shadow(0 0 3px #ffe08a) drop-shadow(0 0 7px #d49a18)!important}
-/* شريط الأغنية أسفل الميكات، والسهم يبقى وحده عند الطي */
-.music-sync-panel{top:108px!important;z-index:8990!important}
-.music-sync-panel.is-collapsed{width:36px!important;left:auto!important;right:8px!important}
+/* شريط الأغاني مصغّر بعرض ~4 مايكات على اليمين لكي لا يغطي زر الكنز أبداً */
+.music-sync-panel{
+  top:109px!important;right:6px!important;left:auto!important;
+  width:min(48vw,182px)!important;max-width:48vw!important;
+  padding:3px 6px!important;gap:4px!important;border-radius:10px!important;
+  min-height:30px!important;max-height:36px!important;z-index:8990!important;
+}
+.music-sync-panel .music-local-toggle{
+  flex:0 0 22px!important;width:22px!important;height:22px!important;
+  font-size:.78rem!important;border-radius:6px!important;line-height:1!important;
+}
+.music-sync-panel .music-info{font-size:.6rem!important;min-width:0!important;flex:1 1 0!important}
+.music-vol-slider{width:34px!important;height:3px!important}
+#music-unmute-btn{padding:2px 6px!important;font-size:.58rem!important;border-radius:7px!important;white-space:nowrap!important}
+.music-sync-panel.is-collapsed{width:32px!important;height:32px!important;min-height:32px!important;padding:2px!important;left:auto!important;right:6px!important}
 .music-sync-panel.is-collapsed>*:not(#music-local-toggle){display:none!important}
 .music-sync-panel.is-collapsed #music-local-toggle{display:flex!important}
-.chat-area.music-panel-visible{padding-top:154px!important}
-.chat-area.music-panel-visible.music-panel-collapsed{padding-top:130px!important}
+.chat-area.music-panel-visible{padding-top:148px!important}
+.chat-area.music-panel-visible.music-panel-collapsed{padding-top:128px!important}
 /* تثبيت ترتيب رسالة الفيديو: اسم المرسل أولاً ثم الفيديو تحته */
 .msg-item .msg-content .user-header{order:1!important}
 .msg-item .msg-content .quote-preview{order:2!important}
@@ -8060,7 +8221,7 @@ boot();
 .msg-item,.online-item,.room-card-v11,.plus-grid-tile,.modal-card{transition:none!important}
 button,.mic-slot,.mic-slot-wrapper,.bottom-tab,.top-btn,.bar-btn,.nav-btn,.top-icon-btn,.plus-grid-tile,.online-item,.room-card-v11,.menu-item,.avatar-wrap,[onclick]{touch-action:manipulation!important;-webkit-tap-highlight-color:transparent}
 .owner-rank-icon,.king-rank-icon,.prince-rank-icon,.owner-wolf-guard,.prince-cheetah-guard,
-.avatar-wrap[class*="av-frame-"]::after,.animated-emoji-grid button span{animation:none!important}
+.avatar-wrap[class*="av-frame-"]::after{animation:none!important}
 #room-bg-canvas{filter:none!important;transform:none!important;will-change:auto!important}
 .mics-group-frame,.top-bar-icons,.bottom-main-nav,.modal-card{backdrop-filter:none!important}
 .msg-drawing-thumb{max-width:min(112px,38vw)!important;max-height:88px!important;margin:5px 0 0!important}
@@ -8073,14 +8234,69 @@ button,.mic-slot,.mic-slot-wrapper,.bottom-tab,.top-btn,.bar-btn,.nav-btn,.top-i
 #games-menu-modal .plus-grid-compact{gap:3px!important;padding:5px!important}
 #games-menu-modal .plus-grid-tile{min-height:43px!important}
 
-/* ===== تحسينات: الغرف أصغر + ثبات الاسم فوق الصورة + صورة أصغر فوق شريط الكتابة + الخاص نصف شاشة ===== */
-#rooms-modal .modal-card{
-  width:min(68vw,272px)!important;min-width:205px!important;max-height:58vh!important;
+/* ===== تكبير أزرار الشريط العلوي والسفلي بشكل متناسق وأوضح ===== */
+.top-bar-icons{top:3px!important;height:54px!important;padding:3px 7px!important}
+.top-bar-icons .nav-item-top{font-size:clamp(.48rem,1.95vw,.59rem)!important;line-height:1.1!important}
+.top-bar-icons .nav-item-top i,.top-bar-icons .nav-item-top.col-gold i{font-size:clamp(1.02rem,3.8vw,1.24rem)!important;margin-bottom:2px!important}
+.bottom-main-nav{bottom:3px!important;height:50px!important;padding:2px 7px!important}
+.bottom-main-nav .bottom-tab{font-size:clamp(.46rem,1.88vw,.57rem)!important;line-height:1.1!important;padding:2px 1px!important}
+.bottom-main-nav .bottom-tab i,.bottom-main-nav .bottom-tab.col-gold i{font-size:clamp(1rem,3.65vw,1.22rem)!important;margin-bottom:2px!important}
+.asatir-center-tab{flex:0 0 47px!important;width:47px!important;height:47px!important;margin-top:-7px!important}
+.asatir-lion-symbol{width:30px!important;height:30px!important}
+.mics-section-container{top:58px!important}
+#main-input-bar,.input-bar{bottom:55px!important}
+#reply-box{bottom:95px!important}
+@media(max-width:380px){
+  .top-bar-icons{height:52px!important;padding:2px 6px!important}
+  .top-bar-icons .nav-item-top{font-size:.46rem!important}
+  .top-bar-icons .nav-item-top i,.top-bar-icons .nav-item-top.col-gold i{font-size:1rem!important}
+  .bottom-main-nav{height:48px!important;padding:2px 6px!important}
+  .bottom-main-nav .bottom-tab{font-size:.44rem!important}
+  .bottom-main-nav .bottom-tab i,.bottom-main-nav .bottom-tab.col-gold i{font-size:.96rem!important}
+  .asatir-center-tab{flex:0 0 43px!important;width:43px!important;height:43px!important;margin-top:-6px!important}
+  .asatir-lion-symbol{width:27px!important;height:27px!important}
 }
-#rooms-modal .modal-title{padding:7px 10px!important;font-size:.78rem!important}
-#rooms-container{padding:5px 6px!important}
+
+/* ===== لوحة الغرف والمتواجدين والقائمة وحسابي: مستطيل ممتد من مقابل الشريط العلوي إلى السفلي ===== */
+#rooms-modal,#online-modal{
+  background:transparent!important;pointer-events:auto!important;
+  align-items:stretch!important;justify-content:flex-start!important;padding:0!important;
+}
+#options-menu-modal,#icon-menu-modal{
+  background:rgba(0,0,0,.16)!important;pointer-events:auto!important;
+  align-items:stretch!important;justify-content:flex-start!important;padding:0!important;
+}
+#rooms-modal .modal-card,
+#online-modal .modal-card,
+#options-menu-modal .modal-card,
+#icon-menu-modal .modal-card{
+  pointer-events:auto!important;position:fixed!important;
+  top:59px!important;bottom:55px!important;
+  height:calc(100dvh - 114px)!important;max-height:calc(100dvh - 114px)!important;
+  margin:0!important;border-radius:10px!important;
+  display:flex!important;flex-direction:column!important;overflow:hidden!important;
+}
+#rooms-modal .modal-card{right:8px!important;left:auto!important;width:min(68vw,272px)!important;min-width:205px!important}
+#online-modal .modal-card{right:8px!important;left:auto!important;width:min(66vw,265px)!important;min-width:205px!important}
+#icon-menu-modal .modal-card{right:8px!important;left:auto!important;width:min(62vw,245px)!important;min-width:195px!important}
+#options-menu-modal .modal-card{left:8px!important;right:auto!important;width:min(66vw,265px)!important;min-width:200px!important}
+#rooms-modal .modal-title,#online-modal .modal-title,#options-menu-modal .modal-title,#icon-menu-modal .modal-title{
+  flex:none!important;padding:8px 10px!important;font-size:.82rem!important;
+}
+#rooms-container{
+  flex:1 1 auto!important;min-height:0!important;overflow-y:auto!important;
+  padding:6px!important;display:flex!important;flex-direction:column!important;justify-content:flex-start!important;
+}
+#owner-room-create-box{
+  order:5!important;flex:none!important;margin-top:auto!important;padding:8px!important;
+  border-top:1px solid color-mix(in srgb,var(--chat-accent) 32%,transparent)!important;
+  background:rgba(10,12,18,.72);
+}
+#online-users-container,#options-menu-modal .menu-list,#icon-menu-modal .menu-list{
+  flex:1 1 auto!important;min-height:0!important;overflow-y:auto!important;
+}
 #rooms-modal .room-card-v11{
-  grid-template-columns:38px 1fr!important;gap:7px!important;
+  grid-template-columns:38px 1fr!important;gap:7px!important;flex:none!important;
   padding:5px 7px!important;margin:4px 0!important;min-height:48px!important;border-radius:9px!important;
 }
 #rooms-modal .room-card-v11 .room-thumb{width:36px!important;height:36px!important;border-radius:7px!important}
@@ -8089,7 +8305,7 @@ button,.mic-slot,.mic-slot-wrapper,.bottom-tab,.top-btn,.bar-btn,.nav-btn,.top-i
 #rooms-modal .room-card-v11 .room-meta{font-size:.58rem!important;margin-top:2px!important}
 
 /* ثبات الاسم في سطره الأصلي فوق الصورة وعدم نزول الصورة تحت شريط الكتابة */
-.chat-area{bottom:98px!important;padding-bottom:16px!important}
+.chat-area{top:58px!important;bottom:100px!important;padding-bottom:16px!important}
 .msg-item .msg-content{display:flex!important;flex-direction:column!important;align-items:stretch!important}
 .msg-item .msg-content>.user-header{order:1!important;width:100%!important}
 .msg-item .msg-content>.quote-preview{order:2!important}
@@ -8109,7 +8325,7 @@ button,.mic-slot,.mic-slot-wrapper,.bottom-tab,.top-btn,.bar-btn,.nav-btn,.top-i
 #private-chat-modal{
   background:rgba(0,0,0,.16)!important;
   align-items:flex-end!important;justify-content:center!important;
-  padding:0 6px 54px!important;
+  padding:0 6px 56px!important;
 }
 #private-chat-modal #private-card-container{
   height:46dvh!important;max-height:46dvh!important;min-height:245px!important;
@@ -8123,26 +8339,429 @@ button,.mic-slot,.mic-slot-wrapper,.bottom-tab,.top-btn,.bar-btn,.nav-btn,.top-i
 #private-chat-modal #private-card-container .input-bar{
   position:static!important;width:calc(100% - 10px)!important;margin:4px auto 6px!important;flex:none!important;
 }
+
+/* ===== لوحة الإيموجي بنصف الشاشة السفلي + 50 إيموجي حقيقي متحرك بدون نصوص + سلامات صغيرة ===== */
+#emoji-panel{
+  background:rgba(0,0,0,.16)!important;
+  align-items:flex-end!important;justify-content:center!important;
+  padding:0 6px 56px!important;
+}
+#emoji-panel .animated-emoji-panel{
+  width:min(98vw,430px)!important;max-width:98vw!important;
+  height:46dvh!important;max-height:46dvh!important;min-height:245px!important;
+  margin:0!important;padding:7px!important;
+  border-radius:16px 16px 12px 12px!important;
+  display:flex!important;flex-direction:column!important;overflow:hidden!important;
+  box-shadow:0 -8px 28px rgba(0,0,0,.8)!important;
+}
+#emoji-panel .modal-title{flex:none!important;padding:5px 28px!important;font-size:.76rem!important}
+#emoji-panel .close-modal{top:5px!important;left:6px!important;width:24px!important;height:24px!important;font-size:1rem!important}
+.emoji-greetings-bar{
+  display:flex;gap:6px;padding:6px 2px 4px;flex:none;justify-content:center;
+}
+.greet-mini-btn{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:3px 10px;border-radius:10px;
+  border:1px solid var(--chat-accent-light);
+  background:linear-gradient(135deg,color-mix(in srgb,var(--chat-accent-dark) 80%,#0b1322),#0a101b);
+  color:#fde68a;font-size:.66rem;font-weight:800;line-height:1.25;cursor:pointer;
+}
+.greet-rose{display:inline-block;font-size:.82rem;animation:emoSwayRose 1.8s ease-in-out infinite}
+.chat-greet-mini{
+  display:inline-flex;align-items:center;gap:3px;
+  padding:1px 7px;margin:0 2px;border-radius:9px;
+  border:1px solid color-mix(in srgb,var(--chat-accent) 70%,transparent);
+  background:linear-gradient(135deg,rgba(212,160,23,.2),rgba(16,185,129,.14));
+  color:#fde68a;font-size:.73rem;font-weight:800;vertical-align:middle;line-height:1.35;
+}
+.chat-greet-mini .greet-rose{font-size:.8rem}
+
+#emoji-panel .animated-emoji-grid{
+  flex:1 1 auto!important;min-height:0!important;overflow-y:auto!important;
+  display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;
+  gap:6px!important;padding:4px 2px!important;max-height:none!important;
+}
+#emoji-panel .animated-emoji-grid button{
+  min-height:48px!important;padding:3px!important;border-radius:11px!important;
+  border:1px solid color-mix(in srgb,var(--chat-accent) 55%,transparent)!important;
+  background:rgba(10,17,30,.92)!important;display:flex!important;
+  align-items:center!important;justify-content:center!important;overflow:hidden!important;
+}
+.emo-live-wrap{
+  position:relative;display:inline-flex;align-items:center;justify-content:center;
+  width:34px;height:34px;vertical-align:middle;line-height:1;overflow:visible;
+}
+.chat-emo-inline{width:25px;height:25px;margin:0 1px}
+.emo-live-wrap svg{width:100%;height:100%;display:block;overflow:visible}
+.emo-glyph-layer{position:relative;display:inline-flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:1.55rem}
+.chat-emo-inline .emo-glyph-layer{font-size:1.25rem}
+.emo-sub{position:absolute;pointer-events:none;font-size:.66em;line-height:1}
+
+/* حركات إيموجيات حقيقية متعددة الطبقات */
+@keyframes emoHeadLaugh{0%,100%{transform:translateY(0) rotate(-3deg) scale(1)}25%{transform:translateY(-3px) rotate(5deg) scale(1.07,0.95)}50%{transform:translateY(1px) rotate(-5deg) scale(0.97,1.06)}75%{transform:translateY(-3px) rotate(4deg) scale(1.06,0.96)}}
+@keyframes emoJawBounce{0%,100%{transform:scaleY(.78)}50%{transform:scaleY(1.18)}}
+@keyframes emoTearLeft{0%{transform:translate(0,0) scale(.6);opacity:0}25%{opacity:1}100%{transform:translate(-9px,7px) scale(1.1);opacity:0}}
+@keyframes emoTearRight{0%{transform:translate(0,0) scale(.6);opacity:0}25%{opacity:1}100%{transform:translate(9px,7px) scale(1.1);opacity:0}}
+@keyframes emoTearStream{0%{transform:translateY(-2px) scaleY(.7);opacity:.35}50%{transform:translateY(3px) scaleY(1.15);opacity:1}100%{transform:translateY(7px) scaleY(.8);opacity:.2}}
+@keyframes emoRoflSpin{0%,100%{transform:rotate(-18deg) translateY(0)}50%{transform:rotate(18deg) translateY(-3px) scale(1.07)}}
+@keyframes emoRunBody{0%,100%{transform:translateX(-2px) translateY(0) skewX(-6deg)}25%{transform:translateX(2px) translateY(-2.5px) skewX(-8deg)}50%{transform:translateX(5px) translateY(0) skewX(-6deg)}75%{transform:translateX(1px) translateY(-2.5px) skewX(-8deg)}}
+@keyframes emoLegFront{0%,100%{transform:rotate(-34deg)}50%{transform:rotate(38deg)}}
+@keyframes emoLegBack{0%,100%{transform:rotate(36deg)}50%{transform:rotate(-34deg)}}
+@keyframes emoArmFront{0%,100%{transform:rotate(38deg)}50%{transform:rotate(-36deg)}}
+@keyframes emoArmBack{0%,100%{transform:rotate(-34deg)}50%{transform:rotate(36deg)}}
+@keyframes emoSpeedDash{0%{transform:translateX(5px);opacity:.95}100%{transform:translateX(-11px);opacity:0}}
+@keyframes emoDanceMove{0%,100%{transform:rotate(-10deg) translateX(-2px) scale(1)}25%{transform:rotate(8deg) translateX(2px) translateY(-3px) scale(1.06)}50%{transform:rotate(12deg) translateX(3px) scale(1)}75%{transform:rotate(-8deg) translateX(-1px) translateY(-2px) scale(1.05)}}
+@keyframes emoHeartBeat{0%,100%{transform:scale(1)}16%{transform:scale(1.24)}32%{transform:scale(1.02)}48%{transform:scale(1.18)}70%{transform:scale(1)}}
+@keyframes emoFloatUp{0%{transform:translateY(4px) scale(.6);opacity:0}35%{opacity:1}100%{transform:translateY(-11px) scale(1.08);opacity:0}}
+@keyframes emoKissSend{0%{transform:translate(0,0) scale(.55);opacity:0}25%{opacity:1}100%{transform:translate(-11px,-6px) scale(1.15);opacity:0}}
+@keyframes emoRageShake{0%,100%{transform:translate(0,0) scale(1)}20%{transform:translate(-2.5px,1px) scale(1.08)}40%{transform:translate(2.5px,-1px) scale(1.1)}60%{transform:translate(-2px,-1px) scale(1.08)}80%{transform:translate(2px,1px) scale(1.05)}}
+@keyframes emoClapLeft{0%,100%{transform:translateX(-4px) rotate(-14deg)}45%{transform:translateX(2.5px) rotate(6deg)}55%{transform:translateX(2.5px) rotate(6deg)}}
+@keyframes emoClapRight{0%,100%{transform:translateX(4px) rotate(14deg)}45%{transform:translateX(-2.5px) rotate(-6deg)}55%{transform:translateX(-2.5px) rotate(-6deg)}}
+@keyframes emoClapSpark{0%,35%,70%,100%{opacity:0;transform:scale(.4)}50%{opacity:1;transform:scale(1.25)}}
+@keyframes emoHandWave{0%,100%{transform:rotate(-18deg)}50%{transform:rotate(24deg) scale(1.06)}}
+@keyframes emoFlameOuter{0%,100%{transform:scale(1,1) skewX(-3deg)}50%{transform:scale(1.08,1.15) skewX(4deg)}}
+@keyframes emoFlameInner{0%,100%{transform:scale(1,.95) translateY(1px)}50%{transform:scale(.9,1.16) translateY(-2px)}}
+@keyframes emoRocketFly{0%,100%{transform:translate(0,0) rotate(-4deg)}50%{transform:translate(2px,-3px) rotate(3deg)}}
+@keyframes emoSwayRose{0%,100%{transform:rotate(-8deg) scale(1)}50%{transform:rotate(8deg) scale(1.08)}}
+@keyframes emoShiver{0%,100%{transform:translateX(0)}25%{transform:translateX(-2px) rotate(-3deg)}50%{transform:translateX(2px) rotate(3deg)}75%{transform:translateX(-1.5px)}}
+@keyframes emoBouncePop{0%,100%{transform:translateY(0) scale(1)}40%{transform:translateY(-5px) scale(1.12)}65%{transform:translateY(1px) scale(.95)}}
+@keyframes emoSpinGlow{0%{transform:rotate(0) scale(.95)}50%{transform:rotate(180deg) scale(1.12)}100%{transform:rotate(360deg) scale(.95)}}
+@keyframes emoMelt{0%,100%{transform:scale(1,1) translateY(0)}50%{transform:scale(1.08,0.88) translateY(3px)}}
+@keyframes emoEyesScan{0%,100%{transform:translateX(-2.5px)}50%{transform:translateX(2.5px) scale(1.06)}}
+@keyframes emoSplitLeft{0%,100%{transform:translateX(0) rotate(0)}50%{transform:translateX(-3px) rotate(-10deg)}}
+@keyframes emoSplitRight{0%,100%{transform:translateX(0) rotate(0)}50%{transform:translateX(3px) rotate(10deg)}}
+
+.emo-a-laugh{animation:emoHeadLaugh .72s ease-in-out infinite}
+.emo-a-rofl{animation:emoRoflSpin .85s ease-in-out infinite}
+.emo-a-run{animation:emoRunBody .48s linear infinite}
+.emo-a-dance{animation:emoDanceMove .85s ease-in-out infinite}
+.emo-a-heart{animation:emoHeartBeat 1.1s ease-in-out infinite}
+.emo-a-rage{animation:emoRageShake .42s linear infinite}
+.emo-a-wave{transform-origin:75% 80%;animation:emoHandWave .75s ease-in-out infinite}
+.emo-a-rocket{animation:emoRocketFly .5s ease-in-out infinite}
+.emo-a-rose{transform-origin:50% 90%;animation:emoSwayRose 1.8s ease-in-out infinite}
+.emo-a-shiver{animation:emoShiver .38s linear infinite}
+.emo-a-bounce{animation:emoBouncePop 1.05s ease-in-out infinite}
+.emo-a-melt{animation:emoMelt 1.7s ease-in-out infinite}
+.emo-a-eyes{animation:emoEyesScan 1.3s ease-in-out infinite}
+
+/* ===== زر الإجراءات الصغير بالبروفايل + زر إنشاء غرفة أصغر + شريط المكالمة + تنبيه المنشور + 50 عبارة متحركة ===== */
+.prof-actions-mini-btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  padding:5px 15px;font-size:.72rem;font-weight:800;border-radius:10px;
+  border:1.5px solid var(--chat-accent-light);
+  background:linear-gradient(135deg,color-mix(in srgb,var(--chat-accent-dark) 82%,#0b1322),#090b10);
+  color:var(--chat-accent-light);box-shadow:0 2px 10px rgba(0,0,0,.45);cursor:pointer;
+}
+#owner-room-create-box .room-create-mini-btn{
+  padding:5px 10px!important;font-size:.66rem!important;border-radius:8px!important;
+  background:#10b981!important;margin:0!important;line-height:1.3!important;width:100%!important;
+}
+.wall-new-pill{
+  background:linear-gradient(135deg,#ef4444,#b91c1c);color:#fff;
+  font-size:.58rem;font-weight:900;padding:2px 7px;border-radius:8px;
+  border:1px solid #fecaca;white-space:nowrap;animation:badgePulse 1.3s infinite;
+}
+.wall-live-notify{
+  position:fixed;top:110px;left:50%;transform:translateX(-50%);z-index:9500;
+  max-width:min(92vw,360px);background:rgba(12,18,32,.96);color:#fff;
+  border:1.5px solid var(--chat-accent-light);border-radius:12px;
+  padding:6px 12px;font-size:.72rem;display:flex;align-items:center;gap:7px;
+  box-shadow:0 6px 20px rgba(0,0,0,.75);cursor:pointer;direction:rtl;
+}
+.wall-live-notify i{color:var(--chat-accent-light);flex:none}
+.direct-call-bar{
+  position:fixed;top:108px;left:50%;transform:translateX(-50%);z-index:99999;
+  display:flex;align-items:center;gap:5px;padding:4px 8px;
+  border:1.5px solid var(--chat-accent-light);border-radius:14px;
+  background:rgba(10,16,28,.96);color:#fff;box-shadow:0 6px 22px rgba(0,0,0,.8);
+  max-width:96vw;direction:rtl;
+}
+.direct-call-peer{font-size:.66rem;font-weight:800;color:#fde68a;max-width:78px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dc-btn{
+  border:1px solid color-mix(in srgb,var(--chat-accent) 70%,transparent);border-radius:9px;
+  padding:4px 7px;font-size:.64rem;font-weight:800;color:#fff;background:#162238;
+  display:inline-flex;align-items:center;gap:4px;white-space:nowrap;cursor:pointer;
+}
+.dc-btn.dc-mute.is-active{background:#dc2626;border-color:#fca5a5}
+.dc-btn.dc-boost.is-active{background:#059669;border-color:#6ee7b7}
+.dc-btn.dc-end{background:#991b1b;border-color:#fca5a5}
+
+.emoji-tabs-bar{display:flex;gap:5px;padding:2px 2px 5px;flex:none}
+.emoji-tab-btn{
+  flex:1;padding:4px 6px;border-radius:9px;font-size:.66rem;font-weight:800;
+  border:1px solid color-mix(in srgb,var(--chat-accent) 45%,transparent);
+  background:rgba(10,17,30,.85);color:#cbd5e1;cursor:pointer;
+}
+.emoji-tab-btn.active{
+  background:linear-gradient(135deg,var(--chat-accent-dark),var(--chat-accent),var(--chat-accent-dark));
+  color:#fff;border-color:var(--chat-accent-light);
+}
+#emoji-panel .animated-phrases-grid{
+  flex:1 1 auto!important;min-height:0!important;overflow-y:auto!important;
+  display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:5px!important;padding:4px 2px!important;align-content:start!important;
+}
+.phrase-mini-btn{
+  display:flex;align-items:center;justify-content:center;text-align:center;
+  min-height:36px;padding:4px 6px;border-radius:9px;
+  border:1px solid color-mix(in srgb,var(--chat-accent) 55%,transparent);
+  background:rgba(10,17,30,.92);color:#f8fafc;font-size:.64rem;font-weight:700;
+  line-height:1.35;cursor:pointer;word-break:break-word;
+  animation:emoPhraseFloat 2.4s ease-in-out infinite;
+}
+.phrase-mini-btn:nth-child(2n){animation-delay:.35s}
+.phrase-mini-btn:nth-child(3n){color:#fde68a;animation-delay:.7s}
+.phrase-emo-mini{display:inline-block;animation:emoHeartBeat 1.5s ease-in-out infinite}
+.chat-phrase-mini{
+  display:inline-flex;align-items:center;gap:2px;flex-wrap:wrap;
+  padding:1px 7px;margin:1px 2px;border-radius:9px;
+  border:1px solid color-mix(in srgb,var(--chat-accent) 60%,transparent);
+  background:linear-gradient(135deg,rgba(212,160,23,.14),rgba(236,72,153,.1));
+  color:#fef3c7;font-size:.73rem;font-weight:700;vertical-align:middle;line-height:1.38;
+  animation:emoPhraseFloat 2.6s ease-in-out infinite;
+}
+@keyframes emoPhraseFloat{0%,100%{transform:translateY(0) scale(1);filter:brightness(1)}50%{transform:translateY(-1.5px) scale(1.025);filter:brightness(1.12)}}
 </style>
+
 <script id="asl-fast-panel-switch-fixes">
-/* فتح لوحة المتواجدين أو الغرف يغلق اللوحة الأخرى مباشرة */
 (() => {
+  // ===== 50 إيموجي حقيقي متحرك بدون نصوص + 50 عبارة مزخرفة صغيرة متحركة =====
+  const SVG_MAP = {
+    "😂": `<svg viewBox="0 0 36 36"><g class="emo-a-laugh" style="transform-origin:18px 18px"><circle cx="18" cy="18" r="14" fill="#fbbf24" stroke="#d97706" stroke-width="1.2"/><path d="M9 14 Q12 10 15 14 M21 14 Q24 10 27 14" fill="none" stroke="#451a03" stroke-width="2.2" stroke-linecap="round"/><path d="M10 19 Q18 19 26 19 Q25 28 18 28 Q11 28 10 19 Z" fill="#7f1d1d" style="transform-origin:18px 20px;animation:emoJawBounce .36s ease-in-out infinite"/><path d="M12 20 Q18 20 24 20 L23 22 Q18 22 13 22 Z" fill="#fff"/></g><ellipse cx="8" cy="17" rx="2.3" ry="3.2" fill="#38bdf8" style="animation:emoTearLeft .95s ease-out infinite"/><ellipse cx="28" cy="17" rx="2.3" ry="3.2" fill="#38bdf8" style="animation:emoTearRight .95s .2s ease-out infinite"/></svg>`,
+    "🤣": `<svg viewBox="0 0 36 36"><g class="emo-a-rofl" style="transform-origin:18px 18px"><circle cx="18" cy="18" r="14" fill="#fbbf24" stroke="#d97706" stroke-width="1.2"/><path d="M9 13 L15 15 L9 17 M27 13 L21 15 L27 17" fill="none" stroke="#451a03" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 20 Q18 18 26 20 Q25 29 18 29 Q11 29 10 20 Z" fill="#7f1d1d" style="transform-origin:18px 21px;animation:emoJawBounce .32s ease-in-out infinite"/><ellipse cx="7" cy="18" rx="2.2" ry="3" fill="#38bdf8" style="animation:emoTearLeft .8s ease-out infinite"/><ellipse cx="29" cy="18" rx="2.2" ry="3" fill="#38bdf8" style="animation:emoTearRight .8s .15s ease-out infinite"/></g></svg>`,
+    "🏃": `<svg viewBox="0 0 36 36"><g stroke="#38bdf8" stroke-width="1.8" stroke-linecap="round"><line x1="2" y1="13" x2="10" y2="13" style="animation:emoSpeedDash .55s linear infinite"/><line x1="0" y1="19" x2="9" y2="19" style="animation:emoSpeedDash .55s .18s linear infinite"/><line x1="3" y1="25" x2="11" y2="25" style="animation:emoSpeedDash .55s .35s linear infinite"/></g><g class="emo-a-run" style="transform-origin:18px 18px"><circle cx="22" cy="7.5" r="3.4" fill="#fde047" stroke="#b45309" stroke-width=".8"/><g style="transform-origin:19px 14px;animation:emoArmBack .48s linear infinite"><path d="M19 14 L12 16 L10 12" fill="none" stroke="#f59e0b" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></g><g style="transform-origin:17px 21px;animation:emoLegBack .48s linear infinite"><path d="M17 21 L11 26 L7 25" fill="none" stroke="#38bdf8" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></g><path d="M21 11.5 L17 21" stroke="#ef4444" stroke-width="4.2" stroke-linecap="round"/><g style="transform-origin:17px 21px;animation:emoLegFront .48s linear infinite"><path d="M17 21 L23 26 L21 32" fill="none" stroke="#60a5fa" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></g><g style="transform-origin:20px 13px;animation:emoArmFront .48s linear infinite"><path d="M20 13 L26 16 L29 12" fill="none" stroke="#fbbf24" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></g></g></svg>`,
+    "😭": `<svg viewBox="0 0 36 36"><g class="emo-a-shiver"><circle cx="18" cy="18" r="14" fill="#fbbf24" stroke="#d97706" stroke-width="1.2"/><rect x="10" y="16" width="4" height="14" rx="2" fill="#38bdf8" opacity=".88" style="animation:emoTearStream .55s linear infinite"/><rect x="22" y="16" width="4" height="14" rx="2" fill="#38bdf8" opacity=".88" style="animation:emoTearStream .55s .25s linear infinite"/><path d="M10 14 L15 15 M26 14 L21 15" stroke="#451a03" stroke-width="2.2" stroke-linecap="round"/><path d="M13 24 Q18 19 23 24 Q18 26 13 24 Z" fill="#7f1d1d" style="transform-origin:18px 23px;animation:emoJawBounce .5s ease-in-out infinite"/></g></svg>`,
+    "😡": `<svg viewBox="0 0 36 36"><g class="emo-a-rage"><circle cx="18" cy="19" r="13.5" fill="#ef4444" stroke="#991b1b" stroke-width="1.4"/><path d="M10 13 L16 16 M26 13 L20 16" stroke="#1f2937" stroke-width="2.3" stroke-linecap="round"/><circle cx="13" cy="18" r="1.8" fill="#111"/><circle cx="23" cy="18" r="1.8" fill="#111"/><path d="M13 26 Q18 22 23 26" fill="none" stroke="#111" stroke-width="2.2" stroke-linecap="round"/></g><circle cx="9" cy="6" r="2.6" fill="#fff" opacity=".85" style="animation:emoFloatUp .9s ease-out infinite"/><circle cx="27" cy="6" r="2.6" fill="#fff" opacity=".85" style="animation:emoFloatUp .9s .4s ease-out infinite"/></svg>`,
+    "😍": `<svg viewBox="0 0 36 36"><g class="emo-a-bounce"><circle cx="18" cy="18" r="14" fill="#fbbf24" stroke="#d97706" stroke-width="1.2"/><g style="transform-origin:12.5px 15px;animation:emoHeartBeat .9s ease-in-out infinite"><path d="M12.5 18 C8 14.5 9.2 10.5 12.5 13 C15.8 10.5 17 14.5 12.5 18 Z" fill="#ef4444"/></g><g style="transform-origin:23.5px 15px;animation:emoHeartBeat .9s .15s ease-in-out infinite"><path d="M23.5 18 C19 14.5 20.2 10.5 23.5 13 C26.8 10.5 28 14.5 23.5 18 Z" fill="#ef4444"/></g><path d="M12 22 Q18 28 24 22" fill="#7f1d1d" stroke="#451a03" stroke-width="1.4"/></g></svg>`,
+    "😘": `<svg viewBox="0 0 36 36"><g class="emo-a-bounce"><circle cx="18" cy="18" r="14" fill="#fbbf24" stroke="#d97706" stroke-width="1.2"/><path d="M10 15 Q13 12 16 15" fill="none" stroke="#451a03" stroke-width="2.1" stroke-linecap="round"/><circle cx="23" cy="15" r="2" fill="#451a03"/><path d="M17 21 Q21 22.5 17 24 Q20 25.5 17 27" fill="none" stroke="#7f1d1d" stroke-width="2" stroke-linecap="round"/></g><path d="M12 22 C8 18 10 14 12 16.5 C14 14 16 18 12 22 Z" fill="#ec4899" style="animation:emoKissSend 1.1s ease-out infinite"/></svg>`,
+    "👏": `<svg viewBox="0 0 36 36"><g stroke="#fde047" stroke-width="2" stroke-linecap="round" style="transform-origin:18px 8px;animation:emoClapSpark .6s linear infinite"><line x1="18" y1="3" x2="18" y2="8"/><line x1="11" y1="6" x2="14" y2="10"/><line x1="25" y1="6" x2="22" y2="10"/></g><path d="M14 29 L11 16 Q11 12 14 14 L17 25 Z" fill="#fbbf24" stroke="#b45309" stroke-width="1.2" style="transform-origin:14px 28px;animation:emoClapLeft .6s ease-in-out infinite"/><path d="M22 29 L25 16 Q25 12 22 14 L19 25 Z" fill="#fcd34d" stroke="#b45309" stroke-width="1.2" style="transform-origin:22px 28px;animation:emoClapRight .6s ease-in-out infinite"/></svg>`,
+    "👋": `<svg viewBox="0 0 36 36"><g class="emo-a-wave"><path d="M12 28 Q8 22 9 16 L11 9 Q12.5 7.5 14 9.5 L15 16 L15 7.5 Q16.5 6 18 8 L18.5 16 L19.5 8.5 Q21 7 22.5 9 L22 17 L24.5 12 Q26.5 11.5 26.5 14 L24 25 Q22 31 16 31 Q13.5 31 12 28 Z" fill="#fbbf24" stroke="#b45309" stroke-width="1.3" stroke-linejoin="round"/></g></svg>`,
+    "❤️": `<svg viewBox="0 0 36 36"><g class="emo-a-heart" style="transform-origin:18px 18px"><path d="M18 31 C6 22 4 12 10 8 C14 5.5 17.2 8.5 18 11 C18.8 8.5 22 5.5 26 8 C32 12 30 22 18 31 Z" fill="#ef4444" stroke="#b91c1c" stroke-width="1.2"/><ellipse cx="12" cy="12" rx="2.5" ry="1.4" transform="rotate(-30 12 12)" fill="#fca5a5" opacity=".75"/></g></svg>`,
+    "💔": `<svg viewBox="0 0 36 36"><path d="M18 30 C7 21 5 12 10.5 8.5 C14 6.5 17 9 18 12 L15 18 L19 23 Z" fill="#ef4444" style="transform-origin:14px 20px;animation:emoSplitLeft 1s ease-in-out infinite"/><path d="M18 30 C29 21 31 12 25.5 8.5 C22 6.5 19 9 18 12 L16 18 L20 23 Z" fill="#dc2626" style="transform-origin:22px 20px;animation:emoSplitRight 1s ease-in-out infinite"/></svg>`,
+    "🔥": `<svg viewBox="0 0 36 36"><path d="M18 3 C22 10 29 13 28 22 C27 29 22.5 33 18 33 C12.5 33 8 28.5 8 22 C8 16 12 12 14 9 C14 13 16 14 16 14 C16 9 18 3 18 3 Z" fill="#f97316" style="transform-origin:18px 32px;animation:emoFlameOuter .55s ease-in-out infinite"/><path d="M18 14 C21 18 24 21 23 26 C22.5 30 20.5 32 18 32 C15 32 13 29.5 13 26 C13 22 16 19 18 14 Z" fill="#fde047" style="transform-origin:18px 31px;animation:emoFlameInner .42s ease-in-out infinite"/></svg>`,
+    "🚀": `<svg viewBox="0 0 36 36"><g class="emo-a-rocket" style="transform-origin:18px 18px"><path d="M9 26 L4 32 L11 29 Z" fill="#fde047" style="transform-origin:10px 26px;animation:emoFlameInner .28s linear infinite"/><path d="M27 7 C21 8 15 13 11 21 L15 25 C23 21 28 15 27 7 Z" fill="#e2e8f0" stroke="#475569" stroke-width="1.2"/><circle cx="20" cy="15" r="2.8" fill="#38bdf8"/><path d="M11 21 L6 21 L9 26 Z M15 25 L15 30 L10 27 Z" fill="#ef4444"/></g></svg>`,
+    "🌹": `<svg viewBox="0 0 36 36"><g class="emo-a-rose"><path d="M18 17 L18 33" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round"/><path d="M18 26 Q12 24 11 21 Q15 21 18 24 M18 23 Q24 21 25 18 Q21 18 18 21" fill="#16a34a"/><path d="M12 11 C12 6 24 6 24 11 C26 16 22 20 18 20 C14 20 10 16 12 11 Z" fill="#ef4444" stroke="#991b1b" stroke-width="1"/><path d="M14 11 Q18 7 22 11 Q18 15 14 11 Z" fill="#fca5a5" opacity=".55"/></g></svg>`,
+    "☕": `<svg viewBox="0 0 36 36"><path d="M13 11 Q11 7 14 4 M18 11 Q16 7 19 4 M23 11 Q21 7 24 4" fill="none" stroke="#e2e8f0" stroke-width="1.8" stroke-linecap="round" style="animation:emoFloatUp 1.3s ease-in-out infinite"/><path d="M8 14 H24 V24 C24 29 20 31 16 31 C12 31 8 29 8 24 Z" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.2"/><path d="M24 16 C28 16 29 22 24 23" fill="none" stroke="#f8fafc" stroke-width="2.4"/><ellipse cx="16" cy="14" rx="7.5" ry="2.2" fill="#78350f"/></svg>`,
+    "😴": `<svg viewBox="0 0 36 36"><g style="animation:emoBouncePop 2s ease-in-out infinite"><circle cx="17" cy="20" r="12.5" fill="#fbbf24" stroke="#d97706" stroke-width="1.2"/><path d="M10 18 Q12.5 20.5 15 18 M19 18 Q21.5 20.5 24 18" fill="none" stroke="#451a03" stroke-width="2" stroke-linecap="round"/><ellipse cx="17" cy="25" rx="2.4" ry="3.2" fill="#7f1d1d"/></g><text x="24" y="12" fill="#38bdf8" font-size="8" font-weight="900" style="animation:emoFloatUp 1.4s ease-out infinite">Z</text><text x="29" y="8" fill="#93c5fd" font-size="6.5" font-weight="900" style="animation:emoFloatUp 1.4s .45s ease-out infinite">z</text></svg>`,
+    "💃": `<svg viewBox="0 0 36 36"><g class="emo-a-dance" style="transform-origin:18px 20px"><circle cx="18" cy="7.5" r="3.2" fill="#fde047"/><path d="M18 11 L13 24 L23 24 Z" fill="#ef4444"/><path d="M17 13 L10 9 M19 13 L25 18 M16 24 L14 32 M20 24 L23 31" stroke="#fbbf24" stroke-width="2.4" stroke-linecap="round"/></g><circle cx="7" cy="12" r="1.6" fill="#fde047" style="animation:emoFloatUp 1.1s infinite"/><circle cx="29" cy="14" r="1.6" fill="#f472b6" style="animation:emoFloatUp 1.1s .4s infinite"/></svg>`
+  };
+
+  // قائمة الـ 50 إيموجي الحقيقية بالترتيب مع نوع الحركة الخاصة بكل واحدة
+  const EMOJIS_50 = [
+    ["😂","laugh"], ["🤣","rofl"], ["🏃","run"], ["💃","dance"], ["😍","bounce"],
+    ["🥰","heart", "💕"], ["😘","bounce"], ["😊","bounce", "✨"], ["😎","bounce", "✨"], ["🤩","bounce", "⭐"],
+    ["🥳","dance", "🎉"], ["😉","wave"], ["😜","rofl"], ["🤪","rofl"], ["🤗","heart"],
+    ["🤭","bounce"], ["🤫","wave"], ["🤔","eyes"], ["🙄","eyes"], ["😲","bounce"],
+    ["😱","shiver", "⚡"], ["🥺","shiver", "💧"], ["😢","shiver", "💧"], ["😭","shiver"], ["😡","rage"],
+    ["🤬","rage", "💢"], ["😈","rage", "🔥"], ["😴","melt"], ["🤯","rage", "💥"], ["🥵","shiver", "💦"],
+    ["🥶","shiver", "❄️"], ["🫠","melt"], ["🫡","wave"], ["👋","wave"], ["👏","bounce"],
+    ["🙌","dance", "✨"], ["🤝","bounce"], ["👍","bounce", "✨"], ["👌","wave"], ["✌️","dance"],
+    ["💪","heart", "⚡"], ["🙏","heart", "✨"], ["❤️","heart"], ["💖","heart", "✨"], ["💔","shiver"],
+    ["🔥","heart"], ["🎉","dance", "✨"], ["🌹","rose"], ["👑","bounce", "✨"], ["🚀","rocket"]
+  ];
+
+  // 50 عبارة وإيموجي مزخرف صغير متحرك
+  const PHRASES_50 = [
+    "مۡسَـ(🍀)ـاء الۣخـ(🌸)ـيۡݛ",
+    "صبـ(⛅)ـُ(آٍلـٍـً(🌺)ـٍورٍدً)ـ(⛅)ـٍآٍآٍحً",
+    "ﻓﻓـداﺂڪك،♥~*•",
+    "ﺂِمـﹷٰﹻـووحٰ🙊💋⇣˝*~",
+    "ﻋـﻋـﻣـࢪي",
+    "اﺂݪـﺣَـﺣَـݪـو٘ꪆ⁽⇣̀🧸💗",
+    "ﺷـﻣـﺣَﺣَــݪاﺂڪك⁽⇣̀🙈💗",
+    "🥺ﺑـڪـࢪهـهـڪك⁽⇣̀😴🖤",
+    "شَِشـَِتقتلـَِڪَُڪًِكَِ 💗",
+    "🍂💛⇣̀ʊ̤ʅɹɹɹȊᓅɹ̇І͛♥",
+    "🥺⇣̀ᓚ۶ᒧ᎗ɹ̣᎗ᓗȊ",
+    "🌸🙈⇣̀ʊ̤ʅɹ̈ɹ̇gɹ̇ᓗ̥ᓄ",
+    "🧡🌸⇣̀ʟ̤ɾʅgᓘȊ",
+    "♥🙈⇣̀ʊ̤ʅɹ̈ᓘȊ",
+    "اﺂهـ۾ ﺷـي اﺂݪاﺧــݪآإق⁽⇣’🕊️💞",
+    "اﺂحـبـڪـ۾⁽⇣̀❤️✨",
+    "يَـاﺂ مـسَـاﺂء اﺂݪـعَـسَـل🍯💛",
+    "صَـبـاﺂح اﺂݪـسَـعَـاﺂده☀️🌸",
+    "نَـو٘ر اﺂݪـشَـاﺂت✨👑",
+    "تـسَـلـمـو٘نَ⁽⇣̀🌹💚",
+    "يَـاﺂ هـݪاﺂ و٘غَـݪاﺂ⁽⇣̀💐💫",
+    "ࢪو٘حَــي⁽⇣̀💓🦋",
+    "حَـيـاﺂتـي⁽⇣̀💞🍓",
+    "قَـلـبـي⁽⇣̀❤️‍🔥✨",
+    "غَــاﺂݪـيـن⁽⇣̀💎👑",
+    "يَـفـدآﺂك قـلـبـي💗🌸",
+    "دعَـاﺂئـي ݪـڪَـ۾🤲🤍",
+    "بـاﺂݪـتـو٘فـيـق🌟🌺",
+    "ضحَـكـتـك تـجـنـن😂💛",
+    "مَـنـو٘ࢪيـن اﺂݪـࢪو٘م✨🌟",
+    "عَـلـى رآﺂسَـي👑❤️",
+    "بَـࢪࢪࢪب⁽⇣̀🏃💨",
+    "بَــاﺂڪَـك⁽⇣̀👋🌸",
+    "اﺂشَـتـقـت ݪـڪَـ۾🥺💞",
+    "تـصـبـحـو٘ن عَ خَـيـر🌙⭐",
+    "لـيـلـتـڪَـ۾ سَـعـيـده✨🌌",
+    "يَـاﺂ و٘يـل حَـاﺂݪـي🙈🔥",
+    "فَـديت ضحَـكـتـك🤭💗",
+    "قَـمـࢪ اﺂݪـمـكَـاﺂن🌕💫",
+    "تَـحـيـتـي ݪـلـجَـمـيـع🫡🌹",
+    "زَعَــلاﺂن مَـنـڪَ🥺💔",
+    "سَـاﺂمَـحـتـڪَ🤍🕊️",
+    "اﺂبـتـسَـم يَ حَـلـو٘😊🌻",
+    "طـاﺂيـࢪ مَـن اﺂݪـفـࢪح🥳🎉",
+    "قَـهـو٘ة اﺂݪـمـسَـاﺂء☕🌿",
+    "شَـمـعَـة حَـيـاﺂتـي🕯️💖",
+    "أغَـلـى اﺂݪـحَـبـاﺂيـب💞🌷",
+    "فَـخـاﺂمَـة حَـضـو٘رك👑🔥",
+    "جَـمـاﺂݪ ࢪو٘حَـك🦋🤍",
+    "مَـع اﺂݪـسَـلاﺂمَـة👋🌸"
+  ];
+
+  const EMOJI_MAP = new Map();
+  for (const item of EMOJIS_50) EMOJI_MAP.set(item[0], item);
+  EMOJI_MAP.set("🏃‍♂️", EMOJI_MAP.get("🏃"));
+  EMOJI_MAP.set("🏃‍♀️", EMOJI_MAP.get("🏃"));
+  EMOJI_MAP.set("❤", EMOJI_MAP.get("❤️"));
+  EMOJI_MAP.set("✌", EMOJI_MAP.get("✌️"));
+
+  function renderAnimatedEmojiNode(em, anim, sub, inlineChat = false) {
+    const cls = `emo-live-wrap${inlineChat ? " chat-emo-inline" : ""}`;
+    if (SVG_MAP[em]) {
+      return `<span class="${cls}" aria-label="${em}">${SVG_MAP[em]}</span>`;
+    }
+    const baseChar = em === "🏃‍♂️" || em === "🏃‍♀️" ? "🏃" : em === "❤" ? "❤️" : em === "✌" ? "✌️" : em;
+    if (SVG_MAP[baseChar]) {
+      return `<span class="${cls}" aria-label="${em}">${SVG_MAP[baseChar]}</span>`;
+    }
+    const subHtml = sub ? `<span class="emo-sub" style="top:-2px;right:-2px;animation:emoFloatUp 1.2s ease-out infinite">${sub}</span>` : "";
+    return `<span class="${cls}" aria-label="${em}"><span class="emo-glyph-layer emo-a-${anim}">${em}</span>${subHtml}</span>`;
+  }
+
+  const ESCAPE_FN = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
+  const EMOJI_KEYS_SORTED = [...EMOJI_MAP.keys()].sort((a, b) => b.length - a.length).map(k => k.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+  const EMOJI_REGEX = new RegExp(`(${EMOJI_KEYS_SORTED.join("|")})`, "g");
+  const PHRASE_EMOJIS_RE = /([\u2600-\u27BF\u{1F300}-\u{1FAFF}]+)/gu;
+  const ESCAPED_PHRASES = PHRASES_50.map(p => ESCAPE_FN(p)).sort((a, b) => b.length - a.length);
+  const PHRASE_REGEX = new RegExp(`(${ESCAPED_PHRASES.map(p => p.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|")})`, "g");
+
+  function decorateMiniPhraseHtml(escapedPhrase) {
+    return escapedPhrase.replace(PHRASE_EMOJIS_RE, m => `<span class="phrase-emo-mini">${m}</span>`);
+  }
+
+  window.ensureAnimatedEmojiGrid = () => {
+    const grid = document.getElementById("animated-emoji-grid");
+    if (grid && grid.dataset.ready !== "1") {
+      grid.dataset.ready = "1";
+      grid.innerHTML = EMOJIS_50.map(([em, anim, sub]) =>
+        `<button type="button" onclick="insertEmoji('${em}')">${renderAnimatedEmojiNode(em, anim, sub, false)}</button>`
+      ).join("");
+    }
+  };
+  window.ensureAnimatedPhrasesGrid = () => {
+    const pGrid = document.getElementById("animated-phrases-grid");
+    if (pGrid && pGrid.dataset.ready !== "1") {
+      pGrid.dataset.ready = "1";
+      pGrid.innerHTML = PHRASES_50.map((p, idx) =>
+        `<button type="button" class="phrase-mini-btn" onclick="insertDecoratedPhrase(${idx})">${decorateMiniPhraseHtml(ESCAPE_FN(p))}</button>`
+      ).join("");
+    }
+  };
+  window.insertDecoratedPhrase = idx => {
+    const ph = PHRASES_50[idx];
+    if (ph) window.insertEmoji?.(ph);
+  };
+  window.switchEmojiTab = tab => {
+    const isPhrases = tab === "phrases";
+    document.getElementById("emoji-tab-icons")?.classList.toggle("active", !isPhrases);
+    document.getElementById("emoji-tab-phrases")?.classList.toggle("active", isPhrases);
+    document.getElementById("animated-emoji-grid")?.classList.toggle("hidden", isPhrases);
+    document.getElementById("animated-phrases-grid")?.classList.toggle("hidden", !isPhrases);
+    if (isPhrases) window.ensureAnimatedPhrasesGrid();
+    else window.ensureAnimatedEmojiGrid();
+  };
+
+  window.toggleProfileAdminActions = () => {
+    const box = document.getElementById("owner-gift-rank-box");
+    const btn = document.getElementById("prof-admin-actions-toggle-btn");
+    if (!box) return;
+    const isHidden = box.classList.toggle("hidden");
+    if (btn) {
+      btn.innerHTML = isHidden
+        ? '<i class="fa-solid fa-sliders"></i> <span>الإجراءات ▾</span>'
+        : '<i class="fa-solid fa-sliders"></i> <span>إخفاء الإجراءات ▴</span>';
+    }
+    if (!isHidden) {
+      setTimeout(() => { try { box.scrollIntoView({ behavior: "smooth", block: "nearest" }); } catch {} }, 40);
+    }
+  };
+
+  window.formatRichChatText = rawText => {
+    let html = ESCAPE_FN(rawText || "");
+    html = html
+      .replace(/السلام عليكم\s*🌹/g, '<span class="chat-greet-mini"><span class="greet-rose">🌹</span><span>السلام عليكم</span></span>')
+      .replace(/وعليكم السلام\s*💐/g, '<span class="chat-greet-mini"><span class="greet-rose">💐</span><span>وعليكم السلام</span></span>');
+    html = html.replace(/(<span class="chat-greet-mini">[\s\S]*?<\/span>)|([^\x00-\x7F]+)/g, (full, badge, chunk) => {
+      if (badge) return badge;
+      return chunk.replace(PHRASE_REGEX, m => `<span class="chat-phrase-mini">${decorateMiniPhraseHtml(m)}</span>`);
+    });
+    return html.replace(/(<span class="chat-(?:greet|phrase)-mini">[\s\S]*?<\/span>)|([^\x00-\x7F]+)/g, (full, badge, nonAscii) => {
+      if (badge) return badge;
+      return nonAscii.replace(EMOJI_REGEX, m => {
+        const entry = EMOJI_MAP.get(m);
+        return entry ? renderAnimatedEmojiNode(entry[0], entry[1], entry[2], true) : m;
+      });
+    });
+  };
+
+  // تهيئة الشبكة عند الفتح
+  window.ensureAnimatedEmojiGrid();
+
+  // إغلاق القوائم المتجاورة تلقائياً + الإغلاق عند الضغط خارج أي قائمة مفتوحة
+  const TRANSIENT_MODALS = ["rooms-modal", "online-modal", "options-menu-modal", "icon-menu-modal", "plus-menu-modal", "games-menu-modal", "emoji-panel", "mic-gear-modal", "diamond-display-modal"];
+  const BACKDROP_CLOSABLE_MODALS = new Set([
+    "rooms-modal", "online-modal", "options-menu-modal", "icon-menu-modal",
+    "plus-menu-modal", "games-menu-modal", "emoji-panel", "mic-gear-modal",
+    "diamond-display-modal", "wallet-modal", "treasure-modal", "store-modal",
+    "drawing-modal", "private-chat-modal", "private-gear-modal", "private-inbox-modal",
+    "video-viewer-modal", "image-viewer-modal", "dice-modal", "wheel-modal",
+    "feature-modal", "notifications-modal", "friend-requests-modal", "mic-request-modal",
+    "mic-control-modal", "convert-points-modal", "chat-settings-modal",
+    "owner-chat-settings-modal", "youtube-search-modal", "wall-modal", "profile-modal"
+  ]);
+
   const originalOpenModal = window.openModal;
   window.openModal = id => {
-    if (id === "online-modal" || id === "rooms-modal") {
-      const other = id === "online-modal" ? "rooms-modal" : "online-modal";
-      document.getElementById(other)?.classList.add("hidden");
+    if (TRANSIENT_MODALS.includes(id)) {
+      document.getElementById("arena-side-panel")?.classList.add("hidden");
+      for (const mId of TRANSIENT_MODALS) {
+        if (mId !== id) document.getElementById(mId)?.classList.add("hidden");
+      }
     }
     return originalOpenModal(id);
   };
-  // إغلاق قائمة الألعاب تلقائياً بعد اختيار أي لعبة، ومنع النقرات المتكررة السريعة
+
+  // إغلاق قائمة الألعاب تلقائياً بعد اختيار أي لعبة + حماية من النقرات السريعة
   let lastPanelAction = 0;
   document.addEventListener("click", e => {
-    const tile = e.target.closest(".plus-grid-tile");
+    const t = e.target;
+    if (t.classList && t.classList.contains("modal-overlay") && BACKDROP_CLOSABLE_MODALS.has(t.id)) {
+      window.closeModal?.(t.id);
+      return;
+    }
+    const tile = t.closest(".plus-grid-tile");
     if (!tile) return;
     const now = Date.now();
     if (now - lastPanelAction < 180) { e.preventDefault(); e.stopImmediatePropagation(); return; }
     lastPanelAction = now;
+  }, true);
+
+  document.addEventListener("pointerdown", e => {
+    const t = e.target;
+    const arena = document.getElementById("arena-side-panel");
+    if (arena && !arena.classList.contains("hidden") && !t.closest("#arena-side-panel") && !t.closest('[onclick*="openArenaPanel"]')) {
+      arena.classList.add("hidden");
+    }
+    if (!t.closest(".message-actions-menu") && !t.closest(".msg-action-trigger")) {
+      document.querySelectorAll(".message-actions-menu:not([hidden])").forEach(m => { m.hidden = true; });
+    }
   }, true);
 })();
 </script>
