@@ -2021,12 +2021,19 @@ html,body{background:#07070a!important;color:#fff}
     }
   };
 
+  window.__aslRoomBgStyle = (url, rawDim = 25) => {
+    const dim = Math.max(0, Math.min(80, Number(rawDim ?? 25)));
+    const effDim = (dim * 0.54 / 100).toFixed(3);
+    const brightVeil = `radial-gradient(ellipse at 50% 20%, rgba(255,244,218,.11) 0%, rgba(18,26,42,.08) 62%, rgba(0,0,0,.24) 100%), linear-gradient(rgba(0,0,0,${effDim}),rgba(0,0,0,${effDim}))`;
+    return url ? `${brightVeil},url("${url}")` : `radial-gradient(ellipse at 50% 22%, #2c3a52 0%, #172133 58%, #0d1320 100%)`;
+  };
+
   window.__aslApplyRoomFast = (roomId, d) => {
     if (!d) return;
     const bg = document.getElementById("room-bg-canvas");
     if (bg) {
       const dim = Math.max(0, Math.min(80, Number(d.bgDim ?? 25)));
-      bg.style.backgroundImage = d.bgUrl ? `linear-gradient(rgba(0,0,0,${dim/100}),rgba(0,0,0,${dim/100})),url("${d.bgUrl}")` : "";
+      bg.style.backgroundImage = window.__aslRoomBgStyle(d.bgUrl, dim);
       const dr = document.getElementById("room-bg-dim-range"), dv = document.getElementById("room-bg-dim-value");
       if (dr) dr.value = String(dim);
       if (dv) dv.textContent = dim + "%";
@@ -4096,12 +4103,14 @@ function showVoiceError(e) {
   alert("تعذر تشغيل الميكروفون.\n" + advice + "\nالتفاصيل: " + n + (msg ? " — " + msg : ""));
 }
 
+let rtcLastOfferAt = new Map();
+let rtcPeerCreatedAt = new Map();
+
 async function setupMicVoiceDetection(stream, slotIndex) {
   try {
-    if (audioContext) await audioContext.close().catch(() => {});
     const AC = window.AudioContext || window.webkitAudioContext;
     if (!AC) return;
-    audioContext = new AC();
+    if (!audioContext || audioContext.state === "closed") audioContext = new AC();
     if (audioContext.state === "suspended") await audioContext.resume().catch(() => {});
     const source = audioContext.createMediaStreamSource(stream);
     analyser = audioContext.createAnalyser();
@@ -4122,7 +4131,7 @@ async function setupMicVoiceDetection(stream, slotIndex) {
         const slot = $("mic-slot-" + slotIndex);
         if (slot) slot.classList.toggle("speaking", speaking);
       }
-    }, 140);
+    }, 180);
   } catch (e) { console.warn("AudioContext error:", e); }
 }
 
@@ -4131,8 +4140,6 @@ function stopVoiceDetection() {
   voiceCheckInterval = null;
   analyser = null;
   prevMicSpeaking = false;
-  if (audioContext) audioContext.close().catch(() => {});
-  audioContext = null;
   document.querySelectorAll(".mic-slot").forEach(s => s.classList.remove("speaking"));
 }
 
@@ -4151,12 +4158,20 @@ function closePeerConnection(remoteUid) {
   remoteUid = String(remoteUid);
   const pc = rtcPeerConnections.get(remoteUid);
   if (pc) {
-    try { pc.onicecandidate = null; pc.ontrack = null; pc.onconnectionstatechange = null; pc.oniceconnectionstatechange = null; pc.close(); } catch (e) {}
+    try {
+      pc.onicecandidate = null;
+      pc.ontrack = null;
+      pc.onconnectionstatechange = null;
+      pc.oniceconnectionstatechange = null;
+      pc.close();
+    } catch (e) {}
     rtcPeerConnections.delete(remoteUid);
   }
   makingOffer.delete(remoteUid);
   pendingIceCandidates.delete(remoteUid);
   rtcSentTrackIds.delete(remoteUid);
+  rtcLastOfferAt.delete(remoteUid);
+  rtcPeerCreatedAt.delete(remoteUid);
   peerSessionIds.delete(remoteUid);
   const aud = $(`remote-audio-${remoteUid}`);
   if (aud) {
@@ -4172,6 +4187,8 @@ function closeAllRtcConnections() {
   pendingIceCandidates.clear();
   makingOffer.clear();
   rtcSentTrackIds.clear();
+  rtcLastOfferAt.clear();
+  rtcPeerCreatedAt.clear();
   peerSessionIds.clear();
   speakerOfferRequested.clear();
   clearTimeout(listenerRecoveryTimer);
@@ -4190,14 +4207,82 @@ function updateAudioUnlockBanner() {
   banner.style.display = blocked ? "block" : "none";
 }
 
+function getKnownPeerSessionId(remoteUid) {
+  remoteUid = String(remoteUid);
+  return peerSessionIds.get(remoteUid)
+    || activeMicPeers.get(remoteUid)?.rtcSessionId
+    || presenceCache.get(remoteUid)?.rtcSessionId
+    || "";
+}
+
+function sdpHasSendingAudio(sdpStr) {
+  if (!sdpStr || typeof sdpStr !== "string") return false;
+  return !/a=recvonly/i.test(sdpStr) && !/a=inactive/i.test(sdpStr);
+}
+
+function ensureRemoteAudioAttached(remoteUid, pc, eventStreams = null, allowAttach = false) {
+  remoteUid = String(remoteUid);
+  if (!pc) return;
+  const box = $("webrtc-remote-audios");
+  if (!box) return;
+
+  const streamTrack = eventStreams?.[0]?.getAudioTracks?.()?.[0];
+  const receiverTrack = pc.getReceivers?.()
+    ?.map(r => r.track)
+    ?.find(t => t && t.kind === "audio" && t.readyState !== "ended");
+  const track = streamTrack || receiverTrack;
+  if (!track) return;
+
+  if (!allowAttach && !activeMicPeers.has(remoteUid) && !sdpHasSendingAudio(pc.remoteDescription?.sdp)) {
+    return;
+  }
+
+  let aud = $(`remote-audio-${remoteUid}`);
+  if (!aud) {
+    aud = document.createElement("audio");
+    aud.id = `remote-audio-${remoteUid}`;
+    aud.autoplay = true;
+    aud.setAttribute("autoplay", "");
+    aud.playsInline = true;
+    aud.setAttribute("playsinline", "");
+    aud.setAttribute("webkit-playsinline", "");
+    aud.controls = false;
+    aud.volume = 1;
+    box.appendChild(aud);
+  }
+
+  const currentTracks = aud.srcObject?.getAudioTracks?.() || [];
+  if (!currentTracks.some(t => t.id === track.id)) {
+    aud.srcObject = (eventStreams && eventStreams[0]) ? eventStreams[0] : new MediaStream([track]);
+  }
+  aud.muted = localMicsMuted;
+  aud.volume = 1;
+
+  track.onunmute = () => {
+    if (!localMicsMuted && aud.paused) {
+      aud.play().then(updateAudioUnlockBanner).catch(updateAudioUnlockBanner);
+    }
+  };
+  if (aud.paused && !localMicsMuted) {
+    const p = aud.play();
+    if (p && typeof p.then === "function") {
+      p.then(updateAudioUnlockBanner).catch(() => updateAudioUnlockBanner());
+    }
+  } else {
+    updateAudioUnlockBanner();
+  }
+}
+
 async function sendRtcSignal(remoteUid, payload, targetSessionId = "") {
   if (!currentUser?.uid || !remoteUid || String(remoteUid) === String(currentUser.uid)) return;
+  remoteUid = String(remoteUid);
+  const resolvedTargetSid = targetSessionId || getKnownPeerSessionId(remoteUid) || "";
   await addDoc(rtcSignalsRef(), {
     ...payload,
     senderUid: String(currentUser.uid),
     senderSessionId: MY_RTC_SESSION_ID,
-    targetUid: String(remoteUid),
-    targetSessionId: targetSessionId || peerSessionIds.get(String(remoteUid)) || "",
+    targetUid: remoteUid,
+    targetSessionId: resolvedTargetSid,
     roomId: String(currentRoomId),
     createdAt: serverTimestamp()
   });
@@ -4229,6 +4314,7 @@ function createPeerConnection(remoteUid, remoteSessionId = "") {
   if (remoteSessionId) peerSessionIds.set(remoteUid, remoteSessionId);
   const pc = new RTCPeerConnection(getRtcConfiguration());
   rtcPeerConnections.set(remoteUid, pc);
+  rtcPeerCreatedAt.set(remoteUid, Date.now());
 
   if (localAudioStream) {
     const tracks = localAudioStream.getAudioTracks();
@@ -4239,45 +4325,18 @@ function createPeerConnection(remoteUid, remoteSessionId = "") {
 
   pc.onicecandidate = e => {
     if (e.candidate) {
-      sendRtcSignal(remoteUid, { type: "candidate", candidate: e.candidate.toJSON() }, peerSessionIds.get(remoteUid) || "")
+      sendRtcSignal(remoteUid, { type: "candidate", candidate: e.candidate.toJSON() }, getKnownPeerSessionId(remoteUid))
         .catch(err => console.warn("ICE send failed", err));
     }
   };
 
-  pc.ontrack = async e => {
-    let aud = $(`remote-audio-${remoteUid}`);
-    if (!aud) {
-      aud = document.createElement("audio");
-      aud.id = `remote-audio-${remoteUid}`;
-      aud.autoplay = true;
-      aud.setAttribute("autoplay", "");
-      aud.playsInline = true;
-      aud.setAttribute("playsinline", "");
-      aud.setAttribute("webkit-playsinline", "");
-      aud.controls = false;
-      aud.volume = 1;
-      $("webrtc-remote-audios").appendChild(aud);
-    }
-    aud.srcObject = e.streams?.[0] || new MediaStream([e.track]);
-    aud.muted = localMicsMuted;
-    if (e.track) {
-      e.track.onunmute = () => {
-        if (!localMicsMuted && aud.paused) {
-          aud.play().then(updateAudioUnlockBanner).catch(updateAudioUnlockBanner);
-        }
-      };
-    }
-    try {
-      await aud.play();
-      updateAudioUnlockBanner();
-    } catch (err) {
-      console.warn("Remote audio autoplay blocked", err);
-      updateAudioUnlockBanner();
-    }
+  pc.ontrack = e => {
+    ensureRemoteAudioAttached(remoteUid, pc, e.streams, true);
   };
 
   pc.onconnectionstatechange = () => {
     if (pc.connectionState === "connected") {
+      ensureRemoteAudioAttached(remoteUid, pc, null, activeMicPeers.has(remoteUid));
       updateAudioUnlockBanner();
     } else if (pc.connectionState === "failed") {
       try { pc.restartIce(); } catch (e) {}
@@ -4285,7 +4344,7 @@ function createPeerConnection(remoteUid, remoteSessionId = "") {
         const cur = rtcPeerConnections.get(remoteUid);
         if (cur === pc && (pc.connectionState === "failed" || pc.connectionState === "disconnected")) {
           if (localAudioStream) {
-            const sid = peerSessionIds.get(remoteUid) || "";
+            const sid = getKnownPeerSessionId(remoteUid);
             closePeerConnection(remoteUid);
             makeRtcOffer(remoteUid, sid, true);
           } else if (activeMicPeers.has(remoteUid)) {
@@ -4294,13 +4353,15 @@ function createPeerConnection(remoteUid, remoteSessionId = "") {
             requestOfferFromSpeaker(remoteUid, sp?.rtcSessionId || "", true);
           }
         }
-      }, 2800);
+      }, 3200);
     }
   };
 
   pc.oniceconnectionstatechange = () => {
     if (pc.iceConnectionState === "failed") {
       try { pc.restartIce(); } catch (e) {}
+    } else if (pc.iceConnectionState === "connected" || pc.iceConnectionState === "completed") {
+      ensureRemoteAudioAttached(remoteUid, pc, null, activeMicPeers.has(remoteUid));
     }
   };
   return pc;
@@ -4314,14 +4375,28 @@ function makeRtcOffer(remoteUid, remoteSessionId = "", forceRenegotiate = false)
     const track = localAudioStream.getAudioTracks()[0];
     if (!track) return;
 
-    const pc = createPeerConnection(remoteUid, remoteSessionId);
-    const hasOfferSent = Boolean(pc.localDescription) && rtcSentTrackIds.get(remoteUid) === track.id && pc.getSenders().some(s => s.track?.id === track.id);
+    const targetSid = remoteSessionId || getKnownPeerSessionId(remoteUid);
+    const pc = createPeerConnection(remoteUid, targetSid);
+    const hasOfferSent = Boolean(pc.localDescription)
+      && rtcSentTrackIds.get(remoteUid) === track.id
+      && pc.getSenders().some(s => s.track?.id === track.id);
     if (hasOfferSent && !forceRenegotiate) {
       return;
     }
-    const existingSender = pc.getSenders().find(s => s.track && s.track.kind === "audio");
-    if (existingSender) {
-      if (existingSender.track?.id !== track.id) await existingSender.replaceTrack(track);
+
+    const audioTransceiver = pc.getTransceivers?.().find(
+      t => t.receiver?.track?.kind === "audio" || t.sender?.track?.kind === "audio" || t.mid !== null
+    );
+    if (audioTransceiver) {
+      if (audioTransceiver.direction !== "sendrecv") {
+        audioTransceiver.direction = "sendrecv";
+      }
+      if (audioTransceiver.sender?.track?.id !== track.id) {
+        await audioTransceiver.sender.replaceTrack(track);
+      }
+      if (audioTransceiver.sender && typeof audioTransceiver.sender.setStreams === "function") {
+        try { audioTransceiver.sender.setStreams(localAudioStream); } catch {}
+      }
     } else {
       pc.addTrack(track, localAudioStream);
     }
@@ -4333,8 +4408,9 @@ function makeRtcOffer(remoteUid, remoteSessionId = "", forceRenegotiate = false)
       if (pc.signalingState !== "stable") return;
       const tunedSdp = { type: offer.type, sdp: tuneVoiceSdp(offer.sdp) };
       await pc.setLocalDescription(tunedSdp);
-      await sendRtcSignal(remoteUid, { type: "offer", sdp: tunedSdp }, remoteSessionId || peerSessionIds.get(remoteUid) || "");
+      await sendRtcSignal(remoteUid, { type: "offer", sdp: tunedSdp }, targetSid);
       rtcSentTrackIds.set(remoteUid, track.id);
+      rtcLastOfferAt.set(remoteUid, Date.now());
     } catch (e) {
       rtcSentTrackIds.delete(remoteUid);
       console.warn("Create offer error:", e);
@@ -4349,9 +4425,21 @@ function requestOfferFromSpeaker(speakerUid, speakerSessionId = "", force = fals
   if (!currentUser?.uid || speakerUid === String(currentUser.uid)) return;
   const key = `${speakerUid}::${speakerSessionId}`;
   const lastReq = speakerOfferRequested.get(key) || 0;
-  if (!force && Date.now() - lastReq < 4000) return;
+  if (!force && Date.now() - lastReq < 4500) return;
   speakerOfferRequested.set(key, Date.now());
   sendRtcSignal(speakerUid, { type: "need-offer" }, speakerSessionId).catch(() => {});
+}
+
+function isPeerActivelyNegotiating(uid, pc) {
+  if (!pc) return false;
+  const age = Date.now() - (rtcPeerCreatedAt.get(uid) || 0);
+  const conn = pc.connectionState;
+  const ice = pc.iceConnectionState;
+  if (conn === "connected" || ice === "connected" || ice === "completed") return true;
+  if (age < 5500 && conn !== "failed" && conn !== "closed") return true;
+  if (pc.signalingState !== "stable" && age < 6000) return true;
+  if ((conn === "connecting" || ice === "checking") && age < 8000) return true;
+  return false;
 }
 
 function scheduleListenerRecovery() {
@@ -4362,14 +4450,21 @@ function scheduleListenerRecovery() {
       if (uid === String(currentUser?.uid)) return;
       const pc = rtcPeerConnections.get(uid);
       const aud = $(`remote-audio-${uid}`);
-      const sessionMismatch = sp.rtcSessionId && peerSessionIds.get(uid) && peerSessionIds.get(uid) !== sp.rtcSessionId;
+      const sessionMismatch = Boolean(sp.rtcSessionId && peerSessionIds.get(uid) && peerSessionIds.get(uid) !== sp.rtcSessionId);
+      if (pc && !sessionMismatch && pc.connectionState === "connected" && !aud?.srcObject) {
+        ensureRemoteAudioAttached(uid, pc, null, true);
+        return;
+      }
+      if (pc && !sessionMismatch && isPeerActivelyNegotiating(uid, pc)) {
+        return;
+      }
       const broken = !pc || sessionMismatch || pc.connectionState === "failed" || pc.connectionState === "closed" || (!aud?.srcObject && pc.connectionState !== "connected");
       if (broken) {
         closePeerConnection(uid);
         requestOfferFromSpeaker(uid, sp.rtcSessionId || "", false);
       }
     });
-  }, 250);
+  }, 3500);
 
   if (!listenerWatchdogInterval) {
     listenerWatchdogInterval = setInterval(() => {
@@ -4382,18 +4477,39 @@ function scheduleListenerRecovery() {
         if (uid === String(currentUser?.uid)) return;
         const pc = rtcPeerConnections.get(uid);
         const aud = $(`remote-audio-${uid}`);
-        if (!pc || pc.connectionState === "failed" || pc.connectionState === "closed" || (!aud?.srcObject && pc.connectionState !== "connected" && pc.connectionState !== "connecting")) {
+        const sessionMismatch = Boolean(sp.rtcSessionId && peerSessionIds.get(uid) && peerSessionIds.get(uid) !== sp.rtcSessionId);
+        if (pc && !sessionMismatch && pc.connectionState === "connected" && !aud?.srcObject) {
+          ensureRemoteAudioAttached(uid, pc, null, true);
+          return;
+        }
+        if (pc && !sessionMismatch && isPeerActivelyNegotiating(uid, pc)) {
+          return;
+        }
+        if (!pc || sessionMismatch || pc.connectionState === "failed" || pc.connectionState === "closed" || !aud?.srcObject) {
           closePeerConnection(uid);
           requestOfferFromSpeaker(uid, sp.rtcSessionId || "", false);
         }
       });
-    }, 7000);
+    }, 7500);
   }
+}
+
+function getPresenceMs(p) {
+  if (!p?.lastSeen) return 0;
+  if (typeof p.lastSeen.toMillis === "function") return p.lastSeen.toMillis();
+  if (typeof p.lastSeen.seconds === "number") return p.lastSeen.seconds * 1000;
+  return 0;
 }
 
 function syncSpeakerConnections() {
   if (!localAudioStream || !currentUser?.uid) return;
   const targets = new Map();
+  let maxSeenMs = 0;
+  presenceCache.forEach(p => {
+    const ms = getPresenceMs(p);
+    if (ms > maxSeenMs) maxSeenMs = ms;
+  });
+
   activeMicPeers.forEach((sp, uid) => {
     if (uid && uid !== String(currentUser.uid)) targets.set(uid, sp.rtcSessionId || "");
   });
@@ -4403,9 +4519,10 @@ function syncSpeakerConnections() {
     if (!uid || uid === String(currentUser.uid)) return;
     const sameRoom = (p.roomId || "main") === (currentRoomId || "main") || !p.roomId;
     if (!sameRoom) return;
-    const lastMs = p.lastSeen?.toMillis ? p.lastSeen.toMillis() : 0;
-    const recentlyActive = lastMs && (Date.now() - lastMs < 180000);
-    if (p.isOnline !== false || recentlyActive) {
+    const ms = getPresenceMs(p);
+    const liveRelative = maxSeenMs > 0 && ms > 0 ? (maxSeenMs - ms < 210000) : true;
+    const liveLocal = ms > 0 && (Date.now() - ms < 210000);
+    if (activeMicPeers.has(uid) || (p.isOnline !== false && (liveRelative || liveLocal))) {
       targets.set(uid, p.rtcSessionId || targets.get(uid) || "");
     }
   });
@@ -4416,10 +4533,13 @@ function syncSpeakerConnections() {
 
 function listenWebRTCAudioMesh() {
   if (!currentUser?.uid) return;
-  if (window._unsubRtcSignals && window._aslRtcUid === String(currentUser.uid)) return;
+  const activeUid = String(currentUser.uid);
+  const activeRoomInit = String(currentRoomId);
+  if (window._unsubRtcSignals && window._aslRtcUid === activeUid && window._aslRtcRoomId === activeRoomInit) return;
   if (window._unsubRtcSignals) { window._unsubRtcSignals(); window._unsubRtcSignals = null; }
-  window._aslRtcUid = String(currentUser.uid);
-  const q = query(rtcSignalsRef(), where("targetUid", "==", String(currentUser.uid)));
+  window._aslRtcUid = activeUid;
+  window._aslRtcRoomId = activeRoomInit;
+  const q = query(rtcSignalsRef(), where("targetUid", "==", activeUid));
   window._unsubRtcSignals = onSnapshot(q, snap => {
     const activeRoom = String(currentRoomId);
     snap.docChanges().forEach(ch => {
@@ -4431,41 +4551,52 @@ function listenWebRTCAudioMesh() {
         return;
       }
       if (data.targetSessionId && data.targetSessionId !== MY_RTC_SESSION_ID) {
-        if (data.type === "offer" && data.senderUid && activeMicPeers.has(String(data.senderUid))) {
-          requestOfferFromSpeaker(String(data.senderUid), String(data.senderSessionId || ""), true);
-        }
         deleteDoc(signalRef).catch(() => {});
         return;
       }
       const remoteUid = String(data.senderUid);
-      if (remoteUid === String(currentUser.uid)) {
+      if (remoteUid === activeUid) {
+        deleteDoc(signalRef).catch(() => {});
+        return;
+      }
+      const knownMicSid = activeMicPeers.get(remoteUid)?.rtcSessionId;
+      if (!data.targetSessionId && knownMicSid && data.senderSessionId && data.senderSessionId !== knownMicSid) {
         deleteDoc(signalRef).catch(() => {});
         return;
       }
 
       enqueueRtcTask(remoteUid, async () => {
         try {
-          const remoteSid = String(data.senderSessionId || "");
+          const remoteSid = String(data.senderSessionId || getKnownPeerSessionId(remoteUid) || "");
           if (data.type === "need-offer") {
             if (!localAudioStream) return;
+            const curPc = rtcPeerConnections.get(remoteUid);
+            const sameSid = !remoteSid || !peerSessionIds.get(remoteUid) || peerSessionIds.get(remoteUid) === remoteSid;
+            const lastOfferAge = Date.now() - (rtcLastOfferAt.get(remoteUid) || 0);
+            if (curPc && sameSid && curPc.connectionState !== "failed" && curPc.connectionState !== "closed" && lastOfferAge < 3500) {
+              return;
+            }
             closePeerConnection(remoteUid);
             const pc = createPeerConnection(remoteUid, remoteSid);
             makingOffer.set(remoteUid, true);
             const offer = await pc.createOffer({ offerToReceiveAudio: true });
             const tunedSdp = { type: offer.type, sdp: tuneVoiceSdp(offer.sdp) };
             await pc.setLocalDescription(tunedSdp);
-            await sendRtcSignal(remoteUid, { type: "offer", sdp: tunedSdp, forceReset: true }, remoteSid);
+            await sendRtcSignal(remoteUid, { type: "offer", sdp: tunedSdp }, remoteSid);
             const sentTrack = localAudioStream.getAudioTracks()[0];
             if (sentTrack) rtcSentTrackIds.set(remoteUid, sentTrack.id);
+            rtcLastOfferAt.set(remoteUid, Date.now());
             makingOffer.set(remoteUid, false);
           } else if (data.type === "offer" && data.sdp) {
             const isListenerOnly = !localAudioStream;
             let pc = rtcPeerConnections.get(remoteUid);
-            if (data.forceReset || (isListenerOnly && pc && pc.signalingState !== "stable")) {
+            const prevSid = peerSessionIds.get(remoteUid);
+            const sidChanged = Boolean(remoteSid && prevSid && remoteSid !== prevSid);
+            if (sidChanged || (isListenerOnly && pc && pc.signalingState !== "stable")) {
               closePeerConnection(remoteUid);
             }
             pc = createPeerConnection(remoteUid, remoteSid);
-            const polite = isListenerOnly || Boolean(data.forceReset) || (String(currentUser.uid).localeCompare(remoteUid) > 0);
+            const polite = isListenerOnly || (activeUid.localeCompare(remoteUid) > 0);
             const collision = Boolean(makingOffer.get(remoteUid)) || pc.signalingState !== "stable";
             if (collision && !polite) {
               return;
@@ -4477,6 +4608,9 @@ function listenWebRTCAudioMesh() {
             const activePc = createPeerConnection(remoteUid, remoteSid);
             await activePc.setRemoteDescription(new RTCSessionDescription(data.sdp));
             await flushPendingIce(remoteUid, activePc);
+            if (activeMicPeers.has(remoteUid) || sdpHasSendingAudio(data.sdp?.sdp)) {
+              ensureRemoteAudioAttached(remoteUid, activePc, null, true);
+            }
             const answer = await activePc.createAnswer();
             const tunedAns = { type: answer.type, sdp: tuneVoiceSdp(answer.sdp) };
             await activePc.setLocalDescription(tunedAns);
@@ -4486,6 +4620,9 @@ function listenWebRTCAudioMesh() {
             if (pc && pc.signalingState === "have-local-offer") {
               await pc.setRemoteDescription(new RTCSessionDescription(data.sdp));
               await flushPendingIce(remoteUid, pc);
+              if (activeMicPeers.has(remoteUid) || sdpHasSendingAudio(data.sdp?.sdp)) {
+                ensureRemoteAudioAttached(remoteUid, pc, null, true);
+              }
             }
           } else if (data.type === "candidate" && data.candidate) {
             const pc = rtcPeerConnections.get(remoteUid);
@@ -4555,9 +4692,11 @@ function listenMics() {
     activeMicSlotsBySlot = nextBySlot;
 
     for (const [uid] of rtcPeerConnections.entries()) {
-      const isOnlineInRoom = Array.from(presenceCache.values()).some(p => String(p.uid) === uid && p.isOnline !== false);
-      if (!nextSpeakers.has(uid) && !(localAudioStream && isOnlineInRoom)) {
+      if (!nextSpeakers.has(uid) && !localAudioStream) {
         closePeerConnection(uid);
+      } else if (!nextSpeakers.has(uid)) {
+        const aud = $(`remote-audio-${uid}`);
+        if (aud) { try { aud.pause(); aud.srcObject = null; } catch {} aud.remove(); }
       }
     }
     activeMicPeers = nextSpeakers;
@@ -4579,6 +4718,7 @@ function listenMics() {
 }
 
 window.micClick = i => {
+  window.retryRemoteAudio?.();
   const slotIdx = Number(i);
   const m = activeMicSlotsBySlot.get(slotIdx);
   if (!m || !m.uid) {
@@ -4613,15 +4753,22 @@ window.confirmMicRequest = async () => {
       throw Object.assign(new Error("الميكروفون يحتاج رابط HTTPS ومتصفحاً يدعم getUserMedia"), { name: "SecureContextRequired" });
     }
     window.retryRemoteAudio();
-    localAudioStream = await navigator.mediaDevices.getUserMedia({
-      audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
-      video: false
-    });
+    try {
+      localAudioStream = await navigator.mediaDevices.getUserMedia({
+        audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
+        video: false
+      });
+    } catch (err1) {
+      if (err1?.name === "OverconstrainedError") {
+        localAudioStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+      } else {
+        throw err1;
+      }
+    }
     localAudioStream.getAudioTracks().forEach(t => {
       t.enabled = true;
       t.onended = () => toast("انقطع مسار الميكروفون؛ تحقق من إذن الميكروفون بالجهاز.");
     });
-    setupMicVoiceDetection(localAudioStream, slot);
 
     const micPayload = {
       uid: String(currentUser.uid), name: currentUser.name,
@@ -4632,6 +4779,9 @@ window.confirmMicRequest = async () => {
     activeMicSlotsBySlot.set(slot, micPayload);
     paintMicSlotUI(slot, micPayload);
     toast("🎙️ تم تشغيل المايك وبث صوتك لجميع المتواجدين في الغرفة!");
+
+    syncSpeakerConnections();
+    setupMicVoiceDetection(localAudioStream, slot);
 
     setDoc(micDoc(slot), micPayload).then(() => {
       window._micJoinPending = false;
@@ -4710,7 +4860,7 @@ window.toggleMicsVisibility = () => {
   $("mics-frame").classList.toggle("hidden-mics");
 };
 
-window.retryRemoteAudio = async () => {
+window.retryRemoteAudio = () => {
   if (audioContext && audioContext.state === "suspended") {
     audioContext.resume().catch(() => {});
   }
@@ -4718,21 +4868,26 @@ window.retryRemoteAudio = async () => {
   if (!box) return;
   for (const aud of box.querySelectorAll("audio")) {
     aud.muted = localMicsMuted;
+    aud.volume = 1;
     if (aud.srcObject && aud.paused) {
-      try { await aud.play(); } catch (e) {}
+      const p = aud.play();
+      if (p && typeof p.then === "function") {
+        p.then(updateAudioUnlockBanner).catch(updateAudioUnlockBanner);
+      }
     }
   }
   updateAudioUnlockBanner();
 };
 
 let _lastAudioRetryTs = 0;
-["pointerdown", "click"].forEach(ev => {
+["touchstart", "pointerdown", "click"].forEach(ev => {
   document.addEventListener(ev, () => {
     if (!currentUser) return;
-    const now = Date.now();
-    if (now - _lastAudioRetryTs < 1500) return;
     const box = $("webrtc-remote-audios");
     if (!box || !box.childElementCount) return;
+    const hasPaused = Array.from(box.querySelectorAll("audio")).some(a => a.srcObject && a.paused);
+    const now = Date.now();
+    if (!hasPaused && now - _lastAudioRetryTs < 2500) return;
     _lastAudioRetryTs = now;
     window.retryRemoteAudio();
   }, { passive: true });
@@ -6945,7 +7100,7 @@ function listenRoomSettings() {
     const bg = $("room-bg-canvas");
     if (bg) {
       const dim = Math.max(0, Math.min(80, Number(d.bgDim ?? 25)));
-      bg.style.backgroundImage = d.bgUrl ? `linear-gradient(rgba(0,0,0,${dim/100}),rgba(0,0,0,${dim/100})),url("${d.bgUrl}")` : "";
+      bg.style.backgroundImage = window.__aslRoomBgStyle ? window.__aslRoomBgStyle(d.bgUrl, dim) : (d.bgUrl ? `linear-gradient(rgba(0,0,0,${(dim*0.54)/100}),rgba(0,0,0,${(dim*0.54)/100})),url("${d.bgUrl}")` : "");
       if ($("room-bg-dim-range")) { $("room-bg-dim-range").value = String(dim); $("room-bg-dim-value").textContent = dim + "%"; }
     }
     const count = Number(d.micsCount ?? 6);
@@ -7019,7 +7174,7 @@ window.previewRoomBackgroundDim = value => {
   const current = bg.style.backgroundImage;
   const match = current.match(/url\(["']?(.*?)["']?\)$/);
   const url = match ? match[1] : "";
-  if (url) bg.style.backgroundImage = `linear-gradient(rgba(0,0,0,${dim/100}),rgba(0,0,0,${dim/100})),url("${url}")`;
+  if (url) bg.style.backgroundImage = window.__aslRoomBgStyle ? window.__aslRoomBgStyle(url, dim) : `linear-gradient(rgba(0,0,0,${(dim*0.54)/100}),rgba(0,0,0,${(dim*0.54)/100})),url("${url}")`;
 };
 
 window.chooseRoomBackground = e => {
@@ -7029,7 +7184,7 @@ window.chooseRoomBackground = e => {
   reader.onload = () => {
     const dim = Math.max(0, Math.min(80, Number($("room-bg-dim-range")?.value ?? 25)));
     const bg = $("room-bg-canvas");
-    if (bg) bg.style.backgroundImage = `linear-gradient(rgba(0,0,0,${dim/100}),rgba(0,0,0,${dim/100})),url("${reader.result}")`;
+    if (bg) bg.style.backgroundImage = window.__aslRoomBgStyle ? window.__aslRoomBgStyle(reader.result, dim) : `linear-gradient(rgba(0,0,0,${(dim*0.54)/100}),rgba(0,0,0,${(dim*0.54)/100})),url("${reader.result}")`;
   };
   reader.readAsDataURL(pendingRoomBackgroundFile);
   toast("تم اختيار الخلفية؛ جرّب درجة التعتيم ثم اضغط حفظ وتطبيق");
@@ -8535,7 +8690,7 @@ button,.mic-slot,.mic-slot-wrapper,.bottom-tab,.top-btn,.bar-btn,.nav-btn,.top-i
   color:#fef3c7;font-size:.73rem;font-weight:700;vertical-align:middle;line-height:1.38;
   animation:emoPhraseFloat 2.6s ease-in-out infinite;
 }
-@keyframes emoPhraseFloat{0%,100%{transform:translateY(0) scale(1);filter:brightness(1)}50%{transform:translateY(-1.5px) scale(1.025);filter:brightness(1.12)}}
+@keyframes emoPhraseFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-1.5px)}}
 
 /* ===== التحديثات الجديدة: نار التنينين كل 5 ثوانٍ، قصر قائمة حسابي، شفافية الأغنية بين المايك 2-6، شفافية يوتيوب، واسم 25 حرفاً بعرض التنينين ===== */
 /* 1. شريط الأغنية شفاف ومحاذي من مقابل المايك 2 إلى مقابل المايك 6 */
@@ -8604,6 +8759,7 @@ button,.mic-slot,.mic-slot-wrapper,.bottom-tab,.top-btn,.bar-btn,.nav-btn,.top-i
   width:auto!important;min-width:calc(var(--bh) * 3.18)!important;max-width:min(86vw,340px)!important;
   padding:0 calc(var(--bh) * (var(--cr, .8) * .76))!important;
   background-size:auto 100%,auto 100%,calc(100% - var(--bh) * var(--cr, .8) * 1.56 + 6px) 100%!important;
+  animation:none!important;
 }
 .name-frame[class*="anim-bg-banner-"] > *{
   font-size:clamp(.60rem,2.55vw,.75rem)!important;
@@ -8631,9 +8787,10 @@ button,.mic-slot,.mic-slot-wrapper,.bottom-tab,.top-btn,.bar-btn,.nav-btn,.top-i
   left:calc(var(--bh) * (var(--cr, .8) * .42))!important;
   right:calc(var(--bh) * (var(--cr, .8) * .42))!important;
   border-radius:8px!important;pointer-events:none!important;z-index:4!important;
-  mix-blend-mode:screen!important;
+  mix-blend-mode:screen!important;transform-origin:center center!important;will-change:transform,opacity!important;
   background-repeat:no-repeat,no-repeat,no-repeat!important;
   background-position:left center,right center,center center!important;
+  background-size:78% 100%,78% 100%,86% 92%!important;
   background-image:
     radial-gradient(ellipse 68% 68% at 0% 50%,rgba(255,253,215,.98) 0%,rgba(253,224,71,.94) 22%,rgba(249,115,22,.88) 50%,rgba(239,68,68,.72) 74%,transparent 96%),
     radial-gradient(ellipse 68% 68% at 100% 50%,rgba(255,253,215,.98) 0%,rgba(253,224,71,.94) 22%,rgba(249,115,22,.88) 50%,rgba(239,68,68,.72) 74%,transparent 96%),
@@ -8644,16 +8801,37 @@ button,.mic-slot,.mic-slot-wrapper,.bottom-tab,.top-btn,.bar-btn,.nav-btn,.top-i
   animation:dragonFireTextPulse5s 5s ease-out infinite!important;
 }
 @keyframes dragonDualFire5s{
-  0%,66%{opacity:0;background-size:6% 32%,6% 32%,0% 0%}
-  72%{opacity:.98;background-size:64% 92%,64% 92%,46% 66%}
-  79%{opacity:1;background-size:88% 108%,88% 108%,94% 98%}
-  87%{opacity:.72;background-size:74% 90%,74% 90%,72% 74%}
-  94%,100%{opacity:0;background-size:14% 38%,14% 38%,0% 0%}
+  0%,66%{opacity:0;transform:scaleX(.25)}
+  72%{opacity:.95;transform:scaleX(.85)}
+  79%{opacity:1;transform:scaleX(1.06)}
+  87%{opacity:.7;transform:scaleX(.92)}
+  94%,100%{opacity:0;transform:scaleX(.3)}
 }
 @keyframes dragonFireTextPulse5s{
-  0%,66%,95%,100%{filter:brightness(1)}
-  76%,82%{filter:brightness(1.24) drop-shadow(0 0 6px rgba(251,146,60,.95)) drop-shadow(0 0 11px rgba(253,224,71,.75))}
+  0%,66%,95%,100%{color:#fff}
+  76%,82%{color:#fff6c4;text-shadow:0 1px 2px #000,0 0 8px #fb923c,0 0 12px #fde047}
 }
+
+/* 6. إضاءة متوسطة وأوضح للعام مع حماية فائقة لوضوح الرسائل + سلاسة تمرير 60fps */
+#room-bg-canvas{background-color:#1c283d!important;filter:none!important;transform:none!important;will-change:auto!important}
+.chat-area{contain:layout style!important}
+#main-input-bar,.asatir-side-panel{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+.name-frame[class*="anim-bg-banner-"]::after{animation:none!important;opacity:.22!important}
+.msg-item{
+  contain:layout style!important;
+  background:rgba(5,9,17,.26)!important;
+  border-radius:10px!important;
+  border-bottom:1px solid color-mix(in srgb,var(--chat-accent) 18%,transparent)!important;
+}
+.msg-item .msg-text-plain,
+.msg-item .msg-content .user-header .inline-message-text{
+  text-shadow:0 1px 2px rgba(0,0,0,.98),0 0 5px rgba(0,0,0,.86)!important;
+}
+.msg-item .msg-content .user-header .msg-time{
+  color:#cbd5e1!important;
+  text-shadow:0 1px 2px rgba(0,0,0,.95)!important;
+}
+.mic-user-name{text-shadow:0 1px 2px #000,0 0 4px rgba(0,0,0,.9)!important}
 </style>
 
 <script id="asl-fast-panel-switch-fixes">
