@@ -1193,7 +1193,7 @@ html,body{background:#07070a!important;color:#fff}
   </div>
 </div>
 
-<!-- شاشة تسجيل الدخول لشات أصل العرب (حد أقصى 18 حرف) -->
+<!-- شاشة تسجيل الدخول لشات أصل العرب (حد أقصى 25 حرف) -->
 <div id="login-modal">
   <div class="login-box">
     <div class="login-header-banner">
@@ -1208,7 +1208,7 @@ html,body{background:#07070a!important;color:#fff}
       <button id="tab-member" class="tab-btn" onclick="switchTab('member')">دخول الأعضاء</button>
     </div>
     <div class="login-body">
-      <div class="input-group"><label>اسم المستخدم / الزائر (18 حرف كحد أقصى)</label><input id="username" maxlength="20" placeholder="اكتب الاسم هنا"></div>
+      <div class="input-group"><label>اسم المستخدم / الزائر (25 حرف كحد أقصى)</label><input id="username" maxlength="25" placeholder="اكتب الاسم هنا"></div>
       <div id="visitor-fields">
         <div class="input-group"><label>العمر</label><input id="visitor-age" type="number" min="13" max="100" value="22"></div>
         <div class="input-group"><label>الجنس</label><select id="visitor-gender" class="edit-select"><option value="ذكر">ذكر</option><option value="أنثى">أنثى</option></select></div>
@@ -1239,7 +1239,7 @@ html,body{background:#07070a!important;color:#fff}
     <span class="close-modal" onclick="closeModal('register-modal')">&times;</span>
     <div class="modal-title">تسجيل حساب VIP جديد 🔑</div>
     <div class="login-body">
-      <div class="input-group"><label>الاسم (18 حرف كحد أقصى)</label><input id="reg-name" maxlength="20"></div>
+      <div class="input-group"><label>الاسم (25 حرف كحد أقصى)</label><input id="reg-name" maxlength="25"></div>
       <div class="input-group"><label>البريد الإلكتروني</label><input id="reg-email" type="email"></div>
       <div class="input-group"><label>كلمة المرور</label><input id="reg-pass" type="password"></div>
       <div class="input-group"><label>العمر</label><input id="reg-age" type="number" min="13" max="100" value="22"></div>
@@ -1490,10 +1490,10 @@ html,body{background:#07070a!important;color:#fff}
       <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed #334a6d"><span>النبذة</span><strong id="prof-info"></strong></div>
     </div>
 
-    <!-- تعديل بيانات الحساب والخطوط (الحد الأقصى 18 حرف) -->
+    <!-- تعديل بيانات الحساب والخطوط (الحد الأقصى 25 حرف) -->
     <div id="self-edit-box" class="login-body hidden">
       <h4 id="profile-edit-title" style="color:#ffd54a;margin-bottom:8px">تعديل بيانات الحساب والخطوط</h4>
-      <div class="input-group"><label>الاسم (18 حرف كحد أقصى)</label><input id="edit-name-input" maxlength="20"></div>
+      <div class="input-group"><label>الاسم (25 حرف كحد أقصى)</label><input id="edit-name-input" maxlength="25"></div>
       
       <div class="input-group"><label>✨ 1. نوع خط الاسم (جميع الخطوط العربية)</label>
         <select id="edit-name-font-select" class="edit-select">
@@ -2385,6 +2385,17 @@ function isAnyOwner(u = currentUser) {
   return isPrimaryOwner(u) || Number(u.rankId) === 1 || u.isOwner === true;
 }
 
+function eliteDragonBannerClass(u, nameAnim, fallbackRankId) {
+  const anim = String(nameAnim || "");
+  if (!/anim-bg-banner-(?:10|[1-9])(?:\s|$)/.test(anim)) return "";
+  if (u?.isContestBot) return "";
+  const rId = Number(u?.rankId || fallbackRankId || 20);
+  if (isPrimaryOwner(u) || isAnyOwner(u) || rId === 1 || rId === 2 || rId === 3) {
+    return "dragon-fire-elite";
+  }
+  return "";
+}
+
 function normalizeRankForUser(u) {
   const x = { ...(u || {}) };
   if (isPrimaryOwner(x)) {
@@ -2845,7 +2856,7 @@ async function login() {
     saveUser(currentUser).catch(() => {});
   } else {
     if (!name) return alert("اكتب اسم الزائر أولاً");
-    if (name.length > 18) return alert("أقصى طول مسموح للاسم هو 18 حرفاً");
+    if (name.length > 25) return alert("أقصى طول مسموح للاسم هو 25 حرفاً");
     const existing = await getUserByName(name);
     if (existing && !existing.isVisitor) {
       return alert("⚠️ هذا الاسم محجوز لعضو مسجل. ادخل من تبويب (دخول الأعضاء) أو اختر اسماً آخر.");
@@ -2887,7 +2898,7 @@ window.registerMember = async () => {
   const country = $("reg-country")?.value.trim() || "اليمن";
 
   if (!name || !email || !pass) return alert("أكمل جميع الحقول");
-  if (name.length > 18) return alert("أقصى طول مسموح للاسم هو 18 حرفاً");
+  if (name.length > 25) return alert("أقصى طول مسموح للاسم هو 25 حرفاً");
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i.test(email)) return alert("⚠️ اكتب بريداً إلكترونياً صحيحاً");
 
   const passHash = await hashPassword(pass);
@@ -3525,7 +3536,7 @@ function renderOnline(arr) {
           <div class="name-line">
             ${Number(u.rankId) === 2 ? renderPrinceCheetahHtml(true) : ""}
             <i class="${r.icon} online-rank-icon ${u.isPrimaryOwner ? 'owner-rank-icon' : ''}" style="color:${r.color}"></i>
-            <span class="name-frame ${frame} ${nameStaticBg} ${nameAnim}"><span class="${nameColor} ${nameFont} ${u.isPrimaryOwner ? 'owner-rank-text' : ''}" style="font-weight:bold">${safe(u.name)}</span></span>
+            <span class="name-frame ${frame} ${nameStaticBg} ${nameAnim} ${eliteDragonBannerClass(u, nameAnim, u.rankId)}"><span class="${nameColor} ${nameFont} ${u.isPrimaryOwner ? 'owner-rank-text' : ''}" style="font-weight:bold">${safe(u.name)}</span></span>
           </div>
           <div class="online-sub-row">
             <small style="color:${r.color};font-weight:bold;font-size:.66rem">${safe(r.title)}</small>
@@ -3562,7 +3573,7 @@ window.openDiamondDisplayList = () => {
           <div class="name-line">
             ${Number(u.rankId) === 2 ? renderPrinceCheetahHtml(true) : ""}
             <i class="${r.icon} online-rank-icon ${isOwner ? 'owner-rank-icon' : ''}" style="color:${r.color}"></i>
-            <span class="name-frame ${u.nameFrame || 'frame-none'} ${u.nameStaticBg || ''} ${u.nameBackground || ''}"><span class="${u.nameColor || 'color-text-white'} ${u.nameFont || 'font-cairo'} ${isOwner ? 'owner-rank-text' : ''}" style="font-weight:bold">${safe(u.name)}</span></span>
+            <span class="name-frame ${u.nameFrame || 'frame-none'} ${u.nameStaticBg || ''} ${u.nameBackground || ''} ${eliteDragonBannerClass(u, u.nameBackground, u.rankId)}"><span class="${u.nameColor || 'color-text-white'} ${u.nameFont || 'font-cairo'} ${isOwner ? 'owner-rank-text' : ''}" style="font-weight:bold">${safe(u.name)}</span></span>
           </div>
           <div class="online-sub-row">
             <small style="color:${r.color};font-weight:bold;font-size:.68rem">${safe(r.title)}</small>
@@ -3612,7 +3623,7 @@ function openProfile(u) {
   const defaultBg = getDefaultGenderBg(selectedUser.gender, !!selectedUser.isVisitor);
 
   $("prof-name").innerHTML = `<span class="${safe(selectedUser.nameColor || 'color-text-white')} ${safe(selectedUser.nameFont || 'font-cairo')}">${safe(selectedUser.name)}</span>`;
-  $("prof-name").className = `name-frame ${selectedUser.nameFrame || 'frame-none'} ${selectedUser.nameStaticBg || ''} ${selectedUser.nameBackground || ''} ${selectedUser.nameColor || 'color-text-white'} ${selectedUser.nameFont || 'font-cairo'}`;
+  $("prof-name").className = `name-frame ${selectedUser.nameFrame || 'frame-none'} ${selectedUser.nameStaticBg || ''} ${selectedUser.nameBackground || ''} ${eliteDragonBannerClass(selectedUser, selectedUser.nameBackground, selectedUser.rankId)} ${selectedUser.nameColor || 'color-text-white'} ${selectedUser.nameFont || 'font-cairo'}`;
   $("prof-rank-display").innerHTML = `${Number(selectedUser.rankId) === 2 ? renderPrinceCheetahHtml(true) : ""}<i class="${r.icon} ${selectedUser.isPrimaryOwner ? 'owner-rank-icon' : ''}" style="color:${r.color}"></i> <span class="${selectedUser.isPrimaryOwner ? 'owner-rank-text' : ''}">${safe(r.title)}</span>`;
   $("prof-img").src = selectedUser.isVisitor ? defaultBg : (selectedUser.avatar || avatarFor(selectedUser.name));
   const avWrap = $("prof-avatar-wrap");
@@ -3777,7 +3788,7 @@ window.saveProfileChanges = async () => {
 
   const oldName = String(target.name);
   const nameInput = $("edit-name-input").value.trim() || oldName;
-  if (nameInput.length > 18) return alert("أقصى طول مسموح للاسم هو 18 حرفاً");
+  if (nameInput.length > 25) return alert("أقصى طول مسموح للاسم هو 25 حرفاً");
 
   const newEmail = $("edit-email-input").value.trim().toLowerCase() || String(target.email || "").toLowerCase();
   const newPass = $("edit-password-input").value.trim();
@@ -4771,6 +4782,8 @@ function listenMusicSync() {
     activeMusicData = d;
     scheduleMusicExpiry(d);
     panel.classList.add("show");
+    window.alignMusicPanelToMics?.();
+    setTimeout(() => window.alignMusicPanelToMics?.(), 60);
     $("chat-area")?.classList.add("music-panel-visible");
     $("chat-area")?.classList.toggle("music-panel-collapsed", panel.classList.contains("is-collapsed"));
     info.textContent = `🎵 ${d.playingBy || "عضو"} يشغّل أغنية`;
@@ -5030,6 +5043,7 @@ window.toggleMusicLocal = () => {
   const collapsed = panel.classList.toggle("is-collapsed");
   area?.classList.toggle("music-panel-collapsed", collapsed);
   if (btn) { btn.textContent = collapsed ? "⌃" : "⌄"; btn.title = collapsed ? "إظهار الأغنية" : "إخفاء الأغنية"; }
+  window.alignMusicPanelToMics?.();
 };
 
 /* ==================== رسائل الشات العام السريعة (تحديث تفاضلي مانع للتعليق) ==================== */
@@ -5114,7 +5128,7 @@ function renderMessageHtml(dId, m) {
         <div class="quote-user-title">
           ${(rep.profileBackground || users.get(rep.sender)?.profileBackground) ? `<img class="quote-profile-bg-icon" loading="lazy" decoding="async" src="${safe(rep.profileBackground || users.get(rep.sender)?.profileBackground)}" alt="الخلفية الشخصية">` : ""}
           <i class="${rank(Number(rep.rankId || 20)).icon} rank-badge-icon" style="color:${rank(Number(rep.rankId || 20)).color}"></i>
-          <span class="name-frame ${rep.nameFrame || 'frame-none'} ${rep.nameStaticBg || ''} ${rep.nameBackground || ''}">
+          <span class="name-frame ${rep.nameFrame || 'frame-none'} ${rep.nameStaticBg || ''} ${rep.nameBackground || ''} ${eliteDragonBannerClass(users.get(rep.sender) || { rankId: rep.rankId }, rep.nameBackground, rep.rankId)}">
             <span class="${rep.nameColor || 'color-text-white'} ${rep.nameFont || 'font-cairo'}">${safe(rep.sender)}</span>
           </span>
         </div>
@@ -5159,7 +5173,7 @@ function renderMessageHtml(dId, m) {
         <div class="user-header-main">
           <span class="message-identity">
             <i class="${r.icon} rank-badge-icon ${Number(u.rankId) === 1 ? 'owner-rank-icon' : Number(u.rankId) === 2 ? 'prince-rank-icon' : Number(u.rankId) === 3 ? 'king-rank-icon' : ''}" style="color:${r.color}"></i>
-            <span class="name-frame ${nameFrame} ${nameStaticBg} ${nameAnim}"><span class="${nameColor} ${nameFont} ${Number(u.rankId) === 1 ? 'owner-rank-text' : ''}" style="cursor:pointer" onclick="mentionUser('${safe(u.name)}')">${safe(u.name)}</span></span>
+            <span class="name-frame ${nameFrame} ${nameStaticBg} ${nameAnim} ${eliteDragonBannerClass(u, nameAnim, u.rankId)}"><span class="${nameColor} ${nameFont} ${Number(u.rankId) === 1 ? 'owner-rank-text' : ''}" style="cursor:pointer" onclick="mentionUser('${safe(u.name)}')">${safe(u.name)}</span></span>
           </span>
           <span class="msg-text-plain inline-message-text ${chatFont} ${chatColor}">${typeof window.formatRichChatText === "function" ? window.formatRichChatText(m.text || "") : safe(m.text || "")}</span>
         </div>
@@ -8522,6 +8536,124 @@ button,.mic-slot,.mic-slot-wrapper,.bottom-tab,.top-btn,.bar-btn,.nav-btn,.top-i
   animation:emoPhraseFloat 2.6s ease-in-out infinite;
 }
 @keyframes emoPhraseFloat{0%,100%{transform:translateY(0) scale(1);filter:brightness(1)}50%{transform:translateY(-1.5px) scale(1.025);filter:brightness(1.12)}}
+
+/* ===== التحديثات الجديدة: نار التنينين كل 5 ثوانٍ، قصر قائمة حسابي، شفافية الأغنية بين المايك 2-6، شفافية يوتيوب، واسم 25 حرفاً بعرض التنينين ===== */
+/* 1. شريط الأغنية شفاف ومحاذي من مقابل المايك 2 إلى مقابل المايك 6 */
+.music-sync-panel{
+  top:109px!important;
+  left:calc(50% - 104px)!important;right:auto!important;
+  width:174px!important;max-width:56vw!important;
+  background:rgba(6,10,18,.22)!important;
+  backdrop-filter:blur(4px)!important;-webkit-backdrop-filter:blur(4px)!important;
+  border:1px solid color-mix(in srgb,var(--chat-accent-light) 55%,transparent)!important;
+  box-shadow:0 2px 10px rgba(0,0,0,.2)!important;
+}
+.music-sync-panel .music-info{
+  color:#fff8d6!important;font-size:.58rem!important;
+  text-shadow:0 1px 2px #000,0 0 4px rgba(0,0,0,.95)!important;
+}
+.music-sync-panel .music-local-toggle{
+  background:rgba(10,16,28,.45)!important;border-color:rgba(247,212,119,.62)!important;
+}
+.music-sync-panel #music-unmute-btn{
+  background:rgba(16,185,129,.72)!important;border:1px solid rgba(110,231,183,.75)!important;
+}
+.music-sync-panel.is-collapsed{
+  left:auto!important;right:6px!important;width:32px!important;
+  background:rgba(6,10,18,.38)!important;
+}
+
+/* 2. قائمة زر حسابي قصيرة تقف تماماً عند زر خروج ولا تمتد للشريط السفلي */
+#icon-menu-modal .modal-card{
+  top:59px!important;bottom:auto!important;
+  height:auto!important;max-height:calc(100dvh - 122px)!important;
+  right:8px!important;left:auto!important;
+  width:min(62vw,245px)!important;min-width:195px!important;
+}
+#icon-menu-modal .menu-list{flex:none!important;overflow-y:auto!important;padding:4px 6px!important}
+#icon-menu-modal .menu-item:last-child{border-bottom:0!important}
+
+/* 3. نافذة بحث اليوتيوب شفافة */
+#youtube-search-modal{background:rgba(0,0,0,.22)!important}
+#youtube-search-modal .modal-card{
+  background:rgba(8,14,26,.34)!important;
+  backdrop-filter:blur(5px)!important;-webkit-backdrop-filter:blur(5px)!important;
+  border:1.5px solid color-mix(in srgb,var(--chat-accent-light) 65%,transparent)!important;
+  box-shadow:0 8px 26px rgba(0,0,0,.42)!important;
+}
+#youtube-search-modal .modal-title{
+  background:rgba(8,14,26,.38)!important;
+  border-bottom:1px solid color-mix(in srgb,var(--chat-accent) 42%,transparent)!important;
+}
+#youtube-search-modal #yt-search-input{
+  background:rgba(8,14,26,.42)!important;color:#fff!important;
+  border-color:color-mix(in srgb,var(--chat-accent) 60%,transparent)!important;
+}
+#youtube-search-modal .yt-result-item{
+  background:rgba(8,14,26,.42)!important;
+  border-color:color-mix(in srgb,var(--chat-accent) 45%,transparent)!important;
+}
+
+/* 4. عرض الاسم حتى 25 حرفاً بطول الفراغ الكامل بين التنينين */
+.name-frame{max-width:min(84vw,335px)!important}
+.msg-item .msg-content .user-header .message-identity{max-width:100%!important;flex:0 1 auto!important}
+.msg-item .msg-content .user-header .message-identity > .name-frame{max-width:min(82vw,330px)!important}
+@media(max-width:480px){.name-frame{max-width:min(84vw,325px)!important}}
+.name-frame[class*="anim-bg-banner-"],
+.msg-item .msg-content .user-header .message-identity > .name-frame[class*="anim-bg-banner-"]{
+  width:auto!important;min-width:calc(var(--bh) * 3.18)!important;max-width:min(86vw,340px)!important;
+  padding:0 calc(var(--bh) * (var(--cr, .8) * .76))!important;
+  background-size:auto 100%,auto 100%,calc(100% - var(--bh) * var(--cr, .8) * 1.56 + 6px) 100%!important;
+}
+.name-frame[class*="anim-bg-banner-"] > *{
+  font-size:clamp(.60rem,2.55vw,.75rem)!important;
+  max-width:100%!important;width:100%!important;text-align:center!important;
+  overflow:hidden!important;text-overflow:clip!important;white-space:nowrap!important;
+}
+.online-item .name-frame[class*="anim-bg-banner-"]{
+  padding:0 calc(var(--bh) * (var(--cr, .8) * .72))!important;
+}
+.online-item .name-frame[class*="anim-bg-banner-"] > *{
+  font-size:clamp(.53rem,2.15vw,.68rem)!important;
+}
+#prof-name[class*="anim-bg-banner-"]{
+  width:fit-content!important;max-width:96%!important;
+  padding:0 calc(var(--bh) * (var(--cr, .8) * .76))!important;
+}
+#prof-name[class*="anim-bg-banner-"] > *{
+  font-size:clamp(.64rem,2.75vw,.84rem)!important;
+}
+
+/* 5. التنينان يخرجان ناراً كل 5 ثوانٍ على الاسم فقط لصاحب الشات والبرنس والكنج */
+.name-frame.dragon-fire-elite[class*="anim-bg-banner-"]::before{
+  content:""!important;position:absolute!important;
+  top:2px!important;bottom:2px!important;
+  left:calc(var(--bh) * (var(--cr, .8) * .42))!important;
+  right:calc(var(--bh) * (var(--cr, .8) * .42))!important;
+  border-radius:8px!important;pointer-events:none!important;z-index:4!important;
+  mix-blend-mode:screen!important;
+  background-repeat:no-repeat,no-repeat,no-repeat!important;
+  background-position:left center,right center,center center!important;
+  background-image:
+    radial-gradient(ellipse 68% 68% at 0% 50%,rgba(255,253,215,.98) 0%,rgba(253,224,71,.94) 22%,rgba(249,115,22,.88) 50%,rgba(239,68,68,.72) 74%,transparent 96%),
+    radial-gradient(ellipse 68% 68% at 100% 50%,rgba(255,253,215,.98) 0%,rgba(253,224,71,.94) 22%,rgba(249,115,22,.88) 50%,rgba(239,68,68,.72) 74%,transparent 96%),
+    radial-gradient(ellipse 74% 78% at 50% 50%,rgba(255,247,190,.92) 0%,rgba(249,115,22,.65) 48%,transparent 85%)!important;
+  animation:dragonDualFire5s 5s ease-out infinite!important;
+}
+.name-frame.dragon-fire-elite[class*="anim-bg-banner-"] > *{
+  animation:dragonFireTextPulse5s 5s ease-out infinite!important;
+}
+@keyframes dragonDualFire5s{
+  0%,66%{opacity:0;background-size:6% 32%,6% 32%,0% 0%}
+  72%{opacity:.98;background-size:64% 92%,64% 92%,46% 66%}
+  79%{opacity:1;background-size:88% 108%,88% 108%,94% 98%}
+  87%{opacity:.72;background-size:74% 90%,74% 90%,72% 74%}
+  94%,100%{opacity:0;background-size:14% 38%,14% 38%,0% 0%}
+}
+@keyframes dragonFireTextPulse5s{
+  0%,66%,95%,100%{filter:brightness(1)}
+  76%,82%{filter:brightness(1.24) drop-shadow(0 0 6px rgba(251,146,60,.95)) drop-shadow(0 0 11px rgba(253,224,71,.75))}
+}
 </style>
 
 <script id="asl-fast-panel-switch-fixes">
@@ -8763,6 +8895,36 @@ button,.mic-slot,.mic-slot-wrapper,.bottom-tab,.top-btn,.bar-btn,.nav-btn,.top-i
       document.querySelectorAll(".message-actions-menu:not([hidden])").forEach(m => { m.hidden = true; });
     }
   }, true);
+  window.alignMusicPanelToMics = () => {
+    const panel = document.getElementById("music-sync-panel");
+    if (!panel) return;
+    if (panel.classList.contains("is-collapsed")) {
+      panel.style.left = "";
+      panel.style.right = "";
+      panel.style.width = "";
+      return;
+    }
+    const micsFrame = document.getElementById("mics-frame");
+    const m2 = document.getElementById("mic-slot-1")?.closest(".mic-slot-wrapper");
+    const m6 = document.getElementById("mic-slot-5")?.closest(".mic-slot-wrapper");
+    if (micsFrame && !micsFrame.classList.contains("hidden-mics") && m2 && m6) {
+      const r2 = m2.getBoundingClientRect();
+      const r6 = m6.getBoundingClientRect();
+      if (r2.width > 0 && r6.width > 0) {
+        const leftEdge = Math.min(r2.left, r6.left);
+        const rightEdge = Math.max(r2.right, r6.right);
+        const span = Math.max(150, Math.round(rightEdge - leftEdge));
+        panel.style.setProperty("left", Math.round(leftEdge) + "px", "important");
+        panel.style.setProperty("right", "auto", "important");
+        panel.style.setProperty("width", span + "px", "important");
+        return;
+      }
+    }
+    panel.style.left = "";
+    panel.style.right = "";
+    panel.style.width = "";
+  };
+  window.addEventListener("resize", () => window.alignMusicPanelToMics(), { passive: true });
 })();
 </script>
 
